@@ -20,7 +20,18 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join, posix } from "node:path";
 import { parseArgs } from "node:util";
 import pkg from "../package.json" with { type: "json" };
-import { colorNames, dark, density, fonts, light, motion, radius, shadow, typeScale, zIndex } from "../tokens/tokens";
+import {
+  colorNames,
+  dark,
+  density,
+  fonts,
+  light,
+  motion,
+  radius,
+  shadow,
+  typeScale,
+  zIndex,
+} from "../tokens/tokens";
 
 const root = join(import.meta.dir, "..");
 const src = join(root, "src");
@@ -39,7 +50,11 @@ export interface RegistryItem {
   dependencies?: string[];
   registryDependencies?: string[];
   files?: RegistryFile[];
-  cssVars?: { theme?: Record<string, string>; light?: Record<string, string>; dark?: Record<string, string> };
+  cssVars?: {
+    theme?: Record<string, string>;
+    light?: Record<string, string>;
+    dark?: Record<string, string>;
+  };
   css?: CssTree;
   categories?: string[];
 }
@@ -137,7 +152,11 @@ interface Rewritten {
 }
 
 /** Rewrites relative imports to shadcn aliases; collects local and npm dependencies. */
-export function rewriteImports(file: SourceFile, content: string, bySrc: Map<string, SourceFile>): Rewritten {
+export function rewriteImports(
+  file: SourceFile,
+  content: string,
+  bySrc: Map<string, SourceFile>,
+): Rewritten {
   const local = new Set<string>();
   const packages = new Set<string>();
   const next = content.replace(IMPORT_RE, (whole, lead: string, quote: string, spec: string) => {
@@ -147,7 +166,11 @@ export function rewriteImports(file: SourceFile, content: string, bySrc: Map<str
       return whole;
     }
     const resolved = posix.normalize(posix.join(posix.dirname(file.srcPath), spec));
-    const target = bySrc.get(`${resolved}.tsx`) ?? bySrc.get(`${resolved}.ts`) ?? bySrc.get(resolved) ?? undefined;
+    const target =
+      bySrc.get(`${resolved}.tsx`) ??
+      bySrc.get(`${resolved}.ts`) ??
+      bySrc.get(resolved) ??
+      undefined;
     if (!target) throw new Error(`${file.srcPath}: cannot map import "${spec}" to a registry file`);
     if (target.item !== file.item) local.add(target.item);
     return `${lead}${quote}${target.alias}${quote}`;
@@ -155,11 +178,26 @@ export function rewriteImports(file: SourceFile, content: string, bySrc: Map<str
   return { content: next, local: [...local].sort(), packages: [...packages].sort() };
 }
 
-/** The first JSDoc sentence above an export, used as the item description. */
-function describe(content: string, fallback: string): string {
-  const doc = /\/\*\*\s*\n?\s*\*?\s*([^\n]+?)(?:\n|\*\/)[\s\S]*?\*\/\s*\nexport (?:function|const|class)/.exec(content);
-  const text = doc?.[1]?.replace(/\s*\*\/$/, "").trim();
-  return text && text.length > 8 ? text : fallback;
+/**
+ * The first sentence of the JSDoc above the file's main export, the one named after the item
+ * (`dropdown-menu` is DropdownMenu). Falls back when that export has no doc comment.
+ */
+function describe(content: string, item: string, fallback: string): string {
+  const name = item
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join("");
+  const at = content.search(new RegExp(`\\nexport (?:function|const) ${name}\\b`));
+  if (at < 0) return fallback;
+  const before = content.slice(0, at).trimEnd();
+  if (!before.endsWith("*/")) return fallback;
+  const doc = before
+    .slice(before.lastIndexOf("/**") + 3, -2)
+    .replace(/^\s*\*\s?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sentence = /^.+?[.!?](?=\s|$)/.exec(doc)?.[0] ?? doc;
+  return sentence.length > 8 ? sentence : fallback;
 }
 
 const rem = (n: number): string => `${Number((n / 16).toFixed(4))}rem`;
@@ -169,13 +207,17 @@ export function themeItem(): RegistryItem {
   const colors = (t: Record<string, string>): Record<string, string> =>
     Object.fromEntries(colorNames.map((n) => [`sb-${n}`, t[n] ?? ""]));
   const shadows = (mode: "dark" | "light"): Record<string, string> =>
-    Object.fromEntries(Object.entries(shadow[mode]).map(([k, v]) => [`sb-shadow-${k}`, v.replace(/\s+/g, " ")]));
+    Object.fromEntries(
+      Object.entries(shadow[mode]).map(([k, v]) => [`sb-shadow-${k}`, v.replace(/\s+/g, " ")]),
+    );
   const prefixed = (vars: Record<string, string>): Record<string, string> =>
     Object.fromEntries(Object.entries(vars).map(([k, v]) => [`--${k}`, v]));
   const themeVars = {
     "font-sans": fonts.sans,
     "font-mono": fonts.mono,
-    ...Object.fromEntries(Object.entries(radius).map(([k, v]) => [`radius-${k}`, k === "full" ? "9999px" : rem(v.px)])),
+    ...Object.fromEntries(
+      Object.entries(radius).map(([k, v]) => [`radius-${k}`, k === "full" ? "9999px" : rem(v.px)]),
+    ),
     ...Object.fromEntries(Object.entries(motion.easing).map(([k, v]) => [`ease-${k}`, v])),
     ...Object.fromEntries(
       Object.entries(typeScale).flatMap(([name, s]) => [
@@ -186,11 +228,15 @@ export function themeItem(): RegistryItem {
       ]),
     ),
     ...Object.fromEntries(colorNames.map((n) => [`color-${n}`, `var(--sb-${n})`])),
-    ...Object.fromEntries(Object.keys(shadow.dark).map((k) => [`shadow-${k}`, `var(--sb-shadow-${k})`])),
+    ...Object.fromEntries(
+      Object.keys(shadow.dark).map((k) => [`shadow-${k}`, `var(--sb-shadow-${k})`]),
+    ),
   };
   const rootVars = {
     "--sb-move": "1",
-    ...Object.fromEntries(Object.entries(motion.duration).map(([k, v]) => [`--sb-duration-${k}`, `${v}ms`])),
+    ...Object.fromEntries(
+      Object.entries(motion.duration).map(([k, v]) => [`--sb-duration-${k}`, `${v}ms`]),
+    ),
     ...Object.fromEntries(
       Object.entries(motion.scale).map(([k, v]) => [
         `--sb-scale-${k}`,
@@ -262,17 +308,27 @@ export function buildRegistry(url: string): BuiltRegistry {
     const { content, local, packages } = rewriteImports(file, raw, bySrc);
     const dependencies = packages.map((p) => {
       const version = versions.get(p);
-      if (!version) throw new Error(`${file.srcPath} imports "${p}", which is not in package.json dependencies`);
+      if (!version)
+        throw new Error(
+          `${file.srcPath} imports "${p}", which is not in package.json dependencies`,
+        );
       return `${p}@${version}`;
     });
     // Client components for frameworks with server components; shadcn strips it elsewhere.
-    const body = file.type === "registry:ui" && file.srcPath.endsWith(".tsx") ? `"use client";\n\n${content}` : content;
+    const body =
+      file.type === "registry:ui" && file.srcPath.endsWith(".tsx")
+        ? `"use client";\n\n${content}`
+        : content;
     files.set(file.outPath, body);
     const item: RegistryItem = {
       name: file.item,
       type: file.type,
       title: kebabToTitle(file.item),
-      description: describe(raw, `${kebabToTitle(file.item)} from ikada, the Sproutboat design system.`),
+      description: describe(
+        raw,
+        file.item,
+        `${kebabToTitle(file.item)} from ikada, the Sproutboat design system.`,
+      ),
       registryDependencies: [...(file.type === "registry:ui" ? ["theme"] : []), ...local].map(ref),
       files: [{ path: file.outPath, type: file.type }],
     };
@@ -301,7 +357,10 @@ export function buildRegistry(url: string): BuiltRegistry {
 
 if (import.meta.main) {
   const { values } = parseArgs({
-    options: { out: { type: "string" }, url: { type: "string", default: "https://sproutboat.com/ikada/r" } },
+    options: {
+      out: { type: "string" },
+      url: { type: "string", default: "https://sproutboat.com/ikada/r" },
+    },
   });
   if (!values.out) {
     console.error("usage: bun scripts/build-registry.ts --out <dir> [--url <base url of /r>]");
@@ -316,5 +375,7 @@ if (import.meta.main) {
     writeFileSync(join(out, path), content);
   }
   writeFileSync(join(out, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
-  console.log(`wrote ${registry.items.length} items to ${join(out, "registry.json")}, linking ${url}`);
+  console.log(
+    `wrote ${registry.items.length} items to ${join(out, "registry.json")}, linking ${url}`,
+  );
 }
