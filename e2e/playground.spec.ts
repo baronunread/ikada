@@ -14,7 +14,9 @@ for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/?view=${theme}`);
       await expect(page.getByRole("heading", { name: "Button", exact: true })).toBeVisible();
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
       expect(overflow).toBe(0);
       await page.screenshot({ path: info.outputPath(`page-${theme}-${width}.png`), fullPage: true });
     });
@@ -70,7 +72,9 @@ for (const width of widths) {
       await expect(password).toHaveAttribute("type", "text");
       await section.getByRole("button", { name: "Next page" }).first().click();
       await expect(section.getByRole("button", { name: "Page 7" }).first()).toHaveAttribute("aria-current", "page");
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
       expect(overflow).toBe(0);
       await section.screenshot({ path: info.outputPath(`app-pieces-${theme}-${width}.png`) });
     });
