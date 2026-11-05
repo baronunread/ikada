@@ -1,5 +1,5 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-// A DOM for component tests. Run through `bun run --cwd packages/ikada test`, which
-// is its own process, so these globals never reach the apps/services suites.
+// A DOM for component tests. Run through `bun run test`, which
+// is its own process, so these globals never leak outside the test run.
 if (!globalThis.document) GlobalRegistrator.register({ url: "http://localhost/" });

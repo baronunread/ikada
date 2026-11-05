@@ -1,9 +1,14 @@
 {
-  "extends": "../../apps/web/tsconfig.json",
   "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "bun"],
-    "paths": {}
+    "types": ["vite/client", "bun"]
   },
   "include": ["src", "tokens", "scripts", "test", "playground", "e2e"]
 }

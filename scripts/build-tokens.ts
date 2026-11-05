@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { applyDocRegions, renderThemeCss, renderTokensTs } from "../tokens/generate";
 
 const root = join(import.meta.dir, "..");
-const repo = join(root, "..", "..");
+const repo = root;
 const outputs = [
   { path: join(root, "src/theme.css"), next: () => renderThemeCss() },
   { path: join(root, "src/tokens.generated.ts"), next: () => renderTokensTs() },
@@ -48,6 +48,6 @@ for (const out of outputs) {
 }
 if (check) rmSync(scratch, { recursive: true, force: true });
 if (stale) {
-  console.error("Run `bun run --cwd packages/ikada tokens` and commit the result.");
+  console.error("Run `bun run tokens` and commit the result.");
   process.exit(1);
 }

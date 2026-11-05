@@ -1,6 +1,6 @@
 # @sproutboat/ikada
 
-The Sproutboat design system: design tokens and React components built on [Base UI](https://base-ui.com) and Tailwind CSS v4. It is what the Sproutboat dashboard is made of.
+筏 ikada (raft) is the Sproutboat design system: design tokens and React components built on [Base UI](https://base-ui.com) and Tailwind CSS v4. It is what the Sproutboat dashboards are made of.
 
 ```sh
 bun add @sproutboat/ikada
@@ -11,6 +11,8 @@ bun add @sproutboat/ikada
 /* your app.css */
 @import "tailwindcss";
 @import "@sproutboat/ikada/theme.css";
+/* Tailwind does not scan node_modules: point it at the package source */
+@source "../node_modules/@sproutboat/ikada/src";
 ```
 
 ```tsx
@@ -29,5 +31,29 @@ import { colors, typeScale } from "@sproutboat/ikada/tokens";
 The package ships TypeScript source, not a compiled build: use it from a bundler that compiles TypeScript in `node_modules` (Vite, Bun, or Next.js with `transpilePackages`).
 
 See [DESIGN.md](DESIGN.md) for the principles and [INVENTORY.md](INVENTORY.md) for every component and its status.
+
+## Develop
+
+```sh
+bun install
+bun run playground      # every component, at http://localhost:5180 (bound to 0.0.0.0)
+bun run check           # tokens:check, typecheck, tests
+bun run e2e             # screenshot and overflow checks of the playground (needs Chromium)
+bun run tokens          # regenerate theme.css, tokens.generated.ts and the DESIGN.md tables
+```
+
+Tokens live in `tokens/tokens.ts`; never edit the generated files.
+
+## Release
+
+Bump `version` in `package.json` on `main`, then tag and push:
+
+```sh
+git tag -a v0.2.0 -m v0.2.0 && git push origin v0.2.0
+```
+
+The `publish` workflow checks that the tag matches the version, runs the checks and publishes to npm with provenance over Trusted Publishing (OIDC, no token). The trusted-publisher settings are the `fledgling` block in `package.json`.
+
+The package began as `packages/ikada` in [baronunread/sproutboat](https://github.com/baronunread/sproutboat); its history was carried over.
 
 MIT licensed.

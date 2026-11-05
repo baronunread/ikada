@@ -1,6 +1,6 @@
 # Sproutboat design system
 
-`@sproutboat/ikada` is the open component package behind the Community dashboard and, later, the Cloud dashboard. This file is the contract: the principles, every token, and the rules for using them. Tokens live in `tokens/tokens.ts`; the tables below are generated from that file by `bun run --cwd packages/ikada tokens`, so they cannot drift from the code.
+`@sproutboat/ikada` is the open component package behind the Community dashboard and, later, the Cloud dashboard. This file is the contract: the principles, every token, and the rules for using them. Tokens live in `tokens/tokens.ts`; the tables below are generated from that file by `bun run tokens`, so they cannot drift from the code.
 
 **Name.** 筏 ikada means raft. The components are lashed together like the logs of a raft, and the sprout rides on it, in the spirit of Cloudflare's Kumo (雲, cloud). Pronounced ee-KAH-dah.
 
@@ -19,7 +19,7 @@
 
 ## Theming convention
 
-Compatible with `apps/web`: dark is the default, light opts in with `data-theme="light"` on `<html>`, and a boot script stamps the attribute before first paint. The attribute is always `light` or `dark`; "system" is resolved by the boot script against `prefers-color-scheme`. The `dark:` Tailwind variant means "not light", exactly as in `apps/web/src/app.css`. `theme.css` sets `color-scheme` per theme so native controls and scrollbars follow.
+Compatible with the Sproutboat dashboards: dark is the default, light opts in with `data-theme="light"` on `<html>`, and a boot script stamps the attribute before first paint. The attribute is always `light` or `dark`; "system" is resolved by the boot script against `prefers-color-scheme`. The `dark:` Tailwind variant means "not light", exactly as in the Community dashboard's `app.css`. `theme.css` sets `color-scheme` per theme so native controls and scrollbars follow.
 
 ```css
 @import "tailwindcss";
@@ -462,5 +462,5 @@ Use compact for log viewers, resource tables with many rows, and panels the user
 ## Adding or changing a token
 
 1. Edit `tokens/tokens.ts`. If it is a color used as text or UI, add or update its pair in `tokens/pairs.ts`.
-2. Run `bun run --cwd packages/ikada tokens`.
-3. Run `bun test packages/ikada/test`. The contrast and drift tests must pass.
+2. Run `bun run tokens`.
+3. Run `bun run test`. The contrast and drift tests must pass.
