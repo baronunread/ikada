@@ -79,7 +79,7 @@ export const dark = {
   raised: "oklch(0.34 0.02 255)",
   hairline: "oklch(0.3 0.018 255)",
   "hairline-strong": "oklch(0.4 0.02 255)",
-  "control-edge": "oklch(0.56 0.02 255)",
+  "control-edge": "oklch(0.62 0.02 255)",
   focus: "oklch(0.95 0.01 255)",
   fg: "oklch(0.95 0.01 255)",
   "fg-muted": "oklch(0.76 0.018 255)",
@@ -187,7 +187,13 @@ export const typeScale = {
   lg: { size: 18, line: 26, weight: 700, tracking: -0.01, use: "Dialog and panel titles" },
   xl: { size: 24, line: 32, weight: 700, tracking: -0.015, use: "Page titles on small screens" },
   "2xl": { size: 28, line: 36, weight: 700, tracking: -0.02, use: "Page titles" },
-  metric: { size: 36, line: 40, weight: 700, tracking: -0.025, use: "KPI numbers (tabular figures)" },
+  metric: {
+    size: 28,
+    line: 36,
+    weight: 700,
+    tracking: -0.02,
+    use: "Hero numbers in a metric tile (proportional figures)",
+  },
 } satisfies Record<string, TypeStep>;
 
 export const fonts = {
@@ -222,17 +228,29 @@ export const border = {
 } as const;
 
 /**
- * Layered shadows: a 1px ring, a contact shadow and an ambient shadow (light), or a
- * ring, a top highlight and a deep ambient shadow (dark), so overlays read as raised.
- * `field` is the control edge drawn as an inset ring instead of a border.
+ * Afloat surfaces: a hairline ring inside the shadow (never a border) plus a negative-spread
+ * cast, so a card floats just above the canvas. Hover lifts the cast (`*-hover`); a press
+ * presses in (`*-pressed`). `tray` is recessed water: segmented controls and tab lists sit
+ * in one, with a raised `pill` (the pebble) riding on top. Dark trades the cast for a top
+ * highlight and a deep black cast. `field` is the control edge drawn as an inset ring (3:1).
  */
 export const shadow = {
   dark: {
-    card: "0 0 0 1px oklch(1 0 0 / 0.05), inset 0 1px 0 oklch(1 0 0 / 0.04)",
-    button: "inset 0 0 0 1px oklch(1 0 0 / 0.08)",
-    primary: "inset 0 1px 0 oklch(1 0 0 / 0.25), 0 1px 2px oklch(0 0 0 / 0.4)",
+    card: "0 0 0 1px oklch(1 0 0 / 0.06), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.5)",
+    "card-hover":
+      "0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 18px 32px -14px oklch(0 0 0 / 0.6)",
+    button: "inset 0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.3)",
+    "button-hover":
+      "inset 0 0 0 1px oklch(1 0 0 / 0.12), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 3px 8px -2px oklch(0 0 0 / 0.45)",
+    "button-pressed": "inset 0 0 0 1px oklch(1 0 0 / 0.1), inset 0 2px 3px oklch(0 0 0 / 0.3)",
+    primary:
+      "inset 0 1px 0 oklch(1 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.4), 0 6px 14px -6px oklch(0.6 0.12 152 / 0.4)",
+    "primary-hover":
+      "inset 0 1px 0 oklch(1 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.4), 0 10px 20px -6px oklch(0.6 0.12 152 / 0.5)",
+    "primary-pressed": "inset 0 2px 3px oklch(0.2 0.06 152 / 0.45)",
     field: "inset 0 0 0 1px var(--sb-control-edge)",
     "field-hover": "inset 0 0 0 1px var(--sb-fg-muted)",
+    tray: "inset 0 1px 2px oklch(0 0 0 / 0.35), inset 0 0 0 1px oklch(1 0 0 / 0.04)",
     pill: "0 0 0 1px oklch(1 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 3px oklch(0 0 0 / 0.4)",
     float:
       "0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.35), 0 18px 44px -6px oklch(0 0 0 / 0.65)",
@@ -240,46 +258,83 @@ export const shadow = {
       "0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 4px 8px oklch(0 0 0 / 0.35), 0 28px 72px -8px oklch(0 0 0 / 0.75)",
   },
   light: {
-    card: "0 0 0 1px oklch(0.3 0 0 / 0.05), 0 1px 2px oklch(0.3 0 0 / 0.05)",
-    button: "inset 0 0 0 1px oklch(0.3 0 0 / 0.07)",
-    primary: "inset 0 1px 0 oklch(1 0 0 / 0.18), 0 1px 2px oklch(0.3 0.08 150 / 0.3)",
+    card: "0 0 0 1px oklch(0.22 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.05), 0 10px 24px -14px oklch(0.3 0 0 / 0.18)",
+    "card-hover":
+      "0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px oklch(0.3 0 0 / 0.06), 0 18px 32px -14px oklch(0.3 0 0 / 0.26)",
+    button: "inset 0 0 0 1px oklch(0.22 0 0 / 0.09), 0 1px 2px oklch(0.3 0 0 / 0.06)",
+    "button-hover": "inset 0 0 0 1px oklch(0.22 0 0 / 0.11), 0 3px 8px -2px oklch(0.3 0 0 / 0.14)",
+    "button-pressed": "inset 0 0 0 1px oklch(0.22 0 0 / 0.12), inset 0 2px 3px oklch(0.3 0 0 / 0.08)",
+    primary:
+      "inset 0 1px 0 oklch(1 0 0 / 0.22), 0 1px 2px oklch(0.3 0.08 152 / 0.3), 0 6px 14px -6px oklch(0.3 0.1 152 / 0.45)",
+    "primary-hover":
+      "inset 0 1px 0 oklch(1 0 0 / 0.26), 0 2px 4px oklch(0.3 0.08 152 / 0.3), 0 10px 20px -6px oklch(0.3 0.1 152 / 0.5)",
+    "primary-pressed": "inset 0 2px 3px oklch(0.2 0.06 152 / 0.3)",
     field: "inset 0 0 0 1px var(--sb-control-edge)",
     "field-hover": "inset 0 0 0 1px var(--sb-fg-muted)",
-    pill: "0 0 0 1px oklch(0.3 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.1)",
+    tray: "inset 0 1px 2px oklch(0.3 0 0 / 0.08), inset 0 0 0 1px oklch(0.22 0 0 / 0.04)",
+    pill: "0 0 0 1px oklch(0.22 0 0 / 0.07), 0 1px 2px oklch(0.3 0 0 / 0.1), 0 4px 8px -4px oklch(0.3 0 0 / 0.16)",
     float:
-      "0 0 0 1px oklch(0.3 0 0 / 0.08), 0 1px 2px -1px oklch(0.3 0 0 / 0.12), 0 4px 8px -2px oklch(0.3 0 0 / 0.08), 0 16px 32px -8px oklch(0.3 0 0 / 0.18)",
+      "0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.1), 0 12px 28px -8px oklch(0.3 0 0 / 0.22), 0 24px 48px -16px oklch(0.3 0 0 / 0.22)",
     dialog:
-      "0 0 0 1px oklch(0.3 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.12), 0 8px 16px -4px oklch(0.3 0 0 / 0.1), 0 32px 64px -12px oklch(0.3 0 0 / 0.28)",
+      "0 0 0 1px oklch(0.22 0 0 / 0.08), 0 4px 8px -2px oklch(0.3 0 0 / 0.12), 0 24px 48px -12px oklch(0.3 0 0 / 0.28), 0 48px 96px -24px oklch(0.3 0 0 / 0.3)",
   },
 } as const;
 
+export interface SpringToken {
+  /** Perceived duration in seconds (Apple's `duration`): how long until it looks settled. */
+  seconds: number;
+  /** 0 is critically damped (no overshoot); 0.25 overshoots once, visibly. */
+  bounce: number;
+  use: string;
+}
+
 /**
- * Motion rules (Krehel, Kowalski): ease-out for everything entering or pressed, in-out
- * only for an indicator that moves across the screen. Enter is slower than exit.
- * Durations are never zeroed for reduced motion: movement is, via `move` (see theme.css).
+ * Motion: Afloat. The raft takes your weight. A press settles 1px down and 3% smaller in 90ms
+ * (ease-out); the release returns on `bob`, which overshoots once. Nothing else bounces:
+ * hover is colour plus a lifted cast shadow, popups and toasts arrive on `snappy` (a hint of
+ * overshoot) and leave in 110ms, dialogs arrive on `smooth`. Springs are `duration + bounce`
+ * (Apple HIG) sampled to a CSS `linear()` at build time, so they run on the compositor and an
+ * interrupted spring needs no JavaScript.
+ *
+ * Reduced motion substitutes, never removes: `--sb-move` drops to 0 (no scale, no slide), every
+ * spring collapses to a 160ms ease-out with no overshoot, and fades and colour changes stay.
  */
 export const motion = {
   duration: {
     hover: 120,
-    press: 160,
+    press: 90,
     "tooltip-in": 150,
     "tooltip-out": 100,
-    "popup-in": 180,
-    "popup-out": 120,
+    "popup-in": 140,
+    "popup-out": 110,
     "dialog-in": 220,
     "dialog-out": 150,
     slide: 250,
     "toast-in": 300,
-    "toast-out": 200,
+    "toast-out": 110,
+    wake: 520,
   },
   easing: {
     out: "cubic-bezier(0.23, 1, 0.32, 1)",
     "in-out": "cubic-bezier(0.77, 0, 0.175, 1)",
-    /** Hover colour only. Everything that enters or is pressed uses `out`. */
+    /** Hover colour only. Everything that enters or is pressed uses `out` or a spring. */
     hover: "ease",
   },
+  spring: {
+    smooth: { seconds: 0.35, bounce: 0, use: "Dialogs and drawers arriving; no overshoot" },
+    snappy: {
+      seconds: 0.35,
+      bounce: 0.15,
+      use: "Popups, toasts, the segmented and tab pebble, the switch thumb",
+    },
+    bob: { seconds: 0.45, bounce: 0.25, use: "Release of a press, a checkbox filling, a success glyph landing" },
+  } satisfies Record<string, SpringToken>,
+  /** What every spring becomes under reduced motion. */
+  reducedSpring: { duration: 160, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
   /** Start scale of an entering layer, the pressed scale of a button, and of a swapping icon. Layers never start below 0.96. */
   scale: { popup: 0.96, dialog: 0.96, press: 0.97, icon: 0.25 },
+  /** Pixel offsets that also collapse under reduced motion: the press settle, the focus wake spread. */
+  offset: { press: 1, wake: 6 },
 } as const;
 
 /**

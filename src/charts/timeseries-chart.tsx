@@ -6,6 +6,7 @@ import { tooltip } from "@tanstack/charts/tooltip";
 import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatCompact, formatNumber } from "../lib/format";
+import { useLocale } from "../lib/locale";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
@@ -43,8 +44,15 @@ export interface TimeseriesChartProps {
   /** [min, max] of the value axis. Defaults to 0 up to the largest value, rounded up. */
   yDomain?: readonly [number, number];
   xDomain?: readonly [number, number];
-  /** Formats x ticks and the tooltip heading. */
+  /**
+   * Formats x ticks and the tooltip heading. Defaults to clock times ("14:30") for epoch
+   * milliseconds spanning up to two days, dates ("Nov 5") beyond that, and plain numbers otherwise.
+   */
   formatTime?: (time: number) => string;
+  /** Number and date locale; defaults to the `LocaleProvider` value, else `en`. */
+  locale?: string;
+  /** Shown in place of the plot when no series has a point. */
+  emptyText?: string;
   /** Formats y ticks and tooltip values. */
   formatValue?: (value: number) => string;
   /** Formats y axis ticks. Defaults to compact numbers (1.5K) with no unit, so labels stay narrow. */
@@ -65,13 +73,50 @@ const compact = (value: number): string => formatCompact(value, { maximumFractio
 
 const defaultValue = (value: number): string => formatNumber(value);
 
+/** Epoch milliseconds from 2001 on; smaller numbers are treated as plain values (hours, indexes). */
+const EPOCH_MS_FLOOR = 978_307_200_000;
+const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
+
+/** The default x formatter for a domain: clock time, date, or a plain number. */
+export function timeFormatter(domain: readonly [number, number], locale = "en"): (time: number) => string {
+  const [x0, x1] = domain;
+  if (!isEpoch(domain)) return (time) => formatNumber(time, { locale });
+  const format =
+    x1 - x0 <= TWO_DAYS
+      ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      : new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
+  return (time) => format.format(time);
+}
+
+const MINUTE = 60_000;
+const TIME_STEPS = [1, 5, 15, 30, 60, 120, 180, 360, 720, 1440, 2880, 10080].map((m) => m * MINUTE);
+
+const isEpoch = ([x0, x1]: readonly [number, number]): boolean => x0 >= EPOCH_MS_FLOOR && x1 >= EPOCH_MS_FLOOR;
+
+/**
+ * Tick positions on whole clock units (on the hour, at local midnight) for an epoch-millisecond
+ * domain, at most about `count` of them. Returns undefined for plain numbers (the scale picks).
+ */
+export function timeTicks(domain: readonly [number, number], count = 5): number[] | undefined {
+  if (!isEpoch(domain)) return undefined;
+  const [x0, x1] = domain;
+  const step = TIME_STEPS.find((s) => (x1 - x0) / s <= count) ?? TIME_STEPS[TIME_STEPS.length - 1]!;
+  // Align to local wall-clock units, not UTC ones.
+  const tz = -new Date(x0).getTimezoneOffset() * MINUTE;
+  const first = Math.ceil((x0 + tz) / step) * step - tz;
+  const ticks: number[] = [];
+  for (let t = first; t <= x1; t += step) ticks.push(t);
+  return ticks;
+}
+
 const markers = (deploy: TimeseriesChartProps["deploy"]): readonly DeployMarker[] =>
   deploy === undefined ? [] : "time" in deploy ? [deploy] : deploy;
 
 /**
  * A line (and optional area) chart on TanStack Charts, themed by the chart tokens:
  * grid and tooltip follow light and dark, and the deploy marker is a dashed rule
- * so a before and after read at a glance.
+ * so a before and after read at a glance. Epoch-millisecond times read as clock times
+ * or dates; with no points at all it keeps its height and says so instead of plotting.
  */
 export function TimeseriesChart({
   series,
@@ -80,18 +125,29 @@ export function TimeseriesChart({
   height = 210,
   yDomain,
   xDomain,
-  formatTime = String,
+  formatTime,
   formatValue = defaultValue,
   formatTick = compact,
   xTicks = 5,
   yTicks = 4,
+  locale,
+  emptyText = "No data for this range",
   className,
 }: TimeseriesChartProps) {
+  const resolvedLocale = useLocale(locale);
+  const empty = !series.some((s) => s.data.length > 0);
   const definition = useMemo(() => {
+    if (empty) return null;
     const all = series.flatMap((s) => s.data);
-    const xs = all.map((p) => p.time);
-    const x0 = xDomain?.[0] ?? Math.min(...xs);
-    const x1 = xDomain?.[1] ?? Math.max(...xs);
+    let x0 = xDomain?.[0] ?? Math.min(...all.map((p) => p.time));
+    let x1 = xDomain?.[1] ?? Math.max(...all.map((p) => p.time));
+    // One point (or one instant) still needs a span to draw on.
+    if (x0 === x1) {
+      x0 -= 1;
+      x1 += 1;
+    }
+    const time = formatTime ?? timeFormatter([x0, x1], resolvedLocale);
+    const ticksAt = timeTicks([x0, x1], xTicks);
     const yMax = yDomain?.[1] ?? Math.max(1, ...all.map((p) => p.value)) * 1.08;
     const yMin = yDomain?.[0] ?? 0;
     const marks = [
@@ -143,7 +199,10 @@ export function TimeseriesChart({
       scales: {
         x: {
           scale: scaleLinear().domain([x0, x1]),
-          axis: { line: false, ticks: { count: xTicks, size: 0, format: formatTime } },
+          axis: {
+            line: false,
+            ticks: { ...(ticksAt ? { values: ticksAt } : { count: xTicks }), size: 0, format: time },
+          },
         },
         y: {
           scale: scaleLinear().domain([yMin, yMax]),
@@ -155,10 +214,28 @@ export function TimeseriesChart({
       maxFocusDistance: Number.POSITIVE_INFINITY,
       tooltip: {
         use: tooltip,
-        format: (p: { datum: Row }) => `${formatTime(p.datum.time)}\n${p.datum.label}: ${formatValue(p.datum.value)}`,
+        format: (p: { datum: Row }) => `${time(p.datum.time)}\n${p.datum.label}: ${formatValue(p.datum.value)}`,
       },
     });
-  }, [series, deploy, yDomain, xDomain, formatTime, formatValue, formatTick, xTicks, yTicks]);
+  }, [empty, series, deploy, yDomain, xDomain, formatTime, formatValue, formatTick, xTicks, yTicks, resolvedLocale]);
+
+  if (!definition) {
+    return (
+      <div
+        role="img"
+        aria-label={`${ariaLabel}: ${emptyText}`}
+        data-empty=""
+        style={{ height }}
+        className={cn(
+          chartClassName,
+          "grid w-full place-items-center rounded-lg bg-well text-sm text-fg-muted shadow-tray",
+          className,
+        )}
+      >
+        <span aria-hidden="true">{emptyText}</span>
+      </div>
+    );
+  }
 
   return (
     <Chart

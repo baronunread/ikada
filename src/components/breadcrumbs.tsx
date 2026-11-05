@@ -1,7 +1,7 @@
 import { useRender } from "@base-ui/react/use-render";
 import { Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { cn, coarseTarget, focusRing } from "../lib/cn";
+import { cn, coarseTarget, focusRing, pressMotion } from "../lib/cn";
 import { ChevronRightIcon, MoreIcon } from "../lib/icons";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 
@@ -76,7 +76,8 @@ export function Breadcrumbs({ items, maxItems = 4, className, ref, ...props }: B
                     <DropdownMenuTrigger
                       aria-label={`${hidden.length} more levels`}
                       className={cn(
-                        "inline-grid size-7 place-items-center rounded-md text-fg-muted transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg pointer-coarse:size-11",
+                        "inline-grid size-7 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:size-11",
+                        pressMotion,
                         focusRing,
                       )}
                     >

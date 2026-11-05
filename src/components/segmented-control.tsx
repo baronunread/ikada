@@ -1,7 +1,8 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
-import type { ReactNode } from "react";
-import { cn, coarseTarget, focusRing } from "../lib/cn";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { cn, coarseTarget, focusRing, pebble, traySurface } from "../lib/cn";
 
 export interface SegmentedOption<T extends string = string> {
   value: T;
@@ -21,9 +22,56 @@ export interface SegmentedControlProps<T extends string = string> {
   className?: string;
 }
 
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * Measures the pressed segment so one pebble can slide to it. Until it has a size (server render,
+ * first paint, a hidden parent) the pressed segment paints its own raised background instead.
+ */
+function usePebble(value: string) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<Box | null>(null);
+  const [ready, setReady] = useState(false);
+  useIsomorphicLayoutEffect(() => {
+    const group = ref.current;
+    if (!group) return undefined;
+    const measure = () => {
+      const el = group.querySelector<HTMLElement>("[data-pressed]");
+      if (!el || el.offsetWidth === 0) {
+        setBox(null);
+        return;
+      }
+      const next = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+      setBox((prev) =>
+        prev && prev.x === next.x && prev.y === next.y && prev.w === next.w && prev.h === next.h ? prev : next,
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(group);
+    return () => observer.disconnect();
+  }, [value]);
+  // The first placement is instant; only later moves slide.
+  useEffect(() => {
+    if (!box || ready) return undefined;
+    const frame = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, [box, ready]);
+  return { ref, box, ready };
+}
+
 /**
  * One choice out of a few, always one selected (a click on the selected segment does nothing).
- * Arrow keys move between segments; Space or Enter selects.
+ * Arrow keys move between segments; Space or Enter selects. A raised pebble on a recessed tray
+ * marks the choice and slides to the new segment on the snappy spring.
  */
 export function SegmentedControl<T extends string = string>({
   options,
@@ -33,16 +81,33 @@ export function SegmentedControl<T extends string = string>({
   className,
   "aria-label": ariaLabel,
 }: SegmentedControlProps<T>) {
+  const { ref, box, ready } = usePebble(value);
   return (
     <ToggleGroup
+      ref={ref}
       aria-label={ariaLabel}
       value={[value]}
       onValueChange={(next) => {
         const chosen = options.find((option) => option.value === next[0]);
         if (chosen) onValueChange(chosen.value);
       }}
-      className={cn("inline-flex w-full gap-0.5 rounded-lg bg-well p-0.5 shadow-field", className)}
+      data-pebble={box ? "" : undefined}
+      className={cn("group/seg relative inline-flex w-full gap-0.5 p-0.5", traySurface, className)}
     >
+      {box ? (
+        <span
+          aria-hidden="true"
+          data-sb-pebble=""
+          className={cn(pebble, !ready && "transition-none")}
+          style={
+            {
+              width: box.w,
+              height: box.h,
+              translate: `${box.x}px ${box.y}px`,
+            } satisfies CSSProperties
+          }
+        />
+      ) : null}
       {options.map((option) => (
         <Toggle
           key={option.value}
@@ -50,9 +115,10 @@ export function SegmentedControl<T extends string = string>({
           disabled={option.disabled}
           aria-label={option.ariaLabel}
           className={cn(
-            "inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-semibold text-fg-muted",
+            "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-semibold text-fg-muted",
             "transition-[background-color,color,box-shadow] duration-(--sb-duration-hover) ease-hover hover:text-fg",
             "data-pressed:bg-raised data-pressed:text-fg data-pressed:shadow-pill",
+            "group-data-pebble/seg:data-pressed:bg-transparent group-data-pebble/seg:data-pressed:shadow-none",
             "data-disabled:cursor-not-allowed data-disabled:opacity-50",
             size === "sm" ? "h-6 px-2 text-xs" : "h-7 px-3 text-sm",
             coarseTarget,

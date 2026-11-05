@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { cn, coarseTarget, focusRing } from "../lib/cn";
+import { cn, coarseTarget, focusRing, pressMotion } from "../lib/cn";
 import { CloseIcon } from "../lib/icons";
 import { softSurface } from "./status";
 import type { Status } from "./status";
@@ -60,7 +60,8 @@ export function Banner({
             onDismiss?.();
           }}
           className={cn(
-            "-me-1.5 -mt-1 inline-grid size-8 shrink-0 place-items-center rounded-md transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-fg/10",
+            "-me-1.5 -mt-1 inline-grid size-8 shrink-0 place-items-center rounded-md hover:bg-fg/10",
+            pressMotion,
             coarseTarget,
             focusRing,
           )}

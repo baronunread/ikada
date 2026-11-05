@@ -5,6 +5,10 @@ import { InstantProvider, instantAttr, useInstant, useInstantOpen } from "../lib
 import { CheckIcon } from "../lib/icons";
 import { usePortalContainer } from "../lib/portal";
 
+/**
+ * A menu of actions that opens from a trigger. Arrives at the trigger on the snappy spring and
+ * leaves in 110ms; opened with a key it appears at once. Compose with DropdownMenuTrigger and DropdownMenuContent.
+ */
 export function DropdownMenu({ onOpenChange, ...props }: ComponentProps<typeof Menu.Root>) {
   const [instant, handle] = useInstantOpen(onOpenChange);
   return (

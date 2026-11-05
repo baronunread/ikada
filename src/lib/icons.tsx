@@ -1,3 +1,4 @@
+/** The ikada icon set: 16px line icons on a 1.6px stroke that inherit the text colour. */
 import type { ComponentProps } from "react";
 import { cn } from "./cn";
 

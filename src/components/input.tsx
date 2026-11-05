@@ -19,6 +19,7 @@ export interface InputProps extends Omit<ComponentProps<typeof BaseInput>, "clas
   mono?: boolean;
 }
 
+/** A single-line text field: a well with the control edge as an inset ring, and the focus wake. */
 export function Input({ invalid, mono, className, ref, ...props }: InputProps) {
   return (
     <BaseInput

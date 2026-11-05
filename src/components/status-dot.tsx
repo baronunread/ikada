@@ -13,14 +13,18 @@ export interface StatusDotProps extends Omit<ComponentProps<"span">, "children">
   live?: boolean;
   /** Pulses for in-progress states; the ring stops spinning when motion is reduced. */
   pulse?: boolean;
+  /** Success that just happened: the shape sprouts on mount (grows up and sends one ring out). */
+  sprout?: boolean;
 }
 
+/** A status shape with its label, for lists and headers. Never colour alone. */
 export function StatusDot({
   status,
   label,
   hideLabel = false,
   live = false,
   pulse = false,
+  sprout = false,
   className,
   ref,
   ...props
@@ -32,7 +36,7 @@ export function StatusDot({
       className={cn("inline-flex items-center gap-2 text-base text-fg", className)}
       {...props}
     >
-      <StatusGlyph status={status} live={live} pulse={pulse} />
+      <StatusGlyph status={status} live={live} pulse={pulse} sprout={sprout} />
       <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
     </span>
   );

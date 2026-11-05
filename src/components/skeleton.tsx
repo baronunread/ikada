@@ -3,7 +3,11 @@ import { tv } from "../lib/cn";
 import type { VariantProps } from "tailwind-variants";
 
 const skeletonStyles = tv({
-  base: "block bg-hover animate-pulse",
+  // A slow breath, not a sweep; siblings start 120ms apart so a block of lines swells top to bottom.
+  base: [
+    "block bg-hover animate-[sb-breathe_1.6s_ease-in-out_infinite]",
+    "[&:nth-child(2)]:[animation-delay:120ms] [&:nth-child(3)]:[animation-delay:240ms] [&:nth-child(4)]:[animation-delay:360ms] [&:nth-child(n+5)]:[animation-delay:480ms]",
+  ],
   variants: {
     kind: {
       line: "h-3.5 w-full rounded-sm",

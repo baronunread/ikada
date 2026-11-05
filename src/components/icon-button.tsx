@@ -22,6 +22,7 @@ export interface IconButtonProps extends Omit<ButtonProps, "children" | "aria-la
   tooltip?: boolean;
 }
 
+/** A Button that shows only an icon. `label` is required: it names the button and becomes its tooltip. */
 export function IconButton({
   label,
   tooltip = true,

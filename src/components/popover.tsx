@@ -4,6 +4,10 @@ import { usePortalContainer } from "../lib/portal";
 import { cn, floatingSurface, popupMotion, type WithClass } from "../lib/cn";
 import { InstantProvider, instantAttr, useInstant, useInstantOpen } from "../lib/instant";
 
+/**
+ * Interactive content anchored to a trigger, such as a small form. Arrives on the snappy spring;
+ * compose with PopoverTrigger and PopoverContent. Plain text belongs in a Tooltip.
+ */
 export function Popover({ onOpenChange, ...props }: ComponentProps<typeof BasePopover.Root>) {
   const [instant, handle] = useInstantOpen(onOpenChange);
   return (

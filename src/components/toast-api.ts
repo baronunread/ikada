@@ -1,3 +1,7 @@
+/**
+ * The toast store behind ToastProvider: `toast()`, `toast.success()`, undo, merging repeats and
+ * mutable deploy toasts, plus the history hook. Usable outside React.
+ */
 import { Toast } from "@base-ui/react/toast";
 import type { Status } from "./status";
 

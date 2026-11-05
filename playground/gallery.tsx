@@ -87,6 +87,9 @@ const chart = ["requests", "errors", "deploy", "2xx", "3xx", "4xx", "5xx", "othe
 const variants = ["primary", "secondary", "ghost", "danger"] as const;
 const names = { primary: "Create project", secondary: "Cancel", ghost: "Skip", danger: "Delete project" };
 const deploy = { time: DEPLOY_HOUR, label: "v48" };
+/** The same series on epoch milliseconds (today, from midnight UTC) to show the default time axis. */
+const MIDNIGHT = Date.UTC(2026, 10, 5);
+const requestsEpoch = requests.map((p) => ({ time: MIDNIGHT + p.time * 3_600_000, value: p.value }));
 const format = { formatTime: clock };
 const perMinute = (v: number): string => `${v.toLocaleString()} req/min`;
 const errPerMinute = (v: number): string => `${v} err/min`;
@@ -156,7 +159,10 @@ function ButtonSection() {
   }
 
   return (
-    <Section title="Button" hint="Hover and press with the pointer: press scales to 0.97 over 160ms.">
+    <Section
+      title="Button"
+      hint="Afloat: a press settles 1px down and to 0.97 in 90ms; the release bobs back on a spring. Hover lifts the shadow."
+    >
       <Row label="Variants">
         {variants.map((v) => (
           <Button key={v} variant={v}>
@@ -311,6 +317,24 @@ function FormSection() {
   );
 }
 
+/** Success and creation sprout: each new badge grows up from its dot and sends one ring out. */
+function SproutRow() {
+  const [made, setMade] = useState<number[]>([]);
+  return (
+    <Row label="Sprout: success and creation (press to create)">
+      <Button variant="primary" size="sm" onClick={() => setMade((m) => [...m.slice(-3), Date.now()])}>
+        New sprout
+      </Button>
+      {made.map((id, i) => (
+        <Badge key={id} tone="success" dot sprout>
+          sprout-{made.length - i}
+        </Badge>
+      ))}
+      {made.length === 0 ? <StatusDot status="success" label="Deployed" sprout /> : null}
+    </Row>
+  );
+}
+
 function StatusSection() {
   return (
     <Section
@@ -327,7 +351,7 @@ function StatusSection() {
       <Row label="Badge without shape">
         <Badge>v12</Badge>
         <Badge tone="success">Production</Badge>
-        <Badge tone="warning">Supervisor</Badge>
+        <Badge tone="warning">Degraded</Badge>
         <Badge tone="danger">Failed</Badge>
         <Badge tone="info">Preview</Badge>
       </Row>
@@ -338,6 +362,7 @@ function StatusSection() {
         <StatusDot status="info" label="Deploying" pulse />
         <StatusDot status="success" live label="Live" pulse />
       </Row>
+      <SproutRow />
       <Row label="StatusDot, label hidden visually (still announced)">
         <StatusDot status="success" label="Ready" hideLabel />
         <StatusDot status="warning" label="Domain not verified" hideLabel />
@@ -351,7 +376,7 @@ function OverlaySection() {
   return (
     <Section
       title="Overlays"
-      hint="Menus, selects and popovers: 180ms in, 120ms out, from the trigger. Open one with Enter and it appears with no animation."
+      hint="Menus, selects and popovers arrive from the trigger on the snappy spring and leave in 110ms. Open one with Enter and it appears with no animation."
     >
       <Row label="Tooltip (hover or focus; neighbours open instantly after the first)">
         <Tooltip content="Copies the deployment ID" defaultOpen={openState === "tooltip"}>
@@ -376,7 +401,7 @@ function OverlaySection() {
           </PopoverContent>
         </Popover>
       </Row>
-      <Row label="Dialog (centered, 220ms in, 150ms out)">
+      <Row label="Dialog (centered, in on the smooth spring, 150ms out)">
         <Dialog defaultOpen={openState === "dialog"}>
           <DialogTrigger render={<Button variant="danger" />}>Delete project</DialogTrigger>
           <DialogContent>
@@ -435,7 +460,10 @@ function OverlaySection() {
 
 function TabsSection() {
   return (
-    <Section title="Tabs" hint="One pill slides to the active tab over 250ms, ease-in-out. Use the arrow keys.">
+    <Section
+      title="Tabs"
+      hint="One raised pebble on a recessed tray slides to the active tab on the snappy spring. Use the arrow keys."
+    >
       <Tabs defaultValue="overview">
         <TabsList aria-label="Project sections">
           <TabsTab value="overview">Overview</TabsTab>
@@ -456,7 +484,7 @@ function TabsSection() {
 function MiscSection() {
   return (
     <Section title="Skeleton and CopyId">
-      <Row label="Skeleton (aria-hidden, a soft fade)">
+      <Row label="Skeleton (aria-hidden, a slow breath, staggered)">
         <div className="flex w-full max-w-sm flex-col gap-2" aria-busy="true">
           <Skeleton className="w-1/3" />
           <Skeleton />
@@ -516,6 +544,18 @@ function ChartsSection() {
             formatValue={millis}
           />
         </Row>
+        <Row label="Epoch milliseconds: the default x axis reads clock times">
+          <TimeseriesChart
+            ariaLabel="Requests per minute, epoch timestamps"
+            height={150}
+            yTicks={2}
+            series={[{ id: "req-epoch", label: "Requests", data: requestsEpoch, area: true }]}
+            formatValue={perMinute}
+          />
+        </Row>
+        <Row label="No points: the chart keeps its height and says so">
+          <TimeseriesChart ariaLabel="Requests per minute, no data" height={150} series={[]} />
+        </Row>
       </div>
       <Row label="Sparkline">
         <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -559,10 +599,12 @@ function MotionSection() {
       title="Motion"
       hint="Use the speed and reduced-motion controls in the header; they apply to the whole page."
     >
-      <Row label="Curves: ease-out for everything entering or pressed; in-out only for a sliding indicator">
+      <Row label="Curves: ease-out for colour and exits; springs for what moves (bob overshoots once, snappy barely, smooth never)">
         <div className="flex w-full max-w-xl flex-col gap-3">
           <EasingTrack name="ease-out" curve="cubic-bezier(0.23, 1, 0.32, 1)" run={run} />
-          <EasingTrack name="ease-in-out" curve="cubic-bezier(0.77, 0, 0.175, 1)" run={run} />
+          <EasingTrack name="spring-smooth" curve="var(--sb-spring-smooth)" run={run} />
+          <EasingTrack name="spring-snappy" curve="var(--sb-spring-snappy)" run={run} />
+          <EasingTrack name="spring-bob" curve="var(--sb-spring-bob)" run={run} />
           <div>
             <Button size="sm" onClick={() => setRun(!run)}>
               {run ? "Reset" : "Play"}
@@ -570,7 +612,7 @@ function MotionSection() {
           </div>
         </div>
       </Row>
-      <Row label="Press (hold the pointer down): scale 0.97, 160ms ease-out">
+      <Row label="Press (hold the pointer down): 1px down and 0.97 in 90ms; let go and it bobs back once">
         <Button variant="primary">Press and hold</Button>
         <Button>Press and hold</Button>
         <Button variant="ghost">Press and hold</Button>
@@ -588,7 +630,7 @@ function MotionSection() {
           <PopoverTrigger render={<Button />}>Popover</PopoverTrigger>
           <PopoverContent>
             <PopoverTitle>Scales from the trigger</PopoverTitle>
-            <PopoverDescription>180ms in, 120ms out, from 0.96.</PopoverDescription>
+            <PopoverDescription>In on the snappy spring from 0.96, out in 110ms.</PopoverDescription>
           </PopoverContent>
         </Popover>
         <Dialog>
@@ -596,7 +638,7 @@ function MotionSection() {
           <DialogContent>
             <DialogTitle>Scales from its center</DialogTitle>
             <DialogDescription>
-              220ms in, 150ms out, from 0.96. Opened with the keyboard, it does not animate.
+              In on the smooth spring from 0.96, out in 150ms. Opened with the keyboard, it does not animate.
             </DialogDescription>
             <DialogFooter>
               <DialogClose render={<Button />}>Close</DialogClose>
@@ -613,7 +655,7 @@ function MotionSection() {
           </Tooltip>
         ))}
       </Row>
-      <Row label="Toasts rise 300ms ease-out and leave in 200ms; reduced motion fades in place. Try the buttons under Overlays.">
+      <Row label="Toasts rise on the snappy spring and leave in 110ms; success sprouts as it lands; reduced motion fades in place. Try the buttons under Overlays.">
         <Button onClick={() => toast.add({ title: "Deployment ready", description: "v12 is live.", tone: "success" })}>
           Push a toast
         </Button>

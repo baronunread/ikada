@@ -14,7 +14,7 @@
 6. **Overlays are clearly raised.** Menus, selects, popovers, dialogs and toasts use the lighter `raised` surface with a layered shadow, in dark as well as light.
 7. **Dense but readable.** 14px body, 36px controls, 48px table rows. Density changes sizes of boxes, never type.
 8. **Keyboard first.** Every control is reachable, shows a neutral focus ring, and works with the keys its WAI-ARIA pattern promises. Overlays opened with the keyboard do not animate.
-9. **Motion with a reason.** Ease-out for everything that enters or is pressed, short exits, nothing below scale 0.96. Reduced motion keeps fades and drops movement.
+9. **Afloat: motion with a reason.** The raft takes your weight: a press settles 1px down and 3% smaller in 90ms, and the release returns on a spring that overshoots once. Nothing else bounces. Popups and toasts arrive on a tighter spring and leave in about 110ms; nothing starts below scale 0.96. Reduced motion substitutes a short ease-out for every spring, keeps fades and drops movement.
 10. **Logical, not physical.** Components use `start`/`end`, `ps-*`/`pe-*` and `inline` utilities so right-to-left works without forks.
 
 ## Theming convention
@@ -52,7 +52,7 @@ The colour survey (`mockups-20261104/color-survey/SURVEY.md`) measured 20-odd cl
 | `raised`          | `bg-raised` `text-raised` `border-raised`                            | `oklch(0.34 0.02 255)`         | `oklch(1 0 0)`             |
 | `hairline`        | `bg-hairline` `text-hairline` `border-hairline`                      | `oklch(0.3 0.018 255)`         | `oklch(0.9 0 0)`           |
 | `hairline-strong` | `bg-hairline-strong` `text-hairline-strong` `border-hairline-strong` | `oklch(0.4 0.02 255)`          | `oklch(0.82 0 0)`          |
-| `control-edge`    | `bg-control-edge` `text-control-edge` `border-control-edge`          | `oklch(0.56 0.02 255)`         | `oklch(0.6 0 0)`           |
+| `control-edge`    | `bg-control-edge` `text-control-edge` `border-control-edge`          | `oklch(0.62 0.02 255)`         | `oklch(0.6 0 0)`           |
 | `focus`           | `bg-focus` `text-focus` `border-focus`                               | `oklch(0.95 0.01 255)`         | `oklch(0.22 0 0)`          |
 | `fg`              | `bg-fg` `text-fg` `border-fg`                                        | `oklch(0.95 0.01 255)`         | `oklch(0.22 0 0)`          |
 | `fg-muted`        | `bg-fg-muted` `text-fg-muted` `border-fg-muted`                      | `oklch(0.76 0.018 255)`        | `oklch(0.44 0 0)`          |
@@ -100,118 +100,123 @@ Every pair below is asserted by `test/tokens.test.ts`. Text needs 4.5:1, large t
 
 <!-- tokens:contrast:start -->
 
-| Foreground       | Background     | Needs        | Dark         | Light        | Used for                                    |
-| ---------------- | -------------- | ------------ | ------------ | ------------ | ------------------------------------------- |
-| `fg`             | `canvas`       | 4.5:1 (text) | 16.26:1 pass | 15.64:1 pass | Body text                                   |
-| `fg`             | `surface`      | 4.5:1 (text) | 14.60:1 pass | 17.07:1 pass | Body text                                   |
-| `fg`             | `well`         | 4.5:1 (text) | 15.65:1 pass | 15.50:1 pass | Body text                                   |
-| `fg`             | `hover`        | 4.5:1 (text) | 11.99:1 pass | 13.87:1 pass | Body text                                   |
-| `fg`             | `raised`       | 4.5:1 (text) | 10.16:1 pass | 17.31:1 pass | Body text                                   |
-| `fg-muted`       | `canvas`       | 4.5:1 (text) | 8.77:1 pass  | 7.02:1 pass  | Secondary text, placeholders                |
-| `fg-muted`       | `surface`      | 4.5:1 (text) | 7.87:1 pass  | 7.66:1 pass  | Secondary text, placeholders                |
-| `fg-muted`       | `well`         | 4.5:1 (text) | 8.44:1 pass  | 6.96:1 pass  | Secondary text, placeholders                |
-| `fg-muted`       | `hover`        | 4.5:1 (text) | 6.46:1 pass  | 6.22:1 pass  | Secondary text, placeholders                |
-| `fg-muted`       | `raised`       | 4.5:1 (text) | 5.48:1 pass  | 7.77:1 pass  | Secondary text, placeholders                |
-| `fg`             | `code-bg`      | 4.5:1 (text) | 16.90:1 pass | 15.19:1 pass | Code and log text                           |
-| `fg-muted`       | `code-bg`      | 4.5:1 (text) | 9.11:1 pass  | 6.81:1 pass  | Log timestamps                              |
-| `fg`             | `diff-add`     | 4.5:1 (text) | 12.80:1 pass | 14.77:1 pass | Added line                                  |
-| `fg`             | `diff-del`     | 4.5:1 (text) | 13.31:1 pass | 14.45:1 pass | Removed line                                |
-| `on-brand`       | `brand`        | 4.5:1 (text) | 7.61:1 pass  | 6.27:1 pass  | Primary button label                        |
-| `on-brand`       | `brand-hover`  | 4.5:1 (text) | 9.09:1 pass  | 7.84:1 pass  | Primary button label, hover                 |
-| `on-danger`      | `danger`       | 4.5:1 (text) | 6.18:1 pass  | 7.19:1 pass  | Destructive button label                    |
-| `on-danger`      | `danger-hover` | 4.5:1 (text) | 7.50:1 pass  | 8.75:1 pass  | Destructive button label, hover             |
-| `brand-fg`       | `surface`      | 4.5:1 (text) | 10.16:1 pass | 7.92:1 pass  | brand text on surface                       |
-| `brand-fg`       | `canvas`       | 4.5:1 (text) | 11.31:1 pass | 7.26:1 pass  | brand text on canvas                        |
-| `brand-fg`       | `raised`       | 4.5:1 (text) | 7.07:1 pass  | 8.03:1 pass  | brand text on a floating layer              |
-| `brand-fg`       | `brand-soft`   | 4.5:1 (text) | 7.77:1 pass  | 6.85:1 pass  | brand badge                                 |
-| `warn-fg`        | `surface`      | 4.5:1 (text) | 11.72:1 pass | 8.15:1 pass  | warn text on surface                        |
-| `warn-fg`        | `canvas`       | 4.5:1 (text) | 13.05:1 pass | 7.47:1 pass  | warn text on canvas                         |
-| `warn-fg`        | `raised`       | 4.5:1 (text) | 8.15:1 pass  | 8.27:1 pass  | warn text on a floating layer               |
-| `warn-fg`        | `warn-soft`    | 4.5:1 (text) | 7.90:1 pass  | 7.11:1 pass  | warn badge                                  |
-| `danger-fg`      | `surface`      | 4.5:1 (text) | 9.98:1 pass  | 7.73:1 pass  | danger text on surface                      |
-| `danger-fg`      | `canvas`       | 4.5:1 (text) | 11.11:1 pass | 7.08:1 pass  | danger text on canvas                       |
-| `danger-fg`      | `raised`       | 4.5:1 (text) | 6.94:1 pass  | 7.84:1 pass  | danger text on a floating layer             |
-| `danger-fg`      | `danger-soft`  | 4.5:1 (text) | 7.20:1 pass  | 6.60:1 pass  | danger badge                                |
-| `info-fg`        | `surface`      | 4.5:1 (text) | 10.23:1 pass | 8.44:1 pass  | info text on surface                        |
-| `info-fg`        | `canvas`       | 4.5:1 (text) | 11.39:1 pass | 7.74:1 pass  | info text on canvas                         |
-| `info-fg`        | `raised`       | 4.5:1 (text) | 7.11:1 pass  | 8.56:1 pass  | info text on a floating layer               |
-| `info-fg`        | `info-soft`    | 4.5:1 (text) | 7.41:1 pass  | 7.16:1 pass  | info badge                                  |
-| `neutral-fg`     | `surface`      | 4.5:1 (text) | 10.69:1 pass | 8.34:1 pass  | neutral text on surface                     |
-| `neutral-fg`     | `canvas`       | 4.5:1 (text) | 11.90:1 pass | 7.64:1 pass  | neutral text on canvas                      |
-| `neutral-fg`     | `raised`       | 4.5:1 (text) | 7.43:1 pass  | 8.46:1 pass  | neutral text on a floating layer            |
-| `neutral-fg`     | `neutral-soft` | 4.5:1 (text) | 7.73:1 pass  | 6.89:1 pass  | neutral badge                               |
-| `danger-fg`      | `surface`      | 3:1 (large)  | 9.98:1 pass  | 7.73:1 pass  | Danger zone heading                         |
-| `control-edge`   | `surface`      | 3:1 (ui)     | 3.63:1 pass  | 3.89:1 pass  | Input, select, checkbox edge                |
-| `brand`          | `surface`      | 3:1 (ui)     | 7.15:1 pass  | 6.35:1 pass  | Switch on, checkbox checked, primary fill   |
-| `brand-dot`      | `surface`      | 3:1 (ui)     | 7.77:1 pass  | 3.35:1 pass  | Success dot                                 |
-| `warn-dot`       | `surface`      | 3:1 (ui)     | 8.91:1 pass  | 3.54:1 pass  | Fallback and warning dot                    |
-| `danger-dot`     | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Error dot                                   |
-| `info-dot`       | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.25:1 pass  | Info dot                                    |
-| `neutral-dot`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Idle and unknown dot                        |
-| `control-edge`   | `canvas`       | 3:1 (ui)     | 4.05:1 pass  | 3.57:1 pass  | Input, select, checkbox edge                |
-| `brand`          | `canvas`       | 3:1 (ui)     | 7.96:1 pass  | 5.82:1 pass  | Switch on, checkbox checked, primary fill   |
-| `brand-dot`      | `canvas`       | 3:1 (ui)     | 8.66:1 pass  | 3.07:1 pass  | Success dot                                 |
-| `warn-dot`       | `canvas`       | 3:1 (ui)     | 9.93:1 pass  | 3.24:1 pass  | Fallback and warning dot                    |
-| `danger-dot`     | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Error dot                                   |
-| `info-dot`       | `canvas`       | 3:1 (ui)     | 8.72:1 pass  | 3.90:1 pass  | Info dot                                    |
-| `neutral-dot`    | `canvas`       | 3:1 (ui)     | 7.58:1 pass  | 4.38:1 pass  | Idle and unknown dot                        |
-| `control-edge`   | `well`         | 3:1 (ui)     | 3.89:1 pass  | 3.53:1 pass  | Input, select, checkbox edge                |
-| `brand`          | `well`         | 3:1 (ui)     | 7.67:1 pass  | 5.77:1 pass  | Switch on, checkbox checked, primary fill   |
-| `brand-dot`      | `well`         | 3:1 (ui)     | 8.33:1 pass  | 3.04:1 pass  | Success dot                                 |
-| `warn-dot`       | `well`         | 3:1 (ui)     | 9.56:1 pass  | 3.22:1 pass  | Fallback and warning dot                    |
-| `danger-dot`     | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Error dot                                   |
-| `info-dot`       | `well`         | 3:1 (ui)     | 8.39:1 pass  | 3.86:1 pass  | Info dot                                    |
-| `neutral-dot`    | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.35:1 pass  | Idle and unknown dot                        |
-| `focus`          | `canvas`       | 3:1 (ui)     | 16.26:1 pass | 15.64:1 pass | Focus ring                                  |
-| `focus`          | `surface`      | 3:1 (ui)     | 14.60:1 pass | 17.07:1 pass | Focus ring                                  |
-| `focus`          | `well`         | 3:1 (ui)     | 15.65:1 pass | 15.50:1 pass | Focus ring                                  |
-| `focus`          | `hover`        | 3:1 (ui)     | 11.99:1 pass | 13.87:1 pass | Focus ring                                  |
-| `focus`          | `raised`       | 3:1 (ui)     | 10.16:1 pass | 17.31:1 pass | Focus ring                                  |
-| `focus`          | `code-bg`      | 3:1 (ui)     | 16.90:1 pass | 15.19:1 pass | Focus ring                                  |
-| `focus`          | `diff-add`     | 3:1 (ui)     | 12.80:1 pass | 14.77:1 pass | Focus ring                                  |
-| `focus`          | `diff-del`     | 3:1 (ui)     | 13.31:1 pass | 14.45:1 pass | Focus ring                                  |
-| `danger`         | `surface`      | 3:1 (ui)     | 5.50:1 pass  | 7.09:1 pass  | Destructive button fill                     |
-| `chart-requests` | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.82:1 pass  | Chart mark                                  |
-| `chart-errors`   | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Chart mark                                  |
-| `chart-deploy`   | `surface`      | 3:1 (ui)     | 10.01:1 pass | 9.08:1 pass  | Chart mark                                  |
-| `chart-2xx`      | `surface`      | 3:1 (ui)     | 8.37:1 pass  | 3.63:1 pass  | Chart mark                                  |
-| `chart-3xx`      | `surface`      | 3:1 (ui)     | 8.58:1 pass  | 3.81:1 pass  | Chart mark                                  |
-| `chart-4xx`      | `surface`      | 3:1 (ui)     | 8.93:1 pass  | 3.67:1 pass  | Chart mark                                  |
-| `chart-5xx`      | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Chart mark                                  |
-| `chart-other`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Chart mark                                  |
-| `chart-series`   | `surface`      | 3:1 (ui)     | 7.62:1 pass  | 5.02:1 pass  | Chart mark                                  |
-| `chart-requests` | `canvas`       | 3:1 (ui)     | 8.72:1 pass  | 4.42:1 pass  | Chart mark                                  |
-| `chart-errors`   | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Chart mark                                  |
-| `chart-deploy`   | `canvas`       | 3:1 (ui)     | 11.14:1 pass | 8.32:1 pass  | Chart mark                                  |
-| `chart-2xx`      | `canvas`       | 3:1 (ui)     | 9.32:1 pass  | 3.33:1 pass  | Chart mark                                  |
-| `chart-3xx`      | `canvas`       | 3:1 (ui)     | 9.56:1 pass  | 3.49:1 pass  | Chart mark                                  |
-| `chart-4xx`      | `canvas`       | 3:1 (ui)     | 9.94:1 pass  | 3.36:1 pass  | Chart mark                                  |
-| `chart-5xx`      | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Chart mark                                  |
-| `chart-other`    | `canvas`       | 3:1 (ui)     | 7.58:1 pass  | 4.38:1 pass  | Chart mark                                  |
-| `chart-series`   | `canvas`       | 3:1 (ui)     | 8.49:1 pass  | 4.60:1 pass  | Chart mark                                  |
-| `chart-requests` | `well`         | 3:1 (ui)     | 8.39:1 pass  | 4.38:1 pass  | Chart mark                                  |
-| `chart-errors`   | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Chart mark                                  |
-| `chart-deploy`   | `well`         | 3:1 (ui)     | 10.73:1 pass | 8.25:1 pass  | Chart mark                                  |
-| `chart-2xx`      | `well`         | 3:1 (ui)     | 8.98:1 pass  | 3.30:1 pass  | Chart mark                                  |
-| `chart-3xx`      | `well`         | 3:1 (ui)     | 9.20:1 pass  | 3.46:1 pass  | Chart mark                                  |
-| `chart-4xx`      | `well`         | 3:1 (ui)     | 9.57:1 pass  | 3.33:1 pass  | Chart mark                                  |
-| `chart-5xx`      | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Chart mark                                  |
-| `chart-other`    | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.35:1 pass  | Chart mark                                  |
-| `chart-series`   | `well`         | 3:1 (ui)     | 8.17:1 pass  | 4.56:1 pass  | Chart mark                                  |
-| `fg`             | `hover`        | 3:1 (ui)     | 11.99:1 pass | 13.87:1 pass | Chart segment on its track                  |
-| `chart-requests` | `hover`        | 3:1 (ui)     | 6.43:1 pass  | 3.92:1 pass  | Chart segment on its track                  |
-| `chart-series`   | `hover`        | 3:1 (ui)     | 6.26:1 pass  | 4.08:1 pass  | Chart segment on its track                  |
-| `chart-3xx`      | `hover`        | 3:1 (ui)     | 7.05:1 pass  | 3.10:1 pass  | Chart segment on its track                  |
-| `chart-other`    | `hover`        | 3:1 (ui)     | 5.59:1 pass  | 3.89:1 pass  | Chart segment on its track                  |
-| `fg`             | `surface`      | 3:1 (ui)     | 14.60:1 pass | 17.07:1 pass | Chart segment and legend swatch             |
-| `chart-requests` | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.82:1 pass  | Chart segment and legend swatch             |
-| `chart-series`   | `surface`      | 3:1 (ui)     | 7.62:1 pass  | 5.02:1 pass  | Chart segment and legend swatch             |
-| `chart-3xx`      | `surface`      | 3:1 (ui)     | 8.58:1 pass  | 3.81:1 pass  | Chart segment and legend swatch             |
-| `chart-other`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Chart segment and legend swatch             |
-| `fg-muted`       | `hover`        | 4.5:1 (text) | 6.46:1 pass  | 6.22:1 pass  | Table sort icon and header text on hover    |
-| `fg`             | `hover`        | 4.5:1 (text) | 11.99:1 pass | 13.87:1 pass | Selected table row and current sidebar item |
-| `fg-muted`       | `well`         | 4.5:1 (text) | 8.44:1 pass  | 6.96:1 pass  | Empty state icon                            |
-| `neutral-fg`     | `neutral-soft` | 4.5:1 (text) | 7.73:1 pass  | 6.89:1 pass  | Palette prefix chip                         |
+| Foreground       | Background     | Needs        | Dark         | Light        | Used for                                                         |
+| ---------------- | -------------- | ------------ | ------------ | ------------ | ---------------------------------------------------------------- |
+| `fg`             | `canvas`       | 4.5:1 (text) | 16.26:1 pass | 15.64:1 pass | Body text                                                        |
+| `fg`             | `surface`      | 4.5:1 (text) | 14.60:1 pass | 17.07:1 pass | Body text                                                        |
+| `fg`             | `well`         | 4.5:1 (text) | 15.65:1 pass | 15.50:1 pass | Body text                                                        |
+| `fg`             | `hover`        | 4.5:1 (text) | 11.99:1 pass | 13.87:1 pass | Body text                                                        |
+| `fg`             | `raised`       | 4.5:1 (text) | 10.16:1 pass | 17.31:1 pass | Body text                                                        |
+| `fg-muted`       | `canvas`       | 4.5:1 (text) | 8.77:1 pass  | 7.02:1 pass  | Secondary text, placeholders                                     |
+| `fg-muted`       | `surface`      | 4.5:1 (text) | 7.87:1 pass  | 7.66:1 pass  | Secondary text, placeholders                                     |
+| `fg-muted`       | `well`         | 4.5:1 (text) | 8.44:1 pass  | 6.96:1 pass  | Secondary text, placeholders                                     |
+| `fg-muted`       | `hover`        | 4.5:1 (text) | 6.46:1 pass  | 6.22:1 pass  | Secondary text, placeholders                                     |
+| `fg-muted`       | `raised`       | 4.5:1 (text) | 5.48:1 pass  | 7.77:1 pass  | Secondary text, placeholders                                     |
+| `fg`             | `code-bg`      | 4.5:1 (text) | 16.90:1 pass | 15.19:1 pass | Code and log text                                                |
+| `fg-muted`       | `code-bg`      | 4.5:1 (text) | 9.11:1 pass  | 6.81:1 pass  | Log timestamps                                                   |
+| `fg`             | `diff-add`     | 4.5:1 (text) | 12.80:1 pass | 14.77:1 pass | Added line                                                       |
+| `fg`             | `diff-del`     | 4.5:1 (text) | 13.31:1 pass | 14.45:1 pass | Removed line                                                     |
+| `on-brand`       | `brand`        | 4.5:1 (text) | 7.61:1 pass  | 6.27:1 pass  | Primary button label                                             |
+| `on-brand`       | `brand-hover`  | 4.5:1 (text) | 9.09:1 pass  | 7.84:1 pass  | Primary button label, hover                                      |
+| `on-danger`      | `danger`       | 4.5:1 (text) | 6.18:1 pass  | 7.19:1 pass  | Destructive button label                                         |
+| `on-danger`      | `danger-hover` | 4.5:1 (text) | 7.50:1 pass  | 8.75:1 pass  | Destructive button label, hover                                  |
+| `brand-fg`       | `surface`      | 4.5:1 (text) | 10.16:1 pass | 7.92:1 pass  | brand text on surface                                            |
+| `brand-fg`       | `canvas`       | 4.5:1 (text) | 11.31:1 pass | 7.26:1 pass  | brand text on canvas                                             |
+| `brand-fg`       | `raised`       | 4.5:1 (text) | 7.07:1 pass  | 8.03:1 pass  | brand text on a floating layer                                   |
+| `brand-fg`       | `brand-soft`   | 4.5:1 (text) | 7.77:1 pass  | 6.85:1 pass  | brand badge                                                      |
+| `warn-fg`        | `surface`      | 4.5:1 (text) | 11.72:1 pass | 8.15:1 pass  | warn text on surface                                             |
+| `warn-fg`        | `canvas`       | 4.5:1 (text) | 13.05:1 pass | 7.47:1 pass  | warn text on canvas                                              |
+| `warn-fg`        | `raised`       | 4.5:1 (text) | 8.15:1 pass  | 8.27:1 pass  | warn text on a floating layer                                    |
+| `warn-fg`        | `warn-soft`    | 4.5:1 (text) | 7.90:1 pass  | 7.11:1 pass  | warn badge                                                       |
+| `danger-fg`      | `surface`      | 4.5:1 (text) | 9.98:1 pass  | 7.73:1 pass  | danger text on surface                                           |
+| `danger-fg`      | `canvas`       | 4.5:1 (text) | 11.11:1 pass | 7.08:1 pass  | danger text on canvas                                            |
+| `danger-fg`      | `raised`       | 4.5:1 (text) | 6.94:1 pass  | 7.84:1 pass  | danger text on a floating layer                                  |
+| `danger-fg`      | `danger-soft`  | 4.5:1 (text) | 7.20:1 pass  | 6.60:1 pass  | danger badge                                                     |
+| `info-fg`        | `surface`      | 4.5:1 (text) | 10.23:1 pass | 8.44:1 pass  | info text on surface                                             |
+| `info-fg`        | `canvas`       | 4.5:1 (text) | 11.39:1 pass | 7.74:1 pass  | info text on canvas                                              |
+| `info-fg`        | `raised`       | 4.5:1 (text) | 7.11:1 pass  | 8.56:1 pass  | info text on a floating layer                                    |
+| `info-fg`        | `info-soft`    | 4.5:1 (text) | 7.41:1 pass  | 7.16:1 pass  | info badge                                                       |
+| `neutral-fg`     | `surface`      | 4.5:1 (text) | 10.69:1 pass | 8.34:1 pass  | neutral text on surface                                          |
+| `neutral-fg`     | `canvas`       | 4.5:1 (text) | 11.90:1 pass | 7.64:1 pass  | neutral text on canvas                                           |
+| `neutral-fg`     | `raised`       | 4.5:1 (text) | 7.43:1 pass  | 8.46:1 pass  | neutral text on a floating layer                                 |
+| `neutral-fg`     | `neutral-soft` | 4.5:1 (text) | 7.73:1 pass  | 6.89:1 pass  | neutral badge                                                    |
+| `danger-fg`      | `surface`      | 3:1 (large)  | 9.98:1 pass  | 7.73:1 pass  | Danger zone heading                                              |
+| `control-edge`   | `surface`      | 3:1 (ui)     | 4.64:1 pass  | 3.89:1 pass  | Unchecked checkbox, radio and switch edge; input and select edge |
+| `brand`          | `surface`      | 3:1 (ui)     | 7.15:1 pass  | 6.35:1 pass  | Checked checkbox, radio and switch fill; primary fill            |
+| `control-edge`   | `canvas`       | 3:1 (ui)     | 5.17:1 pass  | 3.57:1 pass  | Unchecked checkbox, radio and switch edge; input and select edge |
+| `brand`          | `canvas`       | 3:1 (ui)     | 7.96:1 pass  | 5.82:1 pass  | Checked checkbox, radio and switch fill; primary fill            |
+| `control-edge`   | `well`         | 3:1 (ui)     | 4.98:1 pass  | 3.53:1 pass  | Unchecked checkbox, radio and switch edge; input and select edge |
+| `brand`          | `well`         | 3:1 (ui)     | 7.67:1 pass  | 5.77:1 pass  | Checked checkbox, radio and switch fill; primary fill            |
+| `control-edge`   | `raised`       | 3:1 (ui)     | 3.23:1 pass  | 3.95:1 pass  | Unchecked checkbox, radio and switch edge; input and select edge |
+| `brand`          | `raised`       | 3:1 (ui)     | 4.98:1 pass  | 6.45:1 pass  | Checked checkbox, radio and switch fill; primary fill            |
+| `brand`          | `hover`        | 3:1 (ui)     | 5.87:1 pass  | 5.17:1 pass  | Switch track on against the off track                            |
+| `on-brand`       | `brand`        | 3:1 (ui)     | 7.61:1 pass  | 6.27:1 pass  | Check mark, radio dot and switch thumb when checked              |
+| `fg-muted`       | `hover`        | 3:1 (ui)     | 6.46:1 pass  | 6.22:1 pass  | Switch thumb when off                                            |
+| `brand-dot`      | `surface`      | 3:1 (ui)     | 7.77:1 pass  | 3.35:1 pass  | Success dot                                                      |
+| `warn-dot`       | `surface`      | 3:1 (ui)     | 8.91:1 pass  | 3.54:1 pass  | Warning dot                                                      |
+| `danger-dot`     | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Error dot                                                        |
+| `info-dot`       | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.25:1 pass  | Info dot                                                         |
+| `neutral-dot`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Idle and unknown dot                                             |
+| `brand-dot`      | `canvas`       | 3:1 (ui)     | 8.66:1 pass  | 3.07:1 pass  | Success dot                                                      |
+| `warn-dot`       | `canvas`       | 3:1 (ui)     | 9.93:1 pass  | 3.24:1 pass  | Warning dot                                                      |
+| `danger-dot`     | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Error dot                                                        |
+| `info-dot`       | `canvas`       | 3:1 (ui)     | 8.72:1 pass  | 3.90:1 pass  | Info dot                                                         |
+| `neutral-dot`    | `canvas`       | 3:1 (ui)     | 7.58:1 pass  | 4.38:1 pass  | Idle and unknown dot                                             |
+| `brand-dot`      | `well`         | 3:1 (ui)     | 8.33:1 pass  | 3.04:1 pass  | Success dot                                                      |
+| `warn-dot`       | `well`         | 3:1 (ui)     | 9.56:1 pass  | 3.22:1 pass  | Warning dot                                                      |
+| `danger-dot`     | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Error dot                                                        |
+| `info-dot`       | `well`         | 3:1 (ui)     | 8.39:1 pass  | 3.86:1 pass  | Info dot                                                         |
+| `neutral-dot`    | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.35:1 pass  | Idle and unknown dot                                             |
+| `focus`          | `canvas`       | 3:1 (ui)     | 16.26:1 pass | 15.64:1 pass | Focus ring                                                       |
+| `focus`          | `surface`      | 3:1 (ui)     | 14.60:1 pass | 17.07:1 pass | Focus ring                                                       |
+| `focus`          | `well`         | 3:1 (ui)     | 15.65:1 pass | 15.50:1 pass | Focus ring                                                       |
+| `focus`          | `hover`        | 3:1 (ui)     | 11.99:1 pass | 13.87:1 pass | Focus ring                                                       |
+| `focus`          | `raised`       | 3:1 (ui)     | 10.16:1 pass | 17.31:1 pass | Focus ring                                                       |
+| `focus`          | `code-bg`      | 3:1 (ui)     | 16.90:1 pass | 15.19:1 pass | Focus ring                                                       |
+| `focus`          | `diff-add`     | 3:1 (ui)     | 12.80:1 pass | 14.77:1 pass | Focus ring                                                       |
+| `focus`          | `diff-del`     | 3:1 (ui)     | 13.31:1 pass | 14.45:1 pass | Focus ring                                                       |
+| `danger`         | `surface`      | 3:1 (ui)     | 5.50:1 pass  | 7.09:1 pass  | Destructive button fill                                          |
+| `chart-requests` | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.82:1 pass  | Chart mark                                                       |
+| `chart-errors`   | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Chart mark                                                       |
+| `chart-deploy`   | `surface`      | 3:1 (ui)     | 10.01:1 pass | 9.08:1 pass  | Chart mark                                                       |
+| `chart-2xx`      | `surface`      | 3:1 (ui)     | 8.37:1 pass  | 3.63:1 pass  | Chart mark                                                       |
+| `chart-3xx`      | `surface`      | 3:1 (ui)     | 8.58:1 pass  | 3.81:1 pass  | Chart mark                                                       |
+| `chart-4xx`      | `surface`      | 3:1 (ui)     | 8.93:1 pass  | 3.67:1 pass  | Chart mark                                                       |
+| `chart-5xx`      | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.67:1 pass  | Chart mark                                                       |
+| `chart-other`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Chart mark                                                       |
+| `chart-series`   | `surface`      | 3:1 (ui)     | 7.62:1 pass  | 5.02:1 pass  | Chart mark                                                       |
+| `chart-requests` | `canvas`       | 3:1 (ui)     | 8.72:1 pass  | 4.42:1 pass  | Chart mark                                                       |
+| `chart-errors`   | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Chart mark                                                       |
+| `chart-deploy`   | `canvas`       | 3:1 (ui)     | 11.14:1 pass | 8.32:1 pass  | Chart mark                                                       |
+| `chart-2xx`      | `canvas`       | 3:1 (ui)     | 9.32:1 pass  | 3.33:1 pass  | Chart mark                                                       |
+| `chart-3xx`      | `canvas`       | 3:1 (ui)     | 9.56:1 pass  | 3.49:1 pass  | Chart mark                                                       |
+| `chart-4xx`      | `canvas`       | 3:1 (ui)     | 9.94:1 pass  | 3.36:1 pass  | Chart mark                                                       |
+| `chart-5xx`      | `canvas`       | 3:1 (ui)     | 7.59:1 pass  | 4.28:1 pass  | Chart mark                                                       |
+| `chart-other`    | `canvas`       | 3:1 (ui)     | 7.58:1 pass  | 4.38:1 pass  | Chart mark                                                       |
+| `chart-series`   | `canvas`       | 3:1 (ui)     | 8.49:1 pass  | 4.60:1 pass  | Chart mark                                                       |
+| `chart-requests` | `well`         | 3:1 (ui)     | 8.39:1 pass  | 4.38:1 pass  | Chart mark                                                       |
+| `chart-errors`   | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Chart mark                                                       |
+| `chart-deploy`   | `well`         | 3:1 (ui)     | 10.73:1 pass | 8.25:1 pass  | Chart mark                                                       |
+| `chart-2xx`      | `well`         | 3:1 (ui)     | 8.98:1 pass  | 3.30:1 pass  | Chart mark                                                       |
+| `chart-3xx`      | `well`         | 3:1 (ui)     | 9.20:1 pass  | 3.46:1 pass  | Chart mark                                                       |
+| `chart-4xx`      | `well`         | 3:1 (ui)     | 9.57:1 pass  | 3.33:1 pass  | Chart mark                                                       |
+| `chart-5xx`      | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.24:1 pass  | Chart mark                                                       |
+| `chart-other`    | `well`         | 3:1 (ui)     | 7.30:1 pass  | 4.35:1 pass  | Chart mark                                                       |
+| `chart-series`   | `well`         | 3:1 (ui)     | 8.17:1 pass  | 4.56:1 pass  | Chart mark                                                       |
+| `fg`             | `hover`        | 3:1 (ui)     | 11.99:1 pass | 13.87:1 pass | Chart segment on its track                                       |
+| `chart-requests` | `hover`        | 3:1 (ui)     | 6.43:1 pass  | 3.92:1 pass  | Chart segment on its track                                       |
+| `chart-series`   | `hover`        | 3:1 (ui)     | 6.26:1 pass  | 4.08:1 pass  | Chart segment on its track                                       |
+| `chart-3xx`      | `hover`        | 3:1 (ui)     | 7.05:1 pass  | 3.10:1 pass  | Chart segment on its track                                       |
+| `chart-other`    | `hover`        | 3:1 (ui)     | 5.59:1 pass  | 3.89:1 pass  | Chart segment on its track                                       |
+| `fg`             | `surface`      | 3:1 (ui)     | 14.60:1 pass | 17.07:1 pass | Chart segment and legend swatch                                  |
+| `chart-requests` | `surface`      | 3:1 (ui)     | 7.83:1 pass  | 4.82:1 pass  | Chart segment and legend swatch                                  |
+| `chart-series`   | `surface`      | 3:1 (ui)     | 7.62:1 pass  | 5.02:1 pass  | Chart segment and legend swatch                                  |
+| `chart-3xx`      | `surface`      | 3:1 (ui)     | 8.58:1 pass  | 3.81:1 pass  | Chart segment and legend swatch                                  |
+| `chart-other`    | `surface`      | 3:1 (ui)     | 6.81:1 pass  | 4.78:1 pass  | Chart segment and legend swatch                                  |
+| `fg-muted`       | `hover`        | 4.5:1 (text) | 6.46:1 pass  | 6.22:1 pass  | Table sort icon and header text on hover                         |
+| `fg`             | `hover`        | 4.5:1 (text) | 11.99:1 pass | 13.87:1 pass | Selected table row and current sidebar item                      |
+| `fg-muted`       | `well`         | 4.5:1 (text) | 8.44:1 pass  | 6.96:1 pass  | Empty state icon                                                 |
+| `neutral-fg`     | `neutral-soft` | 4.5:1 (text) | 7.73:1 pass  | 6.89:1 pass  | Palette prefix chip                                              |
 
 <!-- tokens:contrast:end -->
 
@@ -248,20 +253,20 @@ Rules:
 
 ## Typography
 
-Figtree for UI, JetBrains Mono (slashed zero) for ids, hashes, keys and logs. Headings use `text-wrap: balance`, prose `text-wrap: pretty`, and the root is antialiased. Numbers in tables and tiles use tabular figures (`tabular-nums`). Body copy never goes below 13px; 12px is for captions and keycaps only.
+Figtree for UI, JetBrains Mono (slashed zero) for ids, hashes, keys and logs. Headings use `text-wrap: balance`, prose `text-wrap: pretty`, and the root is antialiased. Numbers in table columns use tabular figures (`tabular-nums`); the hero number of a metric tile is proportional (`text-metric`, 28px), and its sparkline marks the current point. Body copy never goes below 13px; 12px is for captions and keycaps only.
 
 <!-- tokens:type:start -->
 
-| Step     | Size / line | Weight | Tracking | Utility       | Use                             |
-| -------- | ----------- | ------ | -------- | ------------- | ------------------------------- |
-| `xs`     | 12px / 16px | 500    | 0em      | `text-xs`     | Captions, keycaps, dense meta   |
-| `sm`     | 13px / 20px | 400    | 0em      | `text-sm`     | Labels, helper text, table meta |
-| `base`   | 14px / 20px | 400    | 0em      | `text-base`   | Body, controls, table cells     |
-| `md`     | 15px / 22px | 600    | -0.005em | `text-md`     | Section titles                  |
-| `lg`     | 18px / 26px | 700    | -0.01em  | `text-lg`     | Dialog and panel titles         |
-| `xl`     | 24px / 32px | 700    | -0.015em | `text-xl`     | Page titles on small screens    |
-| `2xl`    | 28px / 36px | 700    | -0.02em  | `text-2xl`    | Page titles                     |
-| `metric` | 36px / 40px | 700    | -0.025em | `text-metric` | KPI numbers (tabular figures)   |
+| Step     | Size / line | Weight | Tracking | Utility       | Use                                                  |
+| -------- | ----------- | ------ | -------- | ------------- | ---------------------------------------------------- |
+| `xs`     | 12px / 16px | 500    | 0em      | `text-xs`     | Captions, keycaps, dense meta                        |
+| `sm`     | 13px / 20px | 400    | 0em      | `text-sm`     | Labels, helper text, table meta                      |
+| `base`   | 14px / 20px | 400    | 0em      | `text-base`   | Body, controls, table cells                          |
+| `md`     | 15px / 22px | 600    | -0.005em | `text-md`     | Section titles                                       |
+| `lg`     | 18px / 26px | 700    | -0.01em  | `text-lg`     | Dialog and panel titles                              |
+| `xl`     | 24px / 32px | 700    | -0.015em | `text-xl`     | Page titles on small screens                         |
+| `2xl`    | 28px / 36px | 700    | -0.02em  | `text-2xl`    | Page titles                                          |
+| `metric` | 28px / 36px | 700    | -0.02em  | `text-metric` | Hero numbers in a metric tile (proportional figures) |
 
 <!-- tokens:type:end -->
 
@@ -318,57 +323,75 @@ Radii are concentric: outer = inner + padding. A button or input is 8. A menu or
 
 ## Shadow and elevation
 
-Each shadow is a stack: a 1px ring, a contact shadow and an ambient shadow in light; a ring, a 1px top highlight and a deep ambient shadow in dark. `card` lifts a card, `button` and `primary` finish controls, `field` draws the control edge, `pill` is the sliding tab, `float` is for menus, selects, popovers and tooltips, `dialog` for dialogs and toasts. Floating layers also use the lighter `raised` surface, so in dark they read as clearly raised.
+Afloat surfaces float low: each shadow is a hairline ring inside the shadow (never a border) plus a negative-spread cast, and in dark a ring, a 1px top highlight and a deep black cast. `card` lifts a card and `card-hover` lifts it further. `button` and `primary` finish controls; their `-hover` steps lift the cast (hover is colour plus that lift, never movement) and `-pressed` presses it in. `field` draws the control edge (3:1). `tray` is recessed water for segmented controls, tab lists and empty charts; `pill` is the raised pebble that rides on it. `float` is for menus, selects, popovers and tooltips, `dialog` for dialogs and toasts. Floating layers also use the lighter `raised` surface, so in dark they read as clearly raised.
 
 <!-- tokens:shadow:start -->
 
-| Token         | Utility              | Dark                                                                                                                                    | Light                                                                                                                                                  |
-| ------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `card`        | `shadow-card`        | `0 0 0 1px oklch(1 0 0 / 0.05), inset 0 1px 0 oklch(1 0 0 / 0.04)`                                                                      | `0 0 0 1px oklch(0.3 0 0 / 0.05), 0 1px 2px oklch(0.3 0 0 / 0.05)`                                                                                     |
-| `button`      | `shadow-button`      | `inset 0 0 0 1px oklch(1 0 0 / 0.08)`                                                                                                   | `inset 0 0 0 1px oklch(0.3 0 0 / 0.07)`                                                                                                                |
-| `primary`     | `shadow-primary`     | `inset 0 1px 0 oklch(1 0 0 / 0.25), 0 1px 2px oklch(0 0 0 / 0.4)`                                                                       | `inset 0 1px 0 oklch(1 0 0 / 0.18), 0 1px 2px oklch(0.3 0.08 150 / 0.3)`                                                                               |
-| `field`       | `shadow-field`       | `inset 0 0 0 1px var(--sb-control-edge)`                                                                                                | `inset 0 0 0 1px var(--sb-control-edge)`                                                                                                               |
-| `field-hover` | `shadow-field-hover` | `inset 0 0 0 1px var(--sb-fg-muted)`                                                                                                    | `inset 0 0 0 1px var(--sb-fg-muted)`                                                                                                                   |
-| `pill`        | `shadow-pill`        | `0 0 0 1px oklch(1 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 3px oklch(0 0 0 / 0.4)`                                         | `0 0 0 1px oklch(0.3 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.1)`                                                                                      |
-| `float`       | `shadow-float`       | `0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.35), 0 18px 44px -6px oklch(0 0 0 / 0.65)` | `0 0 0 1px oklch(0.3 0 0 / 0.08), 0 1px 2px -1px oklch(0.3 0 0 / 0.12), 0 4px 8px -2px oklch(0.3 0 0 / 0.08), 0 16px 32px -8px oklch(0.3 0 0 / 0.18)`  |
-| `dialog`      | `shadow-dialog`      | `0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 4px 8px oklch(0 0 0 / 0.35), 0 28px 72px -8px oklch(0 0 0 / 0.75)` | `0 0 0 1px oklch(0.3 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.12), 0 8px 16px -4px oklch(0.3 0 0 / 0.1), 0 32px 64px -12px oklch(0.3 0 0 / 0.28)` |
+| Token             | Utility                  | Dark                                                                                                                                    | Light                                                                                                                                                     |
+| ----------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `card`            | `shadow-card`            | `0 0 0 1px oklch(1 0 0 / 0.06), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.5)`                                | `0 0 0 1px oklch(0.22 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.05), 0 10px 24px -14px oklch(0.3 0 0 / 0.18)`                                              |
+| `card-hover`      | `shadow-card-hover`      | `0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 18px 32px -14px oklch(0 0 0 / 0.6)`                                | `0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px oklch(0.3 0 0 / 0.06), 0 18px 32px -14px oklch(0.3 0 0 / 0.26)`                                              |
+| `button`          | `shadow-button`          | `inset 0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.3)`                                  | `inset 0 0 0 1px oklch(0.22 0 0 / 0.09), 0 1px 2px oklch(0.3 0 0 / 0.06)`                                                                                 |
+| `button-hover`    | `shadow-button-hover`    | `inset 0 0 0 1px oklch(1 0 0 / 0.12), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 3px 8px -2px oklch(0 0 0 / 0.45)`                            | `inset 0 0 0 1px oklch(0.22 0 0 / 0.11), 0 3px 8px -2px oklch(0.3 0 0 / 0.14)`                                                                            |
+| `button-pressed`  | `shadow-button-pressed`  | `inset 0 0 0 1px oklch(1 0 0 / 0.1), inset 0 2px 3px oklch(0 0 0 / 0.3)`                                                                | `inset 0 0 0 1px oklch(0.22 0 0 / 0.12), inset 0 2px 3px oklch(0.3 0 0 / 0.08)`                                                                           |
+| `primary`         | `shadow-primary`         | `inset 0 1px 0 oklch(1 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.4), 0 6px 14px -6px oklch(0.6 0.12 152 / 0.4)`                            | `inset 0 1px 0 oklch(1 0 0 / 0.22), 0 1px 2px oklch(0.3 0.08 152 / 0.3), 0 6px 14px -6px oklch(0.3 0.1 152 / 0.45)`                                       |
+| `primary-hover`   | `shadow-primary-hover`   | `inset 0 1px 0 oklch(1 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.4), 0 10px 20px -6px oklch(0.6 0.12 152 / 0.5)`                            | `inset 0 1px 0 oklch(1 0 0 / 0.26), 0 2px 4px oklch(0.3 0.08 152 / 0.3), 0 10px 20px -6px oklch(0.3 0.1 152 / 0.5)`                                       |
+| `primary-pressed` | `shadow-primary-pressed` | `inset 0 2px 3px oklch(0.2 0.06 152 / 0.45)`                                                                                            | `inset 0 2px 3px oklch(0.2 0.06 152 / 0.3)`                                                                                                               |
+| `field`           | `shadow-field`           | `inset 0 0 0 1px var(--sb-control-edge)`                                                                                                | `inset 0 0 0 1px var(--sb-control-edge)`                                                                                                                  |
+| `field-hover`     | `shadow-field-hover`     | `inset 0 0 0 1px var(--sb-fg-muted)`                                                                                                    | `inset 0 0 0 1px var(--sb-fg-muted)`                                                                                                                      |
+| `tray`            | `shadow-tray`            | `inset 0 1px 2px oklch(0 0 0 / 0.35), inset 0 0 0 1px oklch(1 0 0 / 0.04)`                                                              | `inset 0 1px 2px oklch(0.3 0 0 / 0.08), inset 0 0 0 1px oklch(0.22 0 0 / 0.04)`                                                                           |
+| `pill`            | `shadow-pill`            | `0 0 0 1px oklch(1 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 3px oklch(0 0 0 / 0.4)`                                         | `0 0 0 1px oklch(0.22 0 0 / 0.07), 0 1px 2px oklch(0.3 0 0 / 0.1), 0 4px 8px -4px oklch(0.3 0 0 / 0.16)`                                                  |
+| `float`           | `shadow-float`           | `0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.35), 0 18px 44px -6px oklch(0 0 0 / 0.65)` | `0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.1), 0 12px 28px -8px oklch(0.3 0 0 / 0.22), 0 24px 48px -16px oklch(0.3 0 0 / 0.22)`  |
+| `dialog`          | `shadow-dialog`          | `0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 4px 8px oklch(0 0 0 / 0.35), 0 28px 72px -8px oklch(0 0 0 / 0.75)` | `0 0 0 1px oklch(0.22 0 0 / 0.08), 0 4px 8px -2px oklch(0.3 0 0 / 0.12), 0 24px 48px -12px oklch(0.3 0 0 / 0.28), 0 48px 96px -24px oklch(0.3 0 0 / 0.3)` |
 
 <!-- tokens:shadow:end -->
 
 ## Motion
 
-Rules (Krehel, Kowalski):
+The character is **Afloat**: the raft takes your weight. Rules (Apple HIG springs, Krehel, Kowalski):
 
-- **Curves.** `ease-out` (`cubic-bezier(.23,1,.32,1)`) for everything entering or pressed. `ease-in-out` (`cubic-bezier(.77,0,.175,1)`) only for an indicator that slides across the screen (the tab pill). Hover colour uses plain `ease`. No ease-in.
-- **Durations.** Press 160ms. Tooltip 150 in, 100 out. Menu, select and popover 180 in, 120 out. Dialog 220 in, 150 out. Tab pill 250. Toast 300 in, 200 out.
+- **Springs.** Three springs, each a `duration + bounce` pair sampled to a CSS `linear()` curve at build time (`src/lib/spring.ts`), so they run on the compositor and an interrupted spring needs no JavaScript. `--sb-spring-bob` (0.45s, bounce 0.25) overshoots once: the release of a press, a checkbox filling, a radio dot landing. `--sb-spring-snappy` (0.35s, bounce 0.15) barely overshoots: popups, tooltips and toasts arriving, the segmented and tab pebble, the switch thumb, deck moves. `--sb-spring-smooth` (0.35s, no bounce): dialogs and the drawer arriving. Pair each with its `--sb-duration-spring-*` (the curve runs to rest, 1.5× the perceived duration, so nothing snaps at the end). Tailwind: `ease-spring-bob` and friends.
+- **Press and release.** A press settles the control 1px down (`--sb-offset-press`) and to scale 0.97 in 90ms ease-out, and presses the shadow in; letting go returns it on `bob`. `pressMotion` in `src/lib/cn.ts` is the one implementation; buttons and icon buttons use it.
+- **Nothing else bounces.** Hover is colour plus a lift in the cast shadow (120ms). Menus and table rows do not animate their highlight. Exits are short and plain: popups and toasts 110ms, dialogs 150ms, all `ease-out`.
+- **Controls.** The switch thumb squishes 18% toward its travel while pressed (anchored on the side it leaves) and slides on `snappy`. A checkbox bobs once as it fills (only on a change, never on mount) and its check pops on `bob`. Segmented control and tabs share one raised pebble (`pebble`, `shadow-pill`) on a recessed tray (`traySurface`, `shadow-tray`) that slides on `snappy`.
+- **Success and creation sprout.** `StatusGlyph sprout` (also on `Badge` and `StatusDot`) grows the success shape up from its base and sends one ring out, once, on mount. Toasts use it when they land as a success or turn into one; `InlineConfirm` uses it on its check. Only success and creation sprout.
+- **Skeletons breathe.** A 1.6s opacity breath, siblings 120ms apart, instead of a flash; it is a fade, so it stays under reduced motion.
+- **Curves.** `ease-out` (`cubic-bezier(.23,1,.32,1)`) for colour, fades and exits. Hover colour uses plain `ease`. No ease-in.
+- **Durations.** Press 90ms. Tooltip 150 in, 100 out. Popup fade 140 in, 110 out. Dialog fade 220 in, 150 out. Toast fade 300 in, 110 out. Focus wake 520ms.
 - **Scale and origin.** Layers enter from scale 0.96 (never lower) with the origin at the trigger (`origin-(--transform-origin)`). Dialogs scale from their center. Buttons press to 0.97.
 - **Tooltips are warm.** The provider waits 450ms, then neighbours open with no delay and no animation for 300ms.
 - **Keyboard opens do not animate.** A menu, select, popover or dialog opened with a key press (or Enter on a trigger) sets `data-sb-instant` and skips the transition; ⌘K-style palettes do not animate at all.
-- **Implementation.** CSS transitions with Base UI's `data-starting-style` and `data-ending-style` (its `@starting-style`), never keyframes, so every transition can be interrupted. Only `opacity`, `scale`, `translate` and colors move. Transitions name their properties, never `all`. Hover styles sit behind `(hover: hover)`.
-- **Reduced motion.** `--sb-move` drops to 0, every `--sb-scale-*` becomes 1 and toasts fade in place; opacity and colour fades stay (durations are not zeroed). The tab pill and switch thumb jump, the spinner stops.
+- **Implementation.** CSS transitions with Base UI's `data-starting-style` and `data-ending-style` (its `@starting-style`), so every transition can be interrupted. Keyframes only for one-shot effects that are never interrupted: the focus wake (`sb-wake`), the checkbox bob (`sb-bob`), the sprout (`sb-sprout`, `sb-sprout-ring`) and the skeleton breath (`sb-breathe`), all in theme.css. Only `opacity`, `scale`, `translate` and colors move. Transitions name their properties, never `all`. Hover styles sit behind `(hover: hover)`.
+- **Reduced motion.** Substitute, never remove. `--sb-move` drops to 0, so every `--sb-scale-*` becomes 1, `--sb-offset-*` becomes 0 and toasts fade in place; every spring collapses to a 160ms ease-out with no overshoot (the pebble and the switch thumb glide instead of springing); opacity and colour fades stay (durations are not zeroed); the focus wake fades without spreading; the spinner stops. `data-motion="reduce"` on `<html>` does the same from an app setting.
 
 <!-- tokens:motion:start -->
 
-| Token                       | Value                             | Reduced motion         |
-| --------------------------- | --------------------------------- | ---------------------- |
-| `--sb-duration-hover`       | 120ms                             | unchanged (fade stays) |
-| `--sb-duration-press`       | 160ms                             | unchanged (fade stays) |
-| `--sb-duration-tooltip-in`  | 150ms                             | unchanged (fade stays) |
-| `--sb-duration-tooltip-out` | 100ms                             | unchanged (fade stays) |
-| `--sb-duration-popup-in`    | 180ms                             | unchanged (fade stays) |
-| `--sb-duration-popup-out`   | 120ms                             | unchanged (fade stays) |
-| `--sb-duration-dialog-in`   | 220ms                             | unchanged (fade stays) |
-| `--sb-duration-dialog-out`  | 150ms                             | unchanged (fade stays) |
-| `--sb-duration-slide`       | 250ms                             | unchanged (fade stays) |
-| `--sb-duration-toast-in`    | 300ms                             | unchanged (fade stays) |
-| `--sb-duration-toast-out`   | 200ms                             | unchanged (fade stays) |
-| `ease-out`                  | `cubic-bezier(0.23, 1, 0.32, 1)`  | unchanged              |
-| `ease-in-out`               | `cubic-bezier(0.77, 0, 0.175, 1)` | unchanged              |
-| `ease-hover`                | `ease`                            | unchanged              |
-| `--sb-scale-popup`          | 0.96                              | 1 (no scale)           |
-| `--sb-scale-dialog`         | 0.96                              | 1 (no scale)           |
-| `--sb-scale-press`          | 0.97                              | 1 (no scale)           |
-| `--sb-scale-icon`           | 0.25                              | 1 (no scale)           |
+| Token                                                                          | Value                                                                               | Reduced motion               |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | ---------------------------- |
+| `--sb-duration-hover`                                                          | 120ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-press`                                                          | 90ms                                                                                | unchanged (fade stays)       |
+| `--sb-duration-tooltip-in`                                                     | 150ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-tooltip-out`                                                    | 100ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-popup-in`                                                       | 140ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-popup-out`                                                      | 110ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-dialog-in`                                                      | 220ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-dialog-out`                                                     | 150ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-slide`                                                          | 250ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-toast-in`                                                       | 300ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-toast-out`                                                      | 110ms                                                                               | unchanged (fade stays)       |
+| `--sb-duration-wake`                                                           | 520ms                                                                               | unchanged (fade stays)       |
+| `ease-out`                                                                     | `cubic-bezier(0.23, 1, 0.32, 1)`                                                    | unchanged                    |
+| `ease-in-out`                                                                  | `cubic-bezier(0.77, 0, 0.175, 1)`                                                   | unchanged                    |
+| `ease-hover`                                                                   | `ease`                                                                              | unchanged                    |
+| `--sb-spring-smooth` (`ease-spring-smooth`) with `--sb-duration-spring-smooth` | 0.35s, bounce 0: Dialogs and drawers arriving; no overshoot                         | 160ms ease-out, no overshoot |
+| `--sb-spring-snappy` (`ease-spring-snappy`) with `--sb-duration-spring-snappy` | 0.35s, bounce 0.15: Popups, toasts, the segmented and tab pebble, the switch thumb  | 160ms ease-out, no overshoot |
+| `--sb-spring-bob` (`ease-spring-bob`) with `--sb-duration-spring-bob`          | 0.45s, bounce 0.25: Release of a press, a checkbox filling, a success glyph landing | 160ms ease-out, no overshoot |
+| `--sb-offset-press`                                                            | 1px                                                                                 | 0 (no movement)              |
+| `--sb-offset-wake`                                                             | 6px                                                                                 | 0 (no movement)              |
+| `--sb-scale-popup`                                                             | 0.96                                                                                | 1 (no scale)                 |
+| `--sb-scale-dialog`                                                            | 0.96                                                                                | 1 (no scale)                 |
+| `--sb-scale-press`                                                             | 0.97                                                                                | 1 (no scale)                 |
+| `--sb-scale-icon`                                                              | 0.25                                                                                | 1 (no scale)                 |
 
 <!-- tokens:motion:end -->
 
@@ -377,7 +400,7 @@ Rules (Krehel, Kowalski):
 One `ToastProvider` near the root, one `toast` object anywhere. A toast is a status (tone) plus a short title; everything else is optional.
 
 - **Deck.** The newest toast sits in front; older ones peek 10px behind it, 5% narrower, up to three. Hover or keyboard focus fans the deck out into a readable history and pauses every timer. Timers also pause while the tab is hidden. Touch: tap to expand.
-- **Dismiss.** Close button, Escape on the focused toast, a swipe past 40px, or a flick (0.4px/ms) either way. A released drag springs back on a damped spring (`linear()` easing, no JavaScript per frame). `Alt+T` (or F6) focuses the newest toast and the region is labelled with the shortcut.
+- **Dismiss.** Close button, Escape on the focused toast, a swipe past 40px, or a flick (0.4px/ms) either way. A released drag springs back on `--sb-spring-bob` (`linear()` easing, no JavaScript per frame). Toasts arrive on `snappy` and leave in 110ms; a success glyph sprouts as it lands. `Alt+T` (or F6) focuses the newest toast and the region is labelled with the shortcut.
 - **Update in place.** `toast.update(id, patch)` crossfades text and glyph (blur-masked, 300ms ease-out) and animates the height. The progress line (3px, tone colour) shows only while `progress` is a number; `progress: null` ends it.
 - **deployToast.** `deployToast({ name })` returns `uploaded(progress) progress(n) live() failed(reason)` for one toast that morphs through the deploy: Uploaded, then Live. Failed is red with Retry. Only the end states are not `silent`.
 - **Merging.** Identical toasts (same tone, title, description, or `key`) become one with a ×N counter, move to the front and restart the timer. `merge: false` or an explicit `id` opts out.
@@ -439,8 +462,10 @@ Use compact for log viewers, resource tables with many rows, and panels the user
 ## Focus rings
 
 - Every focusable element shows a 2px ring in `focus`, offset 2px, on `:focus-visible` only. Mouse clicks do not draw a ring; keyboard and programmatic focus do.
-- **The ring is neutral, never green.** `focus` is the primary text ink: near-black in light, near-white in dark. Green means go or success, so a destructive control must not look safe while focused. The 2px offset leaves a gap of page background, so the ring contrasts with the page, not with the control fill, and it reads on every button variant.- The ring is an outline, so it is not clipped by `overflow: hidden` on the control. Inside a clipped scroller (tab lists, menus) use a negative offset (`-outline-offset-2`).
-- The ring is an outline, so it is not clipped by `overflow: hidden` on the control. Inside a clipped scroller (tab lists, menus) use a negative offset (`-outline-offset-2`).- Never remove an outline without replacing it. Never rely on color change of the background alone.
+- **The wake.** When the ring appears, a halo in the focus ink ripples 6px out from it once and fades (`focusWake`, 520ms), like a wake behind a raft. It rides in Tailwind's ring slot of `box-shadow`, so it composes with the control's own shadow; the 2px outline is the ring that stays.
+- **The ring is neutral, never green.** `focus` is the primary text ink: near-black in light, near-white in dark. Green means go or success, so a destructive control must not look safe while focused. The 2px offset leaves a gap of page background, so the ring contrasts with the page, not with the control fill, and it reads on every button variant.
+- The ring is an outline, so it is not clipped by `overflow: hidden` on the control. Inside a clipped scroller (tab lists, menus) use a negative offset (`-outline-offset-2`, `focusRingInset`, no wake).
+- Never remove an outline without replacing it. Never rely on color change of the background alone.
 - Invalid fields keep the same ring and add a `danger` ring plus an error message wired through `aria-describedby`.
 - The ring must clear 3:1 against every surface it sits on; the contrast table covers `canvas`, `surface`, `well`, `hover`, `raised`, `code-bg` and the diff tints. It does not sit on a control fill: the offset gap is page background.
 
@@ -454,7 +479,8 @@ Use compact for log viewers, resource tables with many rows, and panels the user
 - Tables: `hideBelow` is for low-priority columns only (message, author, age). Never put critical status inside a column that can hide: a failure or degraded signal goes in the always-visible Status cell (or the version cell), so it survives at 390px.
 - Router links: every component that renders an `<a>` (`Link`, `SidebarItem`, `PageTab`, a `Breadcrumbs` item) takes a `render` prop, so a router can supply the element: `<SidebarItem render={<RouterLink to="/projects" />}>Sprouts</SidebarItem>`. ikada merges its class, ref and handlers into it, so there is one link component per app and no `href` to keep in sync. Without `render` they are plain anchors.
 - Secrets: tokens and passwords use `SensitiveInput` (masked, with a reveal button and an optional copy button), never a plain `type="password"` Input with a hand-built toggle.
-- Charts live in `@sproutboat/ikada/charts`: `TimeseriesChart` (with a dashed deploy marker) and `Sparkline` wrap TanStack Charts and read only the `chart-*` tokens, so they follow the theme with no rebuild.
+- Charts live in `@sproutboat/ikada/charts`: `TimeseriesChart` (with a dashed deploy marker) and `Sparkline` wrap TanStack Charts and read only the `chart-*` tokens, so they follow the theme with no rebuild. Epoch-millisecond times read as clock times (ticks on whole hours) or dates; a chart with no points keeps its height on a recessed tray and says "No data for this range". Sparklines mark the current point.
+- Checked checkboxes, radios and switches are a solid `brand` fill: 3:1 against the unchecked control and every surface they sit on (including `raised`), in both themes. Unchecked controls keep the 3:1 `control-edge` ring; never a tint alone.
 - Positioned layers (Tooltip, Popover, Menu, Select) flip and shift inside the viewport and use `collisionPadding`.
 - Dialogs trap focus, restore it on close, and close on Escape. Destructive dialogs focus the cancel action first.
 - Copy follows the product voice: sentence case, verb first on buttons ("Create project", never "Submit"), errors say what to do next.

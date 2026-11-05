@@ -4,7 +4,7 @@ The full list of components `@sproutboat/ikada` needs. It starts from the index 
 
 Priority: **P0** is built in phase 1, **P1** is next (needed by the dashboards' first screens), **P2** comes later. "Base UI" names the primitive from `@base-ui/react`; "none" means plain elements.
 
-Common states for every interactive component: rest, hover, focus-visible, active, disabled, plus the ones listed per row. All components take `className` and `ref`, use logical properties, and honour reduced motion (see `DESIGN.md`).
+Common states for every interactive component: rest, hover, focus-visible (with the wake), active (the Afloat press), disabled, plus the ones listed per row. All components take `className` and `ref`, use logical properties, and honour reduced motion (see `DESIGN.md`).
 
 ## General components
 
@@ -17,10 +17,10 @@ Common states for every interactive component: rest, hover, focus-visible, activ
 | Label                         | none                                | required                                                                                                                 | P0       | done   | Label                            |
 | Field                         | `field`                             | description, error, required, invalid                                                                                    | P0       | done   | Label + Input wrappers           |
 | Select                        | `select`                            | open, selected, disabled option, invalid, placeholder                                                                    | P0       | done   | Select                           |
-| Checkbox                      | `checkbox`                          | checked, mixed, disabled, invalid                                                                                        | P0       | done   | Checkbox                         |
-| Switch                        | `switch`                            | on, off, disabled                                                                                                        | P0       | done   | Switch                           |
-| Badge                         | none                                | tones (neutral, success, warning, danger, info), dot                                                                     | P0       | done   | Badge                            |
-| StatusDot (with label)        | none                                | tones, pulse, label hidden visually                                                                                      | P0       | done   | none                             |
+| Checkbox                      | `checkbox`                          | checked (bobs once as it fills), mixed, disabled, invalid                                                                | P0       | done   | Checkbox                         |
+| Switch                        | `switch`                            | on, off, disabled, pressed (thumb squishes toward its travel)                                                            | P0       | done   | Switch                           |
+| Badge                         | none                                | tones (neutral, success, warning, danger, info), dot, sprout                                                             | P0       | done   | Badge                            |
+| StatusDot (with label)        | none                                | tones, pulse, sprout, label hidden visually                                                                              | P0       | done   | none                             |
 | Tooltip                       | `tooltip`                           | open, delay, collision flip                                                                                              | P0       | done   | Tooltip                          |
 | Popover                       | `popover`                           | open, collision flip, focus return                                                                                       | P0       | done   | Popover                          |
 | Dialog                        | `dialog`                            | open, nested close, destructive, scroll                                                                                  | P0       | done   | Dialog, Layer Dialog             |
@@ -28,7 +28,7 @@ Common states for every interactive component: rest, hover, focus-visible, activ
 | Tabs                          | `tabs`                              | selected, disabled, overflow scroll                                                                                      | P0       | done   | Tabs                             |
 | Toast                         | `toast`                             | deck (stacked, fan out on hover or focus), morph in place, merge ×N, Undo, failed, flick to dismiss, Alt+T, history hook | P0       | done   | Toast                            |     |
 | InlineConfirm                 | none                                | bubble, inline slot, reduced motion, announced                                                                           | P0       | done   | Inline Copy Text                 |     |
-| Skeleton                      | none                                | line, block, circle, reduced motion                                                                                      | P0       | done   | Skeleton Line                    |
+| Skeleton                      | none                                | line, block, circle, breath staggered across siblings                                                                    | P0       | done   | Skeleton Line                    |
 | CopyId                        | `tooltip`                           | copied, clipboard unavailable, truncated                                                                                 | P0       | done   | Clipboard Text, Inline Copy Text |
 | Activity feed                 | none                                | subscribes to the toast history hook; groups by day, filters by project and errors                                       | P1       | todo   | none                             |
 | Spinner (Loader)              | none                                | sizes, reduced motion                                                                                                    | P1       | done   | Loader                           |
@@ -46,7 +46,7 @@ Common states for every interactive component: rest, hover, focus-visible, activ
 | Combobox                      | `combobox`                          | open, filtering, no results, loading, multiple                                                                           | P1       | todo   | Combobox, Autocomplete           |
 | Sidebar                       | none (`navigation-menu` for groups) | expanded, rail, mobile drawer, current                                                                                   | P1       | done   | Sidebar                          |
 | PageHeader                    | none                                | title, status, actions, tabs slot                                                                                        | P1       | done   | Page Header                      |
-| SegmentedControl              | `toggle-group`                      | selected, never empty, disabled option, sizes                                                                            | P1       | done   | Button Group, Tabs (segmented)   |
+| SegmentedControl              | `toggle-group`                      | selected (sliding pebble), never empty, disabled option, sizes                                                           | P1       | done   | Button Group, Tabs (segmented)   |
 | ButtonGroup (split button)    | `toggle-group`                      | split-button menu                                                                                                        | P2       | todo   | Button Group                     |
 | Collapsible                   | `collapsible`                       | open, closed, disabled                                                                                                   | P1       | todo   | Collapsible                      |
 | Meter                         | `meter`                             | normal, near limit (warn), at limit                                                                                      | P1       | done   | Meter                            |
@@ -68,7 +68,7 @@ Common states for every interactive component: rest, hover, focus-visible, activ
 
 | Name                                 | Base UI primitive          | States to support                                                      | Priority | Status | Kumo equivalent      |
 | ------------------------------------ | -------------------------- | ---------------------------------------------------------------------- | -------- | ------ | -------------------- |
-| MetricTile with sparkline            | none                       | loading, no data, delta up and down, unit suffix                       | P1       | done   | none                 |
+| MetricTile with sparkline            | none                       | loading, no data, delta pill, unit suffix, current point               | P1       | done   | none                 |
 | UsageMeter                           | `meter`                    | under, near limit (amber), at limit (red only when blocked), unlimited | P1       | done   | Meter                |
 | ResourceTable with "Used by"         | none                       | rows link to projects, empty "Used by", overflow chips, selection      | P1       | todo   | Table, Resource List |
 | CommandPalette                       | `dialog` + `autocomplete`  | open, groups, no results, loading, shortcut hint                       | P1       | done   | Command Palette      |
