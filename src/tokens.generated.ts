@@ -321,9 +321,9 @@ export const motion = {
 export const zIndex = {
   base: 0,
   sticky: 20,
-  dropdown: 40,
   overlay: 50,
   modal: 60,
+  dropdown: 65,
   popover: 70,
   toast: 80,
   tooltip: 90,

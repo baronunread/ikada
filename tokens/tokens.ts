@@ -282,12 +282,16 @@ export const motion = {
   scale: { popup: 0.96, dialog: 0.96, press: 0.97, icon: 0.25 },
 } as const;
 
+/**
+ * Stacking order. Menus sit above the modal layer because they open from inside dialogs and
+ * the mobile navigation drawer (a modal); below it they would render under the scrim.
+ */
 export const zIndex = {
   base: 0,
   sticky: 20,
-  dropdown: 40,
   overlay: 50,
   modal: 60,
+  dropdown: 65,
   popover: 70,
   toast: 80,
   tooltip: 90,
