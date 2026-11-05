@@ -31,6 +31,7 @@ import {
 import { Field } from "../src/components/field";
 import { IconButton } from "../src/components/icon-button";
 import { Input } from "../src/components/input";
+import { Textarea } from "../src/components/textarea";
 import { Label } from "../src/components/label";
 import { Link } from "../src/components/link";
 import {
@@ -270,6 +271,12 @@ function FormSection() {
           <Label htmlFor={labelId}>Standalone label</Label>
           <Input id={labelId} placeholder="Label + input without Field" />
         </div>
+        <Field label="Query" description="A multi-line field, mono for SQL and JSON.">
+          <Textarea mono rows={3} defaultValue={"select * from deployments\nlimit 10;"} />
+        </Field>
+        <Field label="Notes" error="Keep it under 280 characters.">
+          <Textarea defaultValue="Rolled back after the 14:02 deploy." />
+        </Field>
         <Field label="Region">
           <Select options={regions} value={region} onValueChange={setRegion} defaultOpen={openState === "select"} />
         </Field>

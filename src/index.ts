@@ -33,6 +33,8 @@ export { IconButton } from "./components/icon-button";
 export type { IconButtonProps } from "./components/icon-button";
 export { Input } from "./components/input";
 export type { InputProps } from "./components/input";
+export { Textarea } from "./components/textarea";
+export type { TextareaProps } from "./components/textarea";
 export { Label } from "./components/label";
 export { Link } from "./components/link";
 export type { LinkProps } from "./components/link";
