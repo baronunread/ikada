@@ -20,6 +20,13 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join, posix } from "node:path";
 import { parseArgs } from "node:util";
 import pkg from "../package.json" with { type: "json" };
+import {
+  motionAtProperties,
+  motionKeyframes,
+  offsetProperties,
+  reducedMotionProperties,
+  springProperties,
+} from "../tokens/generate";
 import { colorNames, dark, density, fonts, light, motion, radius, shadow, typeScale, zIndex } from "../tokens/tokens";
 
 const root = join(import.meta.dir, "..");
@@ -159,9 +166,31 @@ export function rewriteImports(file: SourceFile, content: string, bySrc: Map<str
   return { content: next, local: [...local].sort(), packages: [...packages].sort() };
 }
 
+/** The first sentence of a JSDoc body, or null when it is too short to say anything. */
+function firstSentence(raw: string): string | null {
+  const doc = raw
+    .replace(/^\s*\*\s?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sentence = /^.+?[.!?](?=\s|$)/.exec(doc)?.[0] ?? doc;
+  return sentence.length > 8 ? sentence : null;
+}
+
+/**
+ * The module comment: the first JSDoc in the file, when it comes before the first export
+ * (lib files and modules with no export named after the item, such as toast or chart-theme).
+ */
+function moduleDoc(content: string): string | null {
+  const open = content.indexOf("/**");
+  const firstExport = content.search(/^export /m);
+  if (open < 0 || (firstExport >= 0 && open > firstExport)) return null;
+  const close = content.indexOf("*/", open);
+  return close < 0 ? null : firstSentence(content.slice(open + 3, close));
+}
+
 /**
  * The first sentence of the JSDoc above the file's main export, the one named after the item
- * (`dropdown-menu` is DropdownMenu). Falls back when that export has no doc comment.
+ * (`dropdown-menu` is DropdownMenu), else the module comment, else the fallback.
  */
 function describe(content: string, item: string, fallback: string): string {
   const name = item
@@ -169,16 +198,9 @@ function describe(content: string, item: string, fallback: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join("");
   const at = content.search(new RegExp(`\\nexport (?:function|const) ${name}\\b`));
-  if (at < 0) return fallback;
-  const before = content.slice(0, at).trimEnd();
-  if (!before.endsWith("*/")) return fallback;
-  const doc = before
-    .slice(before.lastIndexOf("/**") + 3, -2)
-    .replace(/^\s*\*\s?/gm, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const sentence = /^.+?[.!?](?=\s|$)/.exec(doc)?.[0] ?? doc;
-  return sentence.length > 8 ? sentence : fallback;
+  const before = at < 0 ? "" : content.slice(0, at).trimEnd();
+  const main = before.endsWith("*/") ? firstSentence(before.slice(before.lastIndexOf("/**") + 3, -2)) : null;
+  return main ?? moduleDoc(content) ?? fallback;
 }
 
 const rem = (n: number): string => `${Number((n / 16).toFixed(4))}rem`;
@@ -206,10 +228,13 @@ export function themeItem(): RegistryItem {
     ),
     ...Object.fromEntries(colorNames.map((n) => [`color-${n}`, `var(--sb-${n})`])),
     ...Object.fromEntries(Object.keys(shadow.dark).map((k) => [`shadow-${k}`, `var(--sb-shadow-${k})`])),
+    ...Object.fromEntries(Object.keys(motion.spring).map((k) => [`ease-spring-${k}`, `var(--sb-spring-${k})`])),
   };
   const rootVars = {
     "--sb-move": "1",
     ...Object.fromEntries(Object.entries(motion.duration).map(([k, v]) => [`--sb-duration-${k}`, `${v}ms`])),
+    ...Object.fromEntries(Object.entries(springProperties()).map(([k, v]) => [k, v.replace(/\s+/g, " ")])),
+    ...offsetProperties(),
     ...Object.fromEntries(
       Object.entries(motion.scale).map(([k, v]) => [
         `--sb-scale-${k}`,
@@ -231,6 +256,9 @@ export function themeItem(): RegistryItem {
     // as `--x: var(--x)`, a self-reference. Colours are mirrored as --color-sb-*, which is harmless.
     cssVars: { theme: themeVars, light: colors(light), dark: colors(dark) },
     css: {
+      // Registered properties and keyframes for the focus wake, the checkbox bob, the sprout and the skeleton breath.
+      ...Object.fromEntries(Object.entries(motionAtProperties).map(([name, d]) => [`@property ${name}`, d])),
+      ...Object.fromEntries(Object.entries(motionKeyframes).map(([name, k]) => [`@keyframes ${name}`, k.frames])),
       "@layer base": {
         ":root": { ...rootVars, ...prefixed(shadows("light")), "color-scheme": "light" },
         ".dark": { ...prefixed(shadows("dark")), "color-scheme": "dark" },
@@ -239,7 +267,8 @@ export function themeItem(): RegistryItem {
           "--sb-control-h-sm": `${density.compact.controlSm}px`,
           "--sb-row-h": `${density.compact.row}px`,
         },
-        "@media (prefers-reduced-motion: reduce)": { ":root": { "--sb-move": "0" } },
+        "@media (prefers-reduced-motion: reduce)": { ":root": reducedMotionProperties() },
+        ':root[data-motion="reduce"]': reducedMotionProperties(),
         ".sb-chart": {
           "--ts-chart-1": "var(--sb-chart-requests)",
           "--ts-chart-2": "var(--sb-chart-series)",

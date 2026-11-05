@@ -1,6 +1,6 @@
 ---
 import Docs from "../layouts/Docs.astro";
-import { colorNames, colors, radius, typeScale, zIndex } from "../../../src/tokens.generated";
+import { colorNames, colors, motion, radius, typeScale, zIndex } from "../../../src/tokens.generated";
 ---
 
 <Docs title="Theming and tokens">
@@ -64,6 +64,25 @@ import { colorNames, colors, radius, typeScale, zIndex } from "../../../src/toke
           <li class="flex flex-col gap-2 rounded-xl bg-surface p-3 shadow-card">
             <span class="h-12 bg-hover" style={`border-radius:${name === "full" ? "9999px" : `${r.px}px`}`} />
             <span class="font-mono text-xs">{name} · {name === "full" ? "full" : `${r.px}px`}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="motion">
+      <h2 id="motion" class="text-lg">Motion: Afloat</h2>
+      <p class="max-w-2xl text-fg-muted">
+        The raft takes your weight: a press settles 1px down and 3% smaller in {motion.duration.press}ms, and the
+        release returns on <code>bob</code>, which overshoots once. Nothing else bounces. Each spring is a duration and
+        a bounce, sampled to a CSS <code>linear()</code> curve in <code>theme.css</code>. Under reduced motion every
+        spring becomes a {motion.reducedSpring.duration}ms ease-out and only fades stay.
+      </p>
+      <ul class="flex flex-col gap-2 rounded-xl bg-surface p-4 shadow-card">
+        {Object.entries(motion.spring).map(([name, s]) => (
+          <li class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span class="w-40 shrink-0 font-mono text-xs">--sb-spring-{name}</span>
+            <span class="w-32 shrink-0 font-mono text-xs text-fg-muted">{s.seconds}s, bounce {s.bounce}</span>
+            <span class="text-sm text-fg-muted">{s.use}</span>
           </li>
         ))}
       </ul>

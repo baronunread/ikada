@@ -21,4 +21,12 @@ export const examples: Example[] = [
       </div>
     ),
   },
+  {
+    title: "No data",
+    render: () => (
+      <div className="w-full">
+        <TimeseriesChart ariaLabel="Requests, last hour" series={[]} height={160} />
+      </div>
+    ),
+  },
 ];

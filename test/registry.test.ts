@@ -53,4 +53,26 @@ describe("shadcn registry", () => {
       expect(theme?.cssVars?.theme?.[`color-${n}`]).toBe(`var(--sb-${n})`);
     }
   });
+
+  test("every item is described from its source, never the generic fallback", () => {
+    const generic = registry.items.filter((i) => i.description.endsWith("from ikada, the Sproutboat design system."));
+    expect(generic.map((i) => i.name)).toEqual([]);
+  });
+
+  test("the theme ships the Afloat springs, keyframes and the reduced-motion substitutes", () => {
+    const theme = registry.items.find((i) => i.name === "theme");
+    const css = theme?.css ?? {};
+    const base = css["@layer base"] as Record<string, Record<string, string>>;
+    expect(base[":root"]?.["--sb-spring-bob"]).toMatch(/^linear\(0, /);
+    expect(base[":root"]?.["--sb-offset-press"]).toBe("calc(1px * var(--sb-move))");
+    const reduced = (
+      base["@media (prefers-reduced-motion: reduce)"] as unknown as Record<string, Record<string, string>>
+    )[":root"];
+    expect(reduced?.["--sb-spring-bob"]).toBe("cubic-bezier(0.23, 1, 0.32, 1)");
+    expect(base[':root[data-motion="reduce"]']?.["--sb-move"]).toBe("0");
+    for (const name of ["sb-wake", "sb-bob", "sb-sprout", "sb-sprout-ring", "sb-breathe"])
+      expect(css[`@keyframes ${name}`]).toBeTruthy();
+    expect(css["@property --sb-wake"]).toBeTruthy();
+    expect(theme?.cssVars?.theme?.["ease-spring-bob"]).toBe("var(--sb-spring-bob)");
+  });
 });
