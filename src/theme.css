@@ -149,9 +149,9 @@
   --sb-scale-icon: calc(1 - 0.75 * var(--sb-move));
   --sb-z-base: 0;
   --sb-z-sticky: 20;
-  --sb-z-dropdown: 40;
   --sb-z-overlay: 50;
   --sb-z-modal: 60;
+  --sb-z-dropdown: 65;
   --sb-z-popover: 70;
   --sb-z-toast: 80;
   --sb-z-tooltip: 90;

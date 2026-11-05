@@ -124,3 +124,10 @@ describe("generated files are current", () => {
     expect(strip(doc)).toBe(strip(applyDocRegions(doc)));
   });
 });
+
+describe("layers", () => {
+  test("menus stack above modals, so they open from a dialog or the mobile drawer", () => {
+    expect(generated.zIndex.dropdown).toBeGreaterThan(generated.zIndex.modal);
+    expect(generated.zIndex.dropdown).toBeLessThan(generated.zIndex.popover);
+  });
+});

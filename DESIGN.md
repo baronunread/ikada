@@ -396,9 +396,9 @@ Use the variables, never raw numbers: `z-(--sb-z-popover)`. Floating layers port
 | -------- | ----------------- | ----- |
 | base     | `--sb-z-base`     | 0     |
 | sticky   | `--sb-z-sticky`   | 20    |
-| dropdown | `--sb-z-dropdown` | 40    |
 | overlay  | `--sb-z-overlay`  | 50    |
 | modal    | `--sb-z-modal`    | 60    |
+| dropdown | `--sb-z-dropdown` | 65    |
 | popover  | `--sb-z-popover`  | 70    |
 | toast    | `--sb-z-toast`    | 80    |
 | tooltip  | `--sb-z-tooltip`  | 90    |
