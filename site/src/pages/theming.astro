@@ -1,0 +1,81 @@
+---
+import Docs from "../layouts/Docs.astro";
+import { colorNames, colors, radius, typeScale, zIndex } from "../../../src/tokens.generated";
+---
+
+<Docs title="Theming and tokens">
+  <article class="flex max-w-4xl flex-col gap-10">
+    <header class="flex flex-col gap-2">
+      <h1 class="text-2xl">Theming and tokens</h1>
+      <p class="max-w-2xl text-fg-muted">
+        Every value below is read from <code>tokens/tokens.ts</code> at build time. Colours are OKLCH. ikada is dark
+        unless <code>data-theme="light"</code> is set on <code>&lt;html&gt;</code>; the shadcn theme maps light to
+        <code>:root</code> and dark to <code>.dark</code>. Use the switch in the header to compare.
+      </p>
+    </header>
+
+    <section class="flex flex-col gap-3" aria-labelledby="colours">
+      <h2 id="colours" class="text-lg">Colours</h2>
+      <div class="overflow-x-auto rounded-xl bg-surface shadow-card">
+        <table class="w-full min-w-[34rem] text-left text-sm">
+          <thead class="text-fg-muted">
+            <tr class="border-b border-hairline">
+              <th class="px-4 py-2 font-medium">Token</th>
+              <th class="px-4 py-2 font-medium">Light</th>
+              <th class="px-4 py-2 font-medium">Dark</th>
+            </tr>
+          </thead>
+          <tbody>
+            {colorNames.map((n) => (
+              <tr class="border-b border-hairline last:border-0">
+                <td class="px-4 py-2 font-mono whitespace-nowrap">--sb-{n}</td>
+                {[colors.light[n], colors.dark[n]].map((v) => (
+                  <td class="px-4 py-2">
+                    <span class="flex items-center gap-2 font-mono text-xs whitespace-nowrap">
+                      <span class="size-5 shrink-0 rounded-sm shadow-[inset_0_0_0_1px_oklch(0.5_0_0/0.3)]" style={`background:${v}`} />
+                      {v}
+                    </span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="type">
+      <h2 id="type" class="text-lg">Type scale</h2>
+      <ul class="flex flex-col gap-2 rounded-xl bg-surface p-4 shadow-card">
+        {Object.entries(typeScale).map(([name, s]) => (
+          <li class="flex items-baseline gap-4">
+            <span class="w-16 shrink-0 font-mono text-xs text-fg-muted">{name}</span>
+            <span class="truncate" style={`font-size:${s.size / 16}rem;line-height:${s.line / 16}rem;font-weight:${s.weight};letter-spacing:${s.tracking}em`}>Deploy my-app to production</span>
+            <span class="ms-auto shrink-0 font-mono text-xs text-fg-muted">{s.size}/{s.line}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="radius">
+      <h2 id="radius" class="text-lg">Radius</h2>
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {Object.entries(radius).map(([name, r]) => (
+          <li class="flex flex-col gap-2 rounded-xl bg-surface p-3 shadow-card">
+            <span class="h-12 bg-hover" style={`border-radius:${name === "full" ? "9999px" : `${r.px}px`}`} />
+            <span class="font-mono text-xs">{name} · {name === "full" ? "full" : `${r.px}px`}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="layers">
+      <h2 id="layers" class="text-lg">Layers</h2>
+      <ul class="flex flex-wrap gap-2">
+        {Object.entries(zIndex).map(([name, z]) => (
+          <li class="rounded-md bg-surface px-3 py-1.5 font-mono text-xs shadow-card">--sb-z-{name}: {z}</li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Docs>

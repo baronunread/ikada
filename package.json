@@ -25,6 +25,9 @@
     "README.md"
   ],
   "type": "module",
+  "workspaces": [
+    "site"
+  ],
   "sideEffects": [
     "**/*.css"
   ],
@@ -48,7 +51,9 @@
     "fmt": "oxfmt .",
     "fmt:check": "oxfmt --check .",
     "check": "bun run tokens:check && bun run typecheck && bun run test",
-    "registry": "bun scripts/build-registry.ts"
+    "registry": "bun scripts/build-registry.ts",
+    "site": "bun run --cwd site dev",
+    "site:build": "bun run --cwd site build"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
