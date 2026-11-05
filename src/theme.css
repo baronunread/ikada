@@ -352,8 +352,7 @@
   --sb-duration-spring-bob: 160ms;
 }
 
-/* Shared motion primitives. The focus wake is a halo that ripples out once from the 2px
-   ring; the registered properties let a keyframe animate a box-shadow spread and alpha. */
+/* Shared motion primitives (see DESIGN.md, Motion). */
 @property --sb-wake {
   syntax: "<length>";
   inherits: false;
@@ -364,6 +363,7 @@
   inherits: false;
   initial-value: 0%;
 }
+/* The focus wake: a halo ripples out once from the 2px ring. */
 @keyframes sb-wake {
   from {
     --sb-wake: 4px;
@@ -383,7 +383,7 @@
     scale: 1;
   }
 }
-/* Success and creation: the glyph grows up from its base and sends one ring out. */
+/* Success and creation: the glyph grows up from its base... */
 @keyframes sb-sprout {
   from {
     opacity: 0.4;
@@ -396,6 +396,7 @@
     translate: 0 0;
   }
 }
+/* ...and sends one ring out. */
 @keyframes sb-sprout-ring {
   0% {
     opacity: 0;

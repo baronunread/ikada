@@ -28,14 +28,83 @@ const shadowVars = (mode: "dark" | "light"): string =>
   vars(Object.entries(shadow[mode]).map(([k, v]) => [`--sb-shadow-${k}`, v]));
 
 const ms = (n: number): string => `${n}ms`;
-const springVars = (reduced: boolean): string =>
-  vars(
+
+/** The spring easings and durations as custom properties; `reduced` gives the reduced-motion substitutes. */
+export function springProperties(reduced = false): Record<string, string> {
+  return Object.fromEntries(
     Object.entries(motion.spring).flatMap(([k, v]): [string, string][] => [
       [`--sb-spring-${k}`, reduced ? motion.reducedSpring.easing : springLinear(v.seconds, v.bounce)],
       [`--sb-duration-spring-${k}`, ms(reduced ? motion.reducedSpring.duration : springDuration(v.seconds))],
     ]),
   );
-const reducedVars = (): string => `  --sb-move: 0;\n${springVars(true)}`;
+}
+
+/** Pixel offsets that collapse with --sb-move. */
+export const offsetProperties = (): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(motion.offset).map(([k, v]) => [`--sb-offset-${k}`, `calc(${v}px * var(--sb-move))`]),
+  );
+
+/** What reduced motion (the media query or data-motion="reduce") sets on :root. */
+export const reducedMotionProperties = (): Record<string, string> => ({ "--sb-move": "0", ...springProperties(true) });
+
+/** Registered custom properties, so a keyframe can animate the focus wake's spread and alpha. */
+export const motionAtProperties: Record<string, Record<string, string>> = {
+  "--sb-wake": { syntax: '"<length>"', inherits: "false", "initial-value": "0px" },
+  "--sb-wake-alpha": { syntax: '"<percentage>"', inherits: "false", "initial-value": "0%" },
+};
+
+/** One-shot effects that are never interrupted. Everything else is a transition. */
+export const motionKeyframes: Record<string, { note: string; frames: Record<string, Record<string, string>> }> = {
+  "sb-wake": {
+    note: "The focus wake: a halo ripples out once from the 2px ring.",
+    frames: {
+      from: { "--sb-wake": "4px", "--sb-wake-alpha": "30%" },
+      to: { "--sb-wake": "calc(4px + var(--sb-offset-wake))", "--sb-wake-alpha": "0%" },
+    },
+  },
+  "sb-bob": {
+    note: "A control filling (checkbox) or a thing landing: dips, then springs back past 1 once.",
+    frames: { from: { scale: "calc(1 - 0.12 * var(--sb-move))" }, to: { scale: "1" } },
+  },
+  "sb-sprout": {
+    note: "Success and creation: the glyph grows up from its base...",
+    frames: {
+      from: { opacity: "0.4", scale: "calc(1 - 0.6 * var(--sb-move))", translate: "0 calc(2px * var(--sb-move))" },
+      to: { opacity: "1", scale: "1", translate: "0 0" },
+    },
+  },
+  "sb-sprout-ring": {
+    note: "...and sends one ring out.",
+    frames: {
+      "0%": { opacity: "0", scale: "0.6" },
+      "20%": { opacity: "0.6" },
+      "100%": { opacity: "0", scale: "calc(1 + 1.3 * var(--sb-move))" },
+    },
+  },
+  "sb-breathe": {
+    note: "Skeletons breathe (a fade, so it stays under reduced motion); siblings stagger by 120ms.",
+    frames: { "0%, 100%": { opacity: "1" }, "50%": { opacity: "0.45" } },
+  },
+};
+
+const block = (selector: string, decls: Record<string, string>, indent = ""): string =>
+  `${indent}${selector} {\n${Object.entries(decls)
+    .map(([k, v]) => `${indent}  ${k}: ${v};`)
+    .join("\n")}\n${indent}}`;
+
+function renderMotionPrimitives(): string {
+  const props = Object.entries(motionAtProperties).map(([name, d]) => block(`@property ${name}`, d));
+  const frames = Object.entries(motionKeyframes).map(
+    ([name, k]) =>
+      `/* ${k.note} */\n@keyframes ${name} {\n${Object.entries(k.frames)
+        .map(([at, d]) => block(at, d, "  "))
+        .join("\n")}\n}`,
+  );
+  return `/* Shared motion primitives (see DESIGN.md, Motion). */\n${[...props, ...frames].join("\n")}`;
+}
+
+const reducedVars = (): string => vars(Object.entries(reducedMotionProperties()));
 
 const darkScope = ':root,\n[data-theme="dark"]';
 
@@ -70,8 +139,8 @@ ${shadowVars("light")}
   /* 1 lets layers move (scale, slide); 0 under reduced motion, where only fades stay. */
   --sb-move: 1;
 ${vars(Object.entries(motion.duration).map(([k, v]) => [`--sb-duration-${k}`, ms(v)]))}
-${springVars(false)}
-${vars(Object.entries(motion.offset).map(([k, v]) => [`--sb-offset-${k}`, `calc(${v}px * var(--sb-move))`]))}
+${vars(Object.entries(springProperties()))}
+${vars(Object.entries(offsetProperties()))}
 ${vars(Object.entries(motion.scale).map(([k, v]) => [`--sb-scale-${k}`, `calc(1 - ${Number((1 - v).toFixed(2))} * var(--sb-move))`]))}
 ${vars(Object.entries(zIndex).map(([k, v]) => [`--sb-z-${k}`, String(v)]))}
 }
@@ -105,73 +174,7 @@ ${reducedVars()}
 ${reducedVars()}
 }
 
-/* Shared motion primitives. The focus wake is a halo that ripples out once from the 2px
-   ring; the registered properties let a keyframe animate a box-shadow spread and alpha. */
-@property --sb-wake {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --sb-wake-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-@keyframes sb-wake {
-  from {
-    --sb-wake: 4px;
-    --sb-wake-alpha: 30%;
-  }
-  to {
-    --sb-wake: calc(4px + var(--sb-offset-wake));
-    --sb-wake-alpha: 0%;
-  }
-}
-/* A control filling (checkbox) or a thing landing: dips, then springs back past 1 once. */
-@keyframes sb-bob {
-  from {
-    scale: calc(1 - 0.12 * var(--sb-move));
-  }
-  to {
-    scale: 1;
-  }
-}
-/* Success and creation: the glyph grows up from its base and sends one ring out. */
-@keyframes sb-sprout {
-  from {
-    opacity: 0.4;
-    scale: calc(1 - 0.6 * var(--sb-move));
-    translate: 0 calc(2px * var(--sb-move));
-  }
-  to {
-    opacity: 1;
-    scale: 1;
-    translate: 0 0;
-  }
-}
-@keyframes sb-sprout-ring {
-  0% {
-    opacity: 0;
-    scale: 0.6;
-  }
-  20% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0;
-    scale: calc(1 + 1.3 * var(--sb-move));
-  }
-}
-/* Skeletons breathe (a fade, so it stays under reduced motion); siblings stagger by 120ms. */
-@keyframes sb-breathe {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
-}
+${renderMotionPrimitives()}
 
 @theme {
 ${vars([
