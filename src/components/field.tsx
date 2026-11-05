@@ -14,6 +14,7 @@ export interface FieldProps extends Omit<ComponentProps<typeof BaseField.Root>, 
   children: ReactNode;
 }
 
+/** A form control with its label, hint and error, wired together for screen readers. */
 export function Field({
   label,
   description,

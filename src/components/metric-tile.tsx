@@ -35,12 +35,15 @@ export interface MetricTileProps extends Omit<ComponentProps<"div">, "children">
 }
 
 const sentimentClass = {
-  good: "text-brand-fg",
-  bad: "text-danger-fg",
-  neutral: "text-fg-muted",
+  good: "bg-brand-soft text-brand-fg",
+  bad: "bg-danger-soft text-danger-fg",
+  neutral: "bg-neutral-soft text-neutral-fg",
 } as const;
 
-/** One headline number with its unit, change and trend. */
+/**
+ * One headline number with its unit, change and trend. The hero figure is proportional at 28px
+ * (tabular figures belong in columns); the delta is a soft pill; the sparkline marks the current point.
+ */
 export function MetricTile({
   label,
   value,
@@ -73,19 +76,21 @@ export function MetricTile({
         <span className="text-sm font-medium text-fg-muted">{label}</span>
         {loading ? (
           <div className="flex flex-col gap-2 py-1.5">
-            <Skeleton className="h-7 w-24" />
+            <Skeleton className="h-6 w-24" />
             <Skeleton className="w-32" />
             <span className="sr-only">Loading</span>
           </div>
         ) : (
           <>
             <div className="flex flex-wrap items-baseline gap-x-1.5">
-              <span className={cn("text-metric tabular-nums", noData && "text-fg-muted")}>{noData ? "—" : shown}</span>
+              <span className={cn("text-metric proportional-nums", noData && "text-fg-muted")}>
+                {noData ? "—" : shown}
+              </span>
               {unit && !noData ? <span className="text-base font-medium text-fg-muted">{unit}</span> : null}
               {delta && !noData ? (
                 <span
                   className={cn(
-                    "ms-1 inline-flex items-center gap-0.5 text-sm font-semibold tabular-nums",
+                    "ms-1 inline-flex h-5 items-center gap-0.5 self-center rounded-full px-1.5 text-xs font-semibold tabular-nums",
                     sentimentClass[delta.sentiment ?? "neutral"],
                   )}
                 >

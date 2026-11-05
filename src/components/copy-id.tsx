@@ -19,6 +19,7 @@ export interface CopyIdProps extends Omit<ComponentProps<"span">, "children"> {
 const swap = (on: boolean): string =>
   on ? "scale-100 opacity-100 blur-none" : "scale-(--sb-scale-icon) opacity-0 blur-xs motion-reduce:blur-none";
 
+/** An ID or token in a mono well with a copy button; "Copied" confirms in place, never as a toast. */
 export function CopyId({ value, display, label = "Copy ID", onCopied, className, ref, ...props }: CopyIdProps) {
   async function copy(confirm: () => void) {
     try {

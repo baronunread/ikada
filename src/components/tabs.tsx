@@ -1,20 +1,22 @@
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import type { ComponentProps } from "react";
-import { cn, focusRing, type WithClass } from "../lib/cn";
+import { cn, focusRing, pebble, traySurface, type WithClass } from "../lib/cn";
 
+/** Switches between views of one subject in place. Compose with TabsList, TabsTab and TabsPanel. */
 export function Tabs({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Root>>) {
   return <BaseTabs.Root className={cn("flex flex-col", className)} {...props} />;
 }
 
 /**
- * A 10px well (padding 4) holding 6px tabs. The raised pill is one element that slides
- * to the active tab over 250ms ease-in-out (the one in-out use: it moves across the screen).
+ * A recessed 10px tray (padding 4) holding 6px tabs. The raised pebble, shared with
+ * SegmentedControl, is one element that slides to the active tab on the snappy spring.
  */
 export function TabsList({ className, children, ...props }: WithClass<ComponentProps<typeof BaseTabs.List>>) {
   return (
     <BaseTabs.List
       className={cn(
-        "relative inline-flex max-w-full gap-0.5 self-start overflow-x-auto rounded-lg bg-well p-1 [scrollbar-width:none]",
+        "relative inline-flex max-w-full gap-0.5 self-start overflow-x-auto p-1 [scrollbar-width:none]",
+        traySurface,
         className,
       )}
       {...props}
@@ -22,21 +24,21 @@ export function TabsList({ className, children, ...props }: WithClass<ComponentP
       {children}
       <BaseTabs.Indicator
         className={cn(
-          "absolute start-0 top-0 z-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) translate-y-(--active-tab-top) rounded-sm bg-raised shadow-pill",
-          "[transition:translate_var(--sb-duration-slide)_var(--ease-in-out),width_var(--sb-duration-slide)_var(--ease-in-out)]",
-          "motion-reduce:transition-none",
+          pebble,
+          "h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) translate-y-(--active-tab-top) rounded-sm",
         )}
       />
     </BaseTabs.List>
   );
 }
 
+/** One tab. Its label stays above the pebble. */
 export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Tab>>) {
   return (
     <BaseTabs.Tab
       className={cn(
         "relative z-10 flex h-8 shrink-0 items-center whitespace-nowrap rounded-sm px-3 text-base font-semibold text-fg-muted",
-        "[transition:color_var(--sb-duration-slide)_var(--ease-in-out)]",
+        "transition-colors duration-(--sb-duration-hover) ease-hover",
         "hover:text-fg data-active:text-fg data-disabled:cursor-not-allowed data-disabled:opacity-50",
         "before:absolute before:inset-x-0 before:top-1/2 before:h-10 before:-translate-y-1/2 before:content-[''] pointer-fine:before:hidden",
         "pointer-coarse:min-h-11",
@@ -48,6 +50,7 @@ export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof
   );
 }
 
+/** The content shown for the matching tab. */
 export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
   return (
     <BaseTabs.Panel

@@ -10,9 +10,21 @@ export interface BadgeProps extends ComponentProps<"span"> {
   dot?: boolean;
   /** With tone="success" and a dot: the bullseye shape for "Live" (serving traffic) instead of the "Ready" circle. */
   live?: boolean;
+  /** With tone="success" and a dot: the dot sprouts on mount, for something just created or just succeeded. */
+  sprout?: boolean;
 }
 
-export function Badge({ tone = "neutral", dot = false, live = false, className, children, ref, ...props }: BadgeProps) {
+/** A short status or label in a soft tinted pill. With `dot`, a status shape leads the text. */
+export function Badge({
+  tone = "neutral",
+  dot = false,
+  live = false,
+  sprout = false,
+  className,
+  children,
+  ref,
+  ...props
+}: BadgeProps) {
   return (
     <span
       ref={ref}
@@ -25,7 +37,7 @@ export function Badge({ tone = "neutral", dot = false, live = false, className, 
       )}
       {...props}
     >
-      {dot ? <StatusGlyph status={tone} live={live} /> : null}
+      {dot ? <StatusGlyph status={tone} live={live} sprout={sprout} /> : null}
       {children}
     </span>
   );

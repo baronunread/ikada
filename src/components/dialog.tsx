@@ -1,6 +1,6 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import type { ComponentProps } from "react";
-import { cn, focusRing, type WithClass } from "../lib/cn";
+import { cn, focusRing, pressMotion, type WithClass } from "../lib/cn";
 import { CloseIcon } from "../lib/icons";
 import { usePortalContainer } from "../lib/portal";
 import { InstantProvider, instantAttr, useInstant, useInstantOpen } from "../lib/instant";
@@ -14,7 +14,9 @@ export function Dialog({ onOpenChange, ...props }: ComponentProps<typeof BaseDia
     </InstantProvider>
   );
 }
+/** The element that opens the dialog. */
 export const DialogTrigger = BaseDialog.Trigger;
+/** Any element that closes the dialog, such as a Cancel button. */
 export const DialogClose = BaseDialog.Close;
 
 export interface DialogContentProps extends Omit<ComponentProps<typeof BaseDialog.Popup>, "className"> {
@@ -23,6 +25,10 @@ export interface DialogContentProps extends Omit<ComponentProps<typeof BaseDialo
   hideClose?: boolean;
 }
 
+/**
+ * The modal panel with its scrim, centred. Arrives on the smooth spring from scale 0.96, leaves in
+ * 150ms; a close button sits top-end unless `hideClose`.
+ */
 export function DialogContent({ className, hideClose = false, children, ref, ...props }: DialogContentProps) {
   const instant = useInstant();
   const container = usePortalContainer();
@@ -43,7 +49,9 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
           className={cn(
             "relative w-full max-w-md rounded-xl bg-raised p-6 text-fg shadow-dialog outline-hidden",
             // Centered: a dialog scales from its middle, never from a trigger.
-            "origin-center transition-[opacity,scale] duration-(--sb-duration-dialog-out) ease-out data-open:duration-(--sb-duration-dialog-in)",
+            // Arrives on the smooth spring (no overshoot), leaves in 150ms ease-out.
+            "origin-center [transition:opacity_var(--sb-duration-dialog-out)_var(--ease-out),scale_var(--sb-duration-dialog-out)_var(--ease-out)]",
+            "data-open:[transition:opacity_var(--sb-duration-dialog-in)_var(--ease-out),scale_var(--sb-duration-spring-smooth)_var(--sb-spring-smooth)]",
             "data-starting-style:scale-(--sb-scale-dialog) data-starting-style:opacity-0",
             "data-ending-style:scale-(--sb-scale-dialog) data-ending-style:opacity-0 data-sb-instant:transition-none",
             className,
@@ -55,7 +63,8 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
             <BaseDialog.Close
               aria-label="Close"
               className={cn(
-                "absolute end-3 top-3 inline-grid size-8 place-items-center rounded-md text-fg-muted transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg pointer-coarse:size-11",
+                "absolute end-3 top-3 inline-grid size-8 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:size-11",
+                pressMotion,
                 focusRing,
               )}
             >
@@ -68,14 +77,17 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
   );
 }
 
+/** The dialog heading, wired to aria-labelledby. */
 export function DialogTitle({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Title>>) {
   return <BaseDialog.Title className={cn("pe-8 text-lg font-bold", className)} {...props} />;
 }
 
+/** Supporting text under the title, wired to aria-describedby. */
 export function DialogDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Description>>) {
   return <BaseDialog.Description className={cn("mt-2 text-base text-fg-muted", className)} {...props} />;
 }
 
+/** Right-aligned row of actions; stacks on small screens. */
 export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
   return <div className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
 }

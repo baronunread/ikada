@@ -45,7 +45,7 @@ export function InlineConfirm({
   const { active, confirm } = useInlineConfirm(duration);
   const mark = (
     <>
-      <CheckIcon className="size-3.5 text-brand-fg" />
+      <CheckIcon className="size-3.5 origin-bottom text-brand-fg group-data-open/confirm:animate-[sb-sprout_480ms_var(--ease-out)_both]" />
       {message}
     </>
   );
@@ -58,9 +58,10 @@ export function InlineConfirm({
           data-open={active ? "" : undefined}
           className={cn(
             "pointer-events-none absolute bottom-full start-1/2 z-(--sb-z-popover) mb-1.5 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-lg bg-raised px-2 py-1 text-xs font-medium text-fg shadow-float",
-            "origin-bottom transition-[opacity,translate,scale] duration-(--sb-duration-popup-out) ease-out",
+            "group/confirm origin-bottom [transition:opacity_var(--sb-duration-popup-out)_var(--ease-out),translate_var(--sb-duration-popup-out)_var(--ease-out),scale_var(--sb-duration-popup-out)_var(--ease-out)]",
             "translate-y-[calc(4px*var(--sb-move))] scale-(--sb-scale-popup) opacity-0",
-            "data-open:translate-y-0 data-open:scale-100 data-open:opacity-100 data-open:duration-(--sb-duration-popup-in)",
+            "data-open:translate-y-0 data-open:scale-100 data-open:opacity-100",
+            "data-open:[transition:opacity_var(--sb-duration-popup-in)_var(--ease-out),translate_var(--sb-duration-spring-snappy)_var(--sb-spring-snappy),scale_var(--sb-duration-spring-snappy)_var(--sb-spring-snappy)]",
           )}
         >
           {mark}
@@ -70,7 +71,7 @@ export function InlineConfirm({
           aria-hidden="true"
           data-open={active ? "" : undefined}
           className={cn(
-            "inline-flex min-w-16 items-center gap-1 text-sm font-medium text-brand-fg",
+            "group/confirm inline-flex min-w-16 items-center gap-1 text-sm font-medium text-brand-fg",
             "-translate-x-[calc(4px*var(--sb-move))] opacity-0 transition-[opacity,translate] duration-(--sb-duration-popup-in) ease-out",
             "data-open:translate-x-0 data-open:opacity-100",
           )}

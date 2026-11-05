@@ -27,20 +27,41 @@ export interface StatusGlyphProps extends Omit<ComponentProps<"span">, "children
   live?: boolean;
   /** Pulses (a fade) while in progress; the building ring and its wedge spin when motion is allowed. */
   pulse?: boolean;
+  /**
+   * Success or creation just happened: on mount the shape grows up from its base and sends one
+   * ring out. Only applies to success. Under reduced motion it fades in place.
+   */
+  sprout?: boolean;
 }
 
+/** The sprouting success glyph: grow from the base, then one ring that spreads and fades. */
+const sproutClass = [
+  "relative origin-bottom animate-[sb-sprout_480ms_var(--ease-out)_both]",
+  "after:absolute after:-inset-[3px] after:rounded-full after:border-[1.5px] after:border-brand-dot after:content-['']",
+  "after:animate-[sb-sprout-ring_700ms_var(--ease-out)_both]",
+].join(" ");
+
 /** A 10px shape per status (circle, bullseye for live, triangle, cross, half ring, square). Decorative: always paired with a label. */
-export function StatusGlyph({ status, live = false, pulse = false, className, ...props }: StatusGlyphProps) {
+export function StatusGlyph({
+  status,
+  live = false,
+  pulse = false,
+  sprout = false,
+  className,
+  ...props
+}: StatusGlyphProps) {
   const isLive = live && status === "success";
   return (
     <span
       aria-hidden="true"
       data-glyph={isLive ? "live" : status}
+      data-sprout={sprout && status === "success" ? "" : undefined}
       className={cn(
         "inline-block size-2.5 shrink-0",
         status === "info" || isLive ? "" : dotColor[status],
         isLive ? liveClass : glyphClass[status],
         pulse && (status === "info" ? "motion-safe:animate-spin" : "animate-pulse"),
+        sprout && status === "success" && sproutClass,
         className,
       )}
       {...props}

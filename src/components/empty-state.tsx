@@ -12,6 +12,7 @@ export interface EmptyStateProps extends Omit<ComponentProps<"div">, "title"> {
   as?: "h2" | "h3" | "h4";
 }
 
+/** What an empty list or page says: a title, one line on what goes here, and one action. */
 export function EmptyState({
   icon,
   title,

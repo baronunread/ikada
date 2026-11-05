@@ -212,7 +212,7 @@ function LayoutSection() {
                 Live
               </Badge>
             }
-            description="notes.fernhill.dev · fernhill/field-notes · main"
+            description="field-notes.sprouts.page · fernhill/field-notes · main"
             actions={
               <>
                 <Button>View logs</Button>
@@ -748,7 +748,7 @@ export function DashboardPreview() {
                 breadcrumbs={<Breadcrumbs items={crumbs} />}
                 title="field-notes"
                 status={<StatusDot status="success" live label="Live" />}
-                description="notes.fernhill.dev · fernhill/field-notes · main"
+                description="field-notes.sprouts.page · fernhill/field-notes · main"
                 actions={
                   <>
                     <Button>View logs</Button>

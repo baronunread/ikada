@@ -14,7 +14,7 @@
   --sb-raised: oklch(0.34 0.02 255);
   --sb-hairline: oklch(0.3 0.018 255);
   --sb-hairline-strong: oklch(0.4 0.02 255);
-  --sb-control-edge: oklch(0.56 0.02 255);
+  --sb-control-edge: oklch(0.62 0.02 255);
   --sb-focus: oklch(0.95 0.01 255);
   --sb-fg: oklch(0.95 0.01 255);
   --sb-fg-muted: oklch(0.76 0.018 255);
@@ -53,11 +53,23 @@
   --sb-chart-other: oklch(0.72 0.012 255);
   --sb-chart-series: oklch(0.76 0.1 300);
   --sb-scrim: oklch(0.06 0.012 255 / 0.62);
-  --sb-shadow-card: 0 0 0 1px oklch(1 0 0 / 0.05), inset 0 1px 0 oklch(1 0 0 / 0.04);
-  --sb-shadow-button: inset 0 0 0 1px oklch(1 0 0 / 0.08);
-  --sb-shadow-primary: inset 0 1px 0 oklch(1 0 0 / 0.25), 0 1px 2px oklch(0 0 0 / 0.4);
+  --sb-shadow-card:
+    0 0 0 1px oklch(1 0 0 / 0.06), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 10px 24px -14px oklch(0 0 0 / 0.5);
+  --sb-shadow-card-hover:
+    0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 18px 32px -14px oklch(0 0 0 / 0.6);
+  --sb-shadow-button:
+    inset 0 0 0 1px oklch(1 0 0 / 0.09), inset 0 1px 0 oklch(1 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.3);
+  --sb-shadow-button-hover:
+    inset 0 0 0 1px oklch(1 0 0 / 0.12), inset 0 1px 0 oklch(1 0 0 / 0.05), 0 3px 8px -2px oklch(0 0 0 / 0.45);
+  --sb-shadow-button-pressed: inset 0 0 0 1px oklch(1 0 0 / 0.1), inset 0 2px 3px oklch(0 0 0 / 0.3);
+  --sb-shadow-primary:
+    inset 0 1px 0 oklch(1 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.4), 0 6px 14px -6px oklch(0.6 0.12 152 / 0.4);
+  --sb-shadow-primary-hover:
+    inset 0 1px 0 oklch(1 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.4), 0 10px 20px -6px oklch(0.6 0.12 152 / 0.5);
+  --sb-shadow-primary-pressed: inset 0 2px 3px oklch(0.2 0.06 152 / 0.45);
   --sb-shadow-field: inset 0 0 0 1px var(--sb-control-edge);
   --sb-shadow-field-hover: inset 0 0 0 1px var(--sb-fg-muted);
+  --sb-shadow-tray: inset 0 1px 2px oklch(0 0 0 / 0.35), inset 0 0 0 1px oklch(1 0 0 / 0.04);
   --sb-shadow-pill: 0 0 0 1px oklch(1 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 3px oklch(0 0 0 / 0.4);
   --sb-shadow-float:
     0 0 0 1px oklch(1 0 0 / 0.11), inset 0 1px 0 oklch(1 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.35),
@@ -115,34 +127,180 @@
   --sb-chart-other: oklch(0.55 0 0);
   --sb-chart-series: oklch(0.55 0.12 300);
   --sb-scrim: oklch(0.25 0 260 / 0.34);
-  --sb-shadow-card: 0 0 0 1px oklch(0.3 0 0 / 0.05), 0 1px 2px oklch(0.3 0 0 / 0.05);
-  --sb-shadow-button: inset 0 0 0 1px oklch(0.3 0 0 / 0.07);
-  --sb-shadow-primary: inset 0 1px 0 oklch(1 0 0 / 0.18), 0 1px 2px oklch(0.3 0.08 150 / 0.3);
+  --sb-shadow-card:
+    0 0 0 1px oklch(0.22 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.05), 0 10px 24px -14px oklch(0.3 0 0 / 0.18);
+  --sb-shadow-card-hover:
+    0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px oklch(0.3 0 0 / 0.06), 0 18px 32px -14px oklch(0.3 0 0 / 0.26);
+  --sb-shadow-button: inset 0 0 0 1px oklch(0.22 0 0 / 0.09), 0 1px 2px oklch(0.3 0 0 / 0.06);
+  --sb-shadow-button-hover: inset 0 0 0 1px oklch(0.22 0 0 / 0.11), 0 3px 8px -2px oklch(0.3 0 0 / 0.14);
+  --sb-shadow-button-pressed: inset 0 0 0 1px oklch(0.22 0 0 / 0.12), inset 0 2px 3px oklch(0.3 0 0 / 0.08);
+  --sb-shadow-primary:
+    inset 0 1px 0 oklch(1 0 0 / 0.22), 0 1px 2px oklch(0.3 0.08 152 / 0.3), 0 6px 14px -6px oklch(0.3 0.1 152 / 0.45);
+  --sb-shadow-primary-hover:
+    inset 0 1px 0 oklch(1 0 0 / 0.26), 0 2px 4px oklch(0.3 0.08 152 / 0.3), 0 10px 20px -6px oklch(0.3 0.1 152 / 0.5);
+  --sb-shadow-primary-pressed: inset 0 2px 3px oklch(0.2 0.06 152 / 0.3);
   --sb-shadow-field: inset 0 0 0 1px var(--sb-control-edge);
   --sb-shadow-field-hover: inset 0 0 0 1px var(--sb-fg-muted);
-  --sb-shadow-pill: 0 0 0 1px oklch(0.3 0 0 / 0.06), 0 1px 2px oklch(0.3 0 0 / 0.1);
+  --sb-shadow-tray: inset 0 1px 2px oklch(0.3 0 0 / 0.08), inset 0 0 0 1px oklch(0.22 0 0 / 0.04);
+  --sb-shadow-pill:
+    0 0 0 1px oklch(0.22 0 0 / 0.07), 0 1px 2px oklch(0.3 0 0 / 0.1), 0 4px 8px -4px oklch(0.3 0 0 / 0.16);
   --sb-shadow-float:
-    0 0 0 1px oklch(0.3 0 0 / 0.08), 0 1px 2px -1px oklch(0.3 0 0 / 0.12), 0 4px 8px -2px oklch(0.3 0 0 / 0.08),
-    0 16px 32px -8px oklch(0.3 0 0 / 0.18);
+    0 0 0 1px oklch(0.22 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.1), 0 12px 28px -8px oklch(0.3 0 0 / 0.22),
+    0 24px 48px -16px oklch(0.3 0 0 / 0.22);
   --sb-shadow-dialog:
-    0 0 0 1px oklch(0.3 0 0 / 0.08), 0 2px 4px -1px oklch(0.3 0 0 / 0.12), 0 8px 16px -4px oklch(0.3 0 0 / 0.1),
-    0 32px 64px -12px oklch(0.3 0 0 / 0.28);
+    0 0 0 1px oklch(0.22 0 0 / 0.08), 0 4px 8px -2px oklch(0.3 0 0 / 0.12), 0 24px 48px -12px oklch(0.3 0 0 / 0.28),
+    0 48px 96px -24px oklch(0.3 0 0 / 0.3);
 }
 
 :root {
   /* 1 lets layers move (scale, slide); 0 under reduced motion, where only fades stay. */
   --sb-move: 1;
   --sb-duration-hover: 120ms;
-  --sb-duration-press: 160ms;
+  --sb-duration-press: 90ms;
   --sb-duration-tooltip-in: 150ms;
   --sb-duration-tooltip-out: 100ms;
-  --sb-duration-popup-in: 180ms;
-  --sb-duration-popup-out: 120ms;
+  --sb-duration-popup-in: 140ms;
+  --sb-duration-popup-out: 110ms;
   --sb-duration-dialog-in: 220ms;
   --sb-duration-dialog-out: 150ms;
   --sb-duration-slide: 250ms;
   --sb-duration-toast-in: 300ms;
-  --sb-duration-toast-out: 200ms;
+  --sb-duration-toast-out: 110ms;
+  --sb-duration-wake: 520ms;
+  --sb-spring-smooth: linear(
+    0,
+    0.0238 2.5%,
+    0.0816 5%,
+    0.1582 7.5%,
+    0.2431 10%,
+    0.3294 12.5%,
+    0.4129 15%,
+    0.4909 17.5%,
+    0.562 20%,
+    0.6256 22.5%,
+    0.6819 25%,
+    0.731 27.5%,
+    0.7736 30%,
+    0.8101 32.5%,
+    0.8412 35%,
+    0.8677 37.5%,
+    0.89 40%,
+    0.9088 42.5%,
+    0.9246 45%,
+    0.9377 47.5%,
+    0.9487 50%,
+    0.9578 52.5%,
+    0.9653 55%,
+    0.9716 57.5%,
+    0.9767 60%,
+    0.9809 62.5%,
+    0.9844 65%,
+    0.9873 67.5%,
+    0.9896 70%,
+    0.9916 72.5%,
+    0.9931 75%,
+    0.9944 77.5%,
+    0.9955 80%,
+    0.9963 82.5%,
+    0.997 85%,
+    0.9976 87.5%,
+    0.998 90%,
+    0.9984 92.5%,
+    0.9987 95%,
+    0.999 97.5%,
+    1 100%
+  );
+  --sb-duration-spring-smooth: 525ms;
+  --sb-spring-snappy: linear(
+    0,
+    0.0243 2.5%,
+    0.085 5%,
+    0.1673 7.5%,
+    0.2604 10%,
+    0.3564 12.5%,
+    0.4501 15%,
+    0.5378 17.5%,
+    0.6177 20%,
+    0.6886 22.5%,
+    0.7503 25%,
+    0.803 27.5%,
+    0.8472 30%,
+    0.8839 32.5%,
+    0.9137 35%,
+    0.9376 37.5%,
+    0.9564 40%,
+    0.9711 42.5%,
+    0.9822 45%,
+    0.9904 47.5%,
+    0.9964 50%,
+    1.0006 52.5%,
+    1.0033 55%,
+    1.005 57.5%,
+    1.0059 60%,
+    1.0063 62.5%,
+    1.0062 65%,
+    1.0059 67.5%,
+    1.0054 70%,
+    1.0048 72.5%,
+    1.0042 75%,
+    1.0036 77.5%,
+    1.0031 80%,
+    1.0026 82.5%,
+    1.0021 85%,
+    1.0017 87.5%,
+    1.0013 90%,
+    1.001 92.5%,
+    1.0008 95%,
+    1.0006 97.5%,
+    1 100%
+  );
+  --sb-duration-spring-snappy: 525ms;
+  --sb-spring-bob: linear(
+    0,
+    0.0246 2.5%,
+    0.0874 5%,
+    0.1739 7.5%,
+    0.2731 10%,
+    0.3766 12.5%,
+    0.4783 15%,
+    0.5741 17.5%,
+    0.6611 20%,
+    0.738 22.5%,
+    0.8042 25%,
+    0.8598 27.5%,
+    0.9054 30%,
+    0.9418 32.5%,
+    0.9701 35%,
+    0.9913 37.5%,
+    1.0067 40%,
+    1.0171 42.5%,
+    1.0237 45%,
+    1.0272 47.5%,
+    1.0284 50%,
+    1.0279 52.5%,
+    1.0262 55%,
+    1.0239 57.5%,
+    1.0211 60%,
+    1.0182 62.5%,
+    1.0152 65%,
+    1.0125 67.5%,
+    1.01 70%,
+    1.0078 72.5%,
+    1.0058 75%,
+    1.0042 77.5%,
+    1.0029 80%,
+    1.0018 82.5%,
+    1.001 85%,
+    1.0003 87.5%,
+    0.9999 90%,
+    0.9996 92.5%,
+    0.9994 95%,
+    0.9992 97.5%,
+    1 100%
+  );
+  --sb-duration-spring-bob: 675ms;
+  --sb-offset-press: calc(1px * var(--sb-move));
+  --sb-offset-wake: calc(6px * var(--sb-move));
   --sb-scale-popup: calc(1 - 0.04 * var(--sb-move));
   --sb-scale-dialog: calc(1 - 0.04 * var(--sb-move));
   --sb-scale-press: calc(1 - 0.03 * var(--sb-move));
@@ -170,11 +328,96 @@
   --sb-row-h: 36px;
 }
 
-/* Reduced motion keeps fades and colour changes and drops movement: the scale
-   tokens collapse to 1 and slides use --sb-move, so only opacity still animates. */
+/* Reduced motion substitutes, never removes: the scale and offset tokens collapse (no scale,
+   no slide), every spring becomes a short ease-out with no overshoot, and fades stay.
+   data-motion="reduce" on <html> opts in from an app setting. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --sb-move: 0;
+    --sb-spring-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+    --sb-duration-spring-smooth: 160ms;
+    --sb-spring-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+    --sb-duration-spring-snappy: 160ms;
+    --sb-spring-bob: cubic-bezier(0.23, 1, 0.32, 1);
+    --sb-duration-spring-bob: 160ms;
+  }
+}
+:root[data-motion="reduce"] {
+  --sb-move: 0;
+  --sb-spring-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+  --sb-duration-spring-smooth: 160ms;
+  --sb-spring-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --sb-duration-spring-snappy: 160ms;
+  --sb-spring-bob: cubic-bezier(0.23, 1, 0.32, 1);
+  --sb-duration-spring-bob: 160ms;
+}
+
+/* Shared motion primitives (see DESIGN.md, Motion). */
+@property --sb-wake {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --sb-wake-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+/* The focus wake: a halo ripples out once from the 2px ring. */
+@keyframes sb-wake {
+  from {
+    --sb-wake: 4px;
+    --sb-wake-alpha: 30%;
+  }
+  to {
+    --sb-wake: calc(4px + var(--sb-offset-wake));
+    --sb-wake-alpha: 0%;
+  }
+}
+/* A control filling (checkbox) or a thing landing: dips, then springs back past 1 once. */
+@keyframes sb-bob {
+  from {
+    scale: calc(1 - 0.12 * var(--sb-move));
+  }
+  to {
+    scale: 1;
+  }
+}
+/* Success and creation: the glyph grows up from its base... */
+@keyframes sb-sprout {
+  from {
+    opacity: 0.4;
+    scale: calc(1 - 0.6 * var(--sb-move));
+    translate: 0 calc(2px * var(--sb-move));
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+/* ...and sends one ring out. */
+@keyframes sb-sprout-ring {
+  0% {
+    opacity: 0;
+    scale: 0.6;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    scale: calc(1 + 1.3 * var(--sb-move));
+  }
+}
+/* Skeletons breathe (a fade, so it stays under reduced motion); siblings stagger by 120ms. */
+@keyframes sb-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
   }
 }
 
@@ -225,9 +468,9 @@
   --text-2xl--line-height: 2.25rem;
   --text-2xl--letter-spacing: -0.02em;
   --text-2xl--font-weight: 700;
-  --text-metric: 2.25rem;
-  --text-metric--line-height: 2.5rem;
-  --text-metric--letter-spacing: -0.025em;
+  --text-metric: 1.75rem;
+  --text-metric--line-height: 2.25rem;
+  --text-metric--letter-spacing: -0.02em;
   --text-metric--font-weight: 700;
 }
 
@@ -279,13 +522,22 @@
   --color-chart-series: var(--sb-chart-series);
   --color-scrim: var(--sb-scrim);
   --shadow-card: var(--sb-shadow-card);
+  --shadow-card-hover: var(--sb-shadow-card-hover);
   --shadow-button: var(--sb-shadow-button);
+  --shadow-button-hover: var(--sb-shadow-button-hover);
+  --shadow-button-pressed: var(--sb-shadow-button-pressed);
   --shadow-primary: var(--sb-shadow-primary);
+  --shadow-primary-hover: var(--sb-shadow-primary-hover);
+  --shadow-primary-pressed: var(--sb-shadow-primary-pressed);
   --shadow-field: var(--sb-shadow-field);
   --shadow-field-hover: var(--sb-shadow-field-hover);
+  --shadow-tray: var(--sb-shadow-tray);
   --shadow-pill: var(--sb-shadow-pill);
   --shadow-float: var(--sb-shadow-float);
   --shadow-dialog: var(--sb-shadow-dialog);
+  --ease-spring-smooth: var(--sb-spring-smooth);
+  --ease-spring-snappy: var(--sb-spring-snappy);
+  --ease-spring-bob: var(--sb-spring-bob);
 }
 
 @layer base {

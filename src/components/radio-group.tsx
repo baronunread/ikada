@@ -21,7 +21,10 @@ export interface RadioGroupProps extends Omit<ComponentProps<typeof BaseRadioGro
   className?: string;
 }
 
-/** One choice out of a few, all visible. Arrow keys move and select; Tab leaves the group. */
+/**
+ * One choice out of a few, all visible. Arrow keys move and select; Tab leaves the group. The
+ * chosen dot lands on the bob spring; the checked fill is solid green (3:1 in both themes).
+ */
 export function RadioGroup({
   options,
   legend,
@@ -71,7 +74,11 @@ export function RadioGroup({
             >
               <Radio.Indicator
                 keepMounted={false}
-                className="size-1.5 rounded-full bg-on-brand transition-[opacity,scale] duration-(--sb-duration-hover) ease-out data-starting-style:scale-(--sb-scale-icon) data-starting-style:opacity-0"
+                className={cn(
+                  "size-1.5 rounded-full bg-on-brand data-starting-style:scale-(--sb-scale-icon) data-starting-style:opacity-0",
+                  // The dot lands on the bob spring: it grows past full size once, then settles.
+                  "[transition:opacity_var(--sb-duration-hover)_var(--ease-out),scale_var(--sb-duration-spring-bob)_var(--sb-spring-bob)]",
+                )}
               />
             </Radio.Root>
             <span className="flex flex-col">

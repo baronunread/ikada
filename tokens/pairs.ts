@@ -30,6 +30,8 @@ const statusFamilies = [
 /** Where a control edge, a dot or a chart mark can sit. */
 const focusSurfaces: readonly ColorName[] = [...pageSurfaces, "code-bg", "diff-add", "diff-del"];
 const markBackdrops = ["surface", "canvas", "well"] as const;
+/** Checkboxes, radios and switches also sit on floating layers (menus, dialogs, popovers). */
+const controlBackdrops = [...markBackdrops, "raised"] as const;
 const chartMarks = [
   "chart-requests",
   "chart-errors",
@@ -60,11 +62,17 @@ export const pairs: Pair[] = [
     pair(f.fg, f.soft, "text", `${f.name} badge`),
   ]),
   pair("danger-fg", "surface", "large", "Danger zone heading"),
+  ...controlBackdrops.flatMap((bg) => [
+    pair("control-edge", bg, "ui", "Unchecked checkbox, radio and switch edge; input and select edge"),
+    pair("brand", bg, "ui", "Checked checkbox, radio and switch fill; primary fill"),
+  ]),
+  // Checked state against the unchecked one: the fill change alone must read at 3:1.
+  pair("brand", "hover", "ui", "Switch track on against the off track"),
+  pair("on-brand", "brand", "ui", "Check mark, radio dot and switch thumb when checked"),
+  pair("fg-muted", "hover", "ui", "Switch thumb when off"),
   ...markBackdrops.flatMap((bg) => [
-    pair("control-edge", bg, "ui", "Input, select, checkbox edge"),
-    pair("brand", bg, "ui", "Switch on, checkbox checked, primary fill"),
     pair("brand-dot", bg, "ui", "Success dot"),
-    pair("warn-dot", bg, "ui", "Fallback and warning dot"),
+    pair("warn-dot", bg, "ui", "Warning dot"),
     pair("danger-dot", bg, "ui", "Error dot"),
     pair("info-dot", bg, "ui", "Info dot"),
     pair("neutral-dot", bg, "ui", "Idle and unknown dot"),

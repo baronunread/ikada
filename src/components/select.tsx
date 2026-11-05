@@ -25,6 +25,7 @@ export interface SelectProps extends Omit<
   ref?: ComponentProps<"button">["ref"];
 }
 
+/** Pick one value from a list that opens like a menu. Arrow keys move, Enter picks, typing jumps. */
 export function Select({
   options,
   placeholder = "Select...",

@@ -116,7 +116,7 @@ export function AppPiecesSection() {
             <DescriptionList
               layout="stacked"
               items={[
-                { id: "hostname", term: "Hostname", details: "blog.test-admin.sproutboat.localhost", mono: true },
+                { id: "hostname", term: "Hostname", details: "blog.sprouts.page", mono: true },
                 { id: "version", term: "Active version", details: "v3" },
               ]}
             />
@@ -136,7 +136,7 @@ export function AppPiecesSection() {
           <CodeBlock label="Deploy command" code={"sproutboat init hello\nsproutboat login\nsproutboat deploy hello"} />
           <CodeBlock
             label="Long output"
-            code="curl -sS https://hello.test-admin.sproutboat.localhost/api/items?limit=100&cursor=eyJpZCI6MTIzfQ -H 'accept: application/json'"
+            code="curl -sS https://hello.sprouts.page/api/items?limit=100&cursor=eyJpZCI6MTIzfQ -H 'accept: application/json'"
           />
           <CodeBlock
             wrap

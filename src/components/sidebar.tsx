@@ -2,7 +2,7 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useRender } from "@base-ui/react/use-render";
 import { createContext, useCallback, useContext, useMemo, useState, useSyncExternalStore } from "react";
 import type { ComponentProps, MouseEvent, ReactNode } from "react";
-import { cn, coarseTarget, focusRing, type WithClass } from "../lib/cn";
+import { cn, coarseTarget, focusRing, pressMotion, type WithClass } from "../lib/cn";
 import { MenuIcon, SidebarIcon } from "../lib/icons";
 import { usePortalContainer } from "../lib/portal";
 import { Tooltip } from "./tooltip";
@@ -80,7 +80,9 @@ export function Sidebar({
             className={cn(
               place,
               "inset-y-0 start-0 z-(--sb-z-modal) flex w-72 max-w-[85%] flex-col bg-surface text-fg shadow-dialog outline-hidden",
-              "transition-[translate,opacity] duration-(--sb-duration-slide) ease-out data-ending-style:duration-(--sb-duration-dialog-out)",
+              // Slides in on the smooth spring, out in 150ms ease-out.
+              "[transition:translate_var(--sb-duration-spring-smooth)_var(--sb-spring-smooth),opacity_var(--sb-duration-dialog-in)_var(--ease-out)]",
+              "data-ending-style:[transition:translate_var(--sb-duration-dialog-out)_var(--ease-out),opacity_var(--sb-duration-dialog-out)_var(--ease-out)]",
               "data-starting-style:-translate-x-[calc(100%*var(--sb-move))] data-starting-style:opacity-0",
               "data-ending-style:-translate-x-[calc(100%*var(--sb-move))] data-ending-style:opacity-0",
               className,
@@ -113,10 +115,12 @@ export function Sidebar({
   );
 }
 
+/** Top slot of the sidebar: the product mark or a project switcher. */
 export function SidebarHeader({ className, ...props }: ComponentProps<"div">) {
   return <div className={cn("mb-2 flex items-center gap-2 px-1 pt-1", className)} {...props} />;
 }
 
+/** Bottom slot of the sidebar: account, theme or the rail toggle. */
 export function SidebarFooter({ className, ...props }: ComponentProps<"div">) {
   return <div className={cn("mt-auto flex flex-col gap-1 border-t border-hairline pt-3", className)} {...props} />;
 }
@@ -222,7 +226,8 @@ export function SidebarToggle({
         aria-expanded={!collapsed}
         onClick={() => onCollapsedChange(!collapsed)}
         className={cn(
-          "inline-grid size-9 shrink-0 place-items-center rounded-md text-fg-muted transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
+          "inline-grid size-9 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+          pressMotion,
           coarseTarget,
           focusRing,
           className,
@@ -247,7 +252,8 @@ export function SidebarTrigger({
       aria-label={label}
       aria-haspopup="dialog"
       className={cn(
-        "inline-grid size-9 place-items-center rounded-md text-fg-muted transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
+        "inline-grid size-9 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+        pressMotion,
         coarseTarget,
         focusRing,
         className,

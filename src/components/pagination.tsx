@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { cn, coarseTarget, focusRing } from "../lib/cn";
+import { cn, coarseTarget, focusRing, pressMotion } from "../lib/cn";
 import { ChevronLeftIcon, ChevronRightIcon } from "../lib/icons";
 
 export interface PaginationProps extends Omit<ComponentProps<"nav">, "onChange"> {
@@ -30,12 +30,14 @@ export function pageRange(page: number, pageCount: number, siblings = 1): (numbe
 
 const cell = cn(
   "inline-grid h-8 min-w-8 place-items-center rounded-md px-2 text-sm font-semibold tabular-nums text-fg-muted",
-  "transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
+  "hover:bg-hover hover:text-fg",
+  pressMotion,
   "disabled:pointer-events-none disabled:opacity-50",
   coarseTarget,
   focusRing,
 );
 
+/** Previous, next and numbered pages for a long list, with gaps past the neighbours of the current page. */
 export function Pagination({
   page,
   pageCount,

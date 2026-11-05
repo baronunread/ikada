@@ -1,3 +1,4 @@
+/** Chart colour tokens as CSS variable references, so TanStack Charts follow light and dark. */
 import type { ColorToken } from "../tokens.generated";
 import { colorVar } from "../tokens.generated";
 

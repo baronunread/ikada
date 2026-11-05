@@ -1,10 +1,13 @@
+/**
+ * Toasts as a deck at the bottom end: hover or focus fans out the history, ↩ undoes (⌘Z), a flick
+ * dismisses. They arrive on the snappy spring, leave in 110ms, and success sprouts as it lands.
+ */
 import { Toast } from "@base-ui/react/toast";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
-import { cn, focusRing } from "../lib/cn";
+import { cn, focusRing, pressMotion } from "../lib/cn";
 import { Crossfade } from "../lib/crossfade";
 import { CloseIcon, UndoIcon } from "../lib/icons";
-import { releaseSpring } from "../lib/spring";
 import { buttonStyles } from "./button";
 import { dotColor } from "./status";
 import { StatusGlyph } from "./status-glyph";
@@ -27,6 +30,7 @@ export type {
   UndoOptions,
 } from "./toast-api";
 
+/** The Base UI toast manager for the nearest ToastProvider. Prefer the `toast` object for app code. */
 export function useToast() {
   return Toast.useToastManager<ToastData>();
 }
@@ -43,11 +47,12 @@ const rootBase = [
   "[--x:var(--toast-swipe-movement-x)]",
   "[transform:translate3d(calc(var(--x)+var(--ex)),calc(var(--y)+var(--ey)),0)_scale(var(--s))]",
   "[opacity:calc(var(--o-deck)*var(--o-life))]",
-  // Deck height and position move together, ease-out, transform and opacity apart from the height of a morph.
-  "[transition:transform_var(--sb-duration-toast-in)_var(--ease-out),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
+  // Arriving and every deck move ride the snappy spring; opacity and the height of a morph ease out.
+  "[transition:transform_var(--sb-duration-spring-snappy)_var(--sb-spring-snappy),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
   // Reduced motion: the deck stays where it is and only fades.
   "motion-reduce:[transition:opacity_var(--sb-duration-toast-in)_linear,height_var(--sb-duration-toast-in)_linear]",
-  "data-released:[transition:transform_500ms_var(--sb-ease-spring),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
+  // A drag let go short of dismissal returns on the bob spring.
+  "data-released:[transition:transform_var(--sb-duration-spring-bob)_var(--sb-spring-bob),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
   "data-swiping:cursor-grabbing",
   focusRing,
   // Invisible bridge across the gap so the pointer can cross from one fanned-out toast to the next.
@@ -73,6 +78,9 @@ function rootState(state: Toast.Root.State, flick: string | undefined): string {
     swiped ? "[--ex:120%]" : "[--ex:0px]",
     swiped && (state.swipeDirection === "left" || flick === "left") && "[--ex:-120%]",
     entering || leaving || state.limited ? "[--o-life:0]" : "[--o-life:1]",
+    // Leaving is quick and plain: 110ms ease-out, no spring.
+    leaving &&
+      "[transition:transform_var(--sb-duration-toast-out)_var(--ease-out),opacity_var(--sb-duration-toast-out)_var(--ease-out),height_var(--sb-duration-toast-out)_var(--ease-out)]",
     state.swiping && "transition-none!",
   );
 }
@@ -93,7 +101,8 @@ function Glyph({ tone, busy }: { tone: ToastTone; busy: boolean }) {
             className="inline-block size-2.5 rounded-full border-2 border-info-dot"
           />
         ) : (
-          <StatusGlyph status={v.tone} pulse={v.busy} />
+          // Success sprouts as it lands (on arrival, or when a busy toast turns into a success).
+          <StatusGlyph status={v.tone} pulse={v.busy} sprout={v.tone === "success" && !v.busy} />
         )
       }
     />
@@ -159,7 +168,8 @@ function UndoButton({ undo, id }: { undo: ToastAction; id: string }) {
         data-sb-undo=""
         onClick={() => toast.runUndo(id)}
         className={cn(
-          "relative -mt-0.5 inline-grid size-7 shrink-0 place-items-center self-start rounded-full text-fg-muted transition-[background-color,color,scale] duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg active:scale-(--sb-scale-press)",
+          "relative -mt-0.5 inline-grid size-7 shrink-0 place-items-center self-start rounded-full text-fg-muted hover:bg-hover hover:text-fg",
+          pressMotion,
           // 28px visual, 40px hit area.
           "after:absolute after:-inset-1.5 after:rounded-full after:content-['']",
           focusRing,
@@ -344,7 +354,8 @@ function ToastItem({ item }: { item: BaseToast }) {
           <Toast.Close
             aria-label="Dismiss notification"
             className={cn(
-              "relative inline-grid size-6 shrink-0 place-items-center self-start rounded-md text-fg-muted transition-[background-color,color,scale] duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg active:scale-(--sb-scale-press)",
+              "relative inline-grid size-6 shrink-0 place-items-center self-start rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+              pressMotion,
               "after:absolute after:-inset-2 after:content-[''] pointer-coarse:after:-inset-3",
               focusRing,
             )}
@@ -388,7 +399,6 @@ export function ToastProvider({ children, onToast, limit = 5, label = "Notificat
   useEffect(() => toast.subscribe((event) => onToastRef.current?.(event)), []);
 
   useEffect(() => {
-    viewport?.style.setProperty("--sb-ease-spring", releaseSpring);
     const hidden = () => toast.setPaused("hidden", document.hidden);
     hidden();
     document.addEventListener("visibilitychange", hidden);

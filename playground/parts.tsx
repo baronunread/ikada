@@ -25,5 +25,5 @@ export function Row({ label, children }: { label: string; children: ReactNode })
   );
 }
 
-/** ?open=menu|select|dialog|tooltip|popover|toast|palette|fallback|drawer|table-sorted opens that state for screenshots. */
+/** ?open=menu|select|dialog|tooltip|popover|toast|palette|drawer|table-sorted opens that state for screenshots. */
 export const openState = new URLSearchParams(location.search).get("open");
