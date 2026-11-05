@@ -27,7 +27,7 @@ bun run preview             # serve dist/ like the asset server, 0.0.0.0:4410
 
 ## Deploying
 
-The site is its own Sproutboat app, `ikada-site` (`sproutboat.jsonc`, `sprout/index.js`). Its build sits under
+The site is its own Sproutboat app, `ikada-site` (`sproutboat.jsonc`, `src/sprout.js`). Its build sits under
 `dist/ikada`, so the files have the same paths they are served from. sproutboat.com reaches it over a service
 binding: the sproutboat.com sprout sends `/ikada` and `/ikada/*` to `env.IKADA.fetch(request)`.
 

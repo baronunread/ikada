@@ -1,7 +1,7 @@
 {
   "$schema": "https://sproutboat.com/schema.json",
   "name": "ikada-site",
-  "main": "sprout/index.js",
+  "main": "src/sprout.js",
   "compatibility_date": "2026-08-31",
   "assets": {
     // built by `bun run build`: the pages under dist/ikada, the registry under dist/ikada/r
