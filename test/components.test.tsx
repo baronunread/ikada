@@ -21,6 +21,7 @@ import {
   Field,
   IconButton,
   Input,
+  Textarea,
   Link,
   Select,
   Skeleton,
@@ -131,6 +132,26 @@ describe("Link", () => {
     expect(a.getAttribute("rel")).toBe("noopener noreferrer");
     expect(a.getAttribute("target")).toBe("_blank");
     expect(a.textContent).toContain("opens in a new tab");
+  });
+});
+
+describe("Textarea", () => {
+  test("Field wires label, description and error to the textarea", () => {
+    render(
+      <Field label="Query" description="SQL." error="Too long.">
+        <Textarea mono />
+      </Field>,
+    );
+    const area = screen.getByRole("textbox", { name: "Query" });
+    expect(area.tagName).toBe("TEXTAREA");
+    expect(area.getAttribute("aria-invalid")).toBe("true");
+    expect(area.getAttribute("aria-describedby")).toBeTruthy();
+    expect(area.className).toContain("font-mono");
+  });
+
+  test("invalid marks a standalone textarea", () => {
+    render(<Textarea aria-label="Notes" invalid />);
+    expect(screen.getByRole("textbox", { name: "Notes" }).getAttribute("aria-invalid")).toBe("true");
   });
 });
 
