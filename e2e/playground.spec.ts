@@ -1,4 +1,13 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/**
+ * Pixels the page is wider than the window. A Linux runner with a classic scrollbar reports a
+ * scrollWidth narrower than innerWidth (-15 on ubuntu runners), so a negative difference is not
+ * overflow. Exact on macOS, where scrollbars overlay; it can hide up to a scrollbar of overflow on Linux.
+ */
+async function horizontalOverflow(page: Page): Promise<number> {
+  return page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - innerWidth));
+}
 
 const widths = [390, 1440];
 const themes = ["light", "dark"];
@@ -14,9 +23,7 @@ for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/?view=${theme}`);
       await expect(page.getByRole("heading", { name: "Button", exact: true })).toBeVisible();
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      );
+      const overflow = await horizontalOverflow(page);
       expect(overflow).toBe(0);
       await page.screenshot({ path: info.outputPath(`page-${theme}-${width}.png`), fullPage: true });
     });
@@ -72,9 +79,7 @@ for (const width of widths) {
       await expect(password).toHaveAttribute("type", "text");
       await section.getByRole("button", { name: "Next page" }).first().click();
       await expect(section.getByRole("button", { name: "Page 7" }).first()).toHaveAttribute("aria-current", "page");
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      );
+      const overflow = await horizontalOverflow(page);
       expect(overflow).toBe(0);
       await section.screenshot({ path: info.outputPath(`app-pieces-${theme}-${width}.png`) });
     });
