@@ -17,6 +17,9 @@
     "type": "git",
     "url": "git+https://github.com/baronunread/ikada.git"
   },
+  "workspaces": [
+    "site"
+  ],
   "files": [
     "src",
     "DESIGN.md",
@@ -25,9 +28,6 @@
     "README.md"
   ],
   "type": "module",
-  "workspaces": [
-    "site"
-  ],
   "sideEffects": [
     "**/*.css"
   ],

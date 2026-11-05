@@ -10,6 +10,7 @@ Bun is the package manager (`bun.lock` is committed; CI uses `--frozen-lockfile`
 - `bun run fmt` / `fmt:check`: oxfmt, 120 columns. CI gates on `fmt:check`.
 - `bun run playground`: gallery and dashboard sandbox at :5180.
 - `bun run e2e`: Playwright against the playground at 390px and 1440px, light and dark.
+- `bun run site` / `site:build`: the docs site and shadcn registry in `site/` (see site/README.md). The registry is generated from `src/` by `scripts/build-registry.ts`; never edit registry JSON by hand.
 - `bun run tokens`: regenerate `src/theme.css`, `src/tokens.generated.ts` and the DESIGN.md token tables from `tokens/tokens.ts`.
 
 ## Rules

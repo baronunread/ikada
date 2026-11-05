@@ -17,14 +17,6 @@ const run = (cmd: string, args: string[], cwd: string): void => {
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")} failed`);
 };
 
-run(
-  "bun",
-  [join(site, "../scripts/build-registry.ts"), "--out", join(site, ".registry"), "--url", url],
-  site,
-);
+run("bun", [join(site, "../scripts/build-registry.ts"), "--out", join(site, ".registry"), "--url", url], site);
 rmSync(join(site, "public/r"), { recursive: true, force: true });
-run(
-  "bunx",
-  ["shadcn", "build", "registry.json", "--output", join(site, "public/r")],
-  join(site, ".registry"),
-);
+run("bunx", ["shadcn", "build", "registry.json", "--output", join(site, "public/r")], join(site, ".registry"));

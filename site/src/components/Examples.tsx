@@ -23,8 +23,7 @@ function load(slug: string): ComponentType {
 
 function make(slug: string): ComponentType {
   const loader = modules[`../examples/${slug}.tsx`];
-  if (!loader)
-    return () => <p className="text-fg-muted">No live examples for this component yet.</p>;
+  if (!loader) return () => <p className="text-fg-muted">No live examples for this component yet.</p>;
   return lazy(() =>
     loader().then(({ examples }) => ({
       default: () => (
@@ -35,9 +34,7 @@ function make(slug: string): ComponentType {
                 <h3 className="text-md">{ex.title}</h3>
                 {ex.description ? <p className="text-sm text-fg-muted">{ex.description}</p> : null}
               </header>
-              <div className="flex min-h-24 flex-wrap items-center gap-3 p-4 sm:p-6">
-                {ex.render()}
-              </div>
+              <div className="flex min-h-24 flex-wrap items-center gap-3 p-4 sm:p-6">{ex.render()}</div>
             </section>
           ))}
         </div>

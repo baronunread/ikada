@@ -79,12 +79,7 @@ function members(body: string): Prop[] {
     const c = body[i] ?? "";
     if ("{([<".includes(c)) depth++;
     if ("})]>".includes(c) && !(c === ">" && body[i - 1] === "=")) depth--;
-    if (
-      depth === 0 &&
-      (c === ";" || c === "\n") &&
-      current.trim() &&
-      !/[|&,:]\s*$/.test(current.trim())
-    ) {
+    if (depth === 0 && (c === ";" || c === "\n") && current.trim() && !/[|&,:]\s*$/.test(current.trim())) {
       flush();
       continue;
     }

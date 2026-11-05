@@ -11,9 +11,7 @@ export const examples: Example[] = [
         <Button onClick={() => toast.add({ title: "Settings saved" })}>Neutral</Button>
         <Button
           variant="primary"
-          onClick={() =>
-            toast.add({ tone: "success", title: "Deployed", description: "my-app is live." })
-          }
+          onClick={() => toast.add({ tone: "success", title: "Deployed", description: "my-app is live." })}
         >
           Success
         </Button>

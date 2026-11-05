@@ -19,6 +19,19 @@ jobs:
       - run: bun run fmt:check
       - run: bun run test
 
+  # The docs site and the shadcn registry, both generated from src/: a component the registry
+  # cannot map, or a page that fails to render, fails here.
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - run: bun install --frozen-lockfile
+      - run: bun run site:build
+      - run: test -f site/dist/ikada/r/registry.json && test -f site/dist/ikada/components/button.html
+
   # Screenshot and overflow checks of the playground at 390px and 1440px, light and dark.
   e2e:
     runs-on: ubuntu-latest

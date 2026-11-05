@@ -21,8 +21,7 @@ export const siteDir = process.cwd();
 export const srcDir = join(siteDir, "..", "src");
 
 const registryPath = join(siteDir, ".registry", "registry.json");
-if (!existsSync(registryPath))
-  throw new Error("Run `bun run registry` first: .registry/registry.json is missing.");
+if (!existsSync(registryPath)) throw new Error("Run `bun run registry` first: .registry/registry.json is missing.");
 
 export const items: Item[] = JSON.parse(readFileSync(registryPath, "utf8")).items;
 
@@ -38,8 +37,7 @@ export function sourcePath(item: Item): string {
   return "";
 }
 
-const exportsComponent = (source: string): boolean =>
-  /export function [A-Z]\w*\s*[(<]/.test(source);
+const exportsComponent = (source: string): boolean => /export function [A-Z]\w*\s*[(<]/.test(source);
 
 /** One docs page per ui file that exports a React component (helpers like status.ts get none). */
 export const components = items

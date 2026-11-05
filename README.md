@@ -56,4 +56,10 @@ The `publish` workflow checks that the tag matches the version, runs the checks 
 
 The package began as `packages/ikada` in [baronunread/sproutboat](https://github.com/baronunread/sproutboat); its history was carried over.
 
+Docs, live examples and a shadcn registry live at [sproutboat.com/ikada](https://sproutboat.com/ikada) (source in [`site/`](site/README.md)):
+
+```sh
+npx shadcn@latest add https://sproutboat.com/ikada/r/button.json
+```
+
 MIT licensed.
