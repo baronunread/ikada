@@ -1,0 +1,11 @@
+---
+import Docs from "../layouts/Docs.astro";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<Docs title="Not found">
+  <article class="flex max-w-3xl flex-col gap-4">
+    <h1 class="text-2xl">Not found</h1>
+    <p class="text-fg-muted">No page here. <a class="text-fg underline" href={`${base}/`}>Back to ikada</a>.</p>
+  </article>
+</Docs>

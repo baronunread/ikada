@@ -1,0 +1,5 @@
+dist/
+.astro/
+.registry/
+public/r/
+node_modules/

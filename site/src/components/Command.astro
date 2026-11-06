@@ -1,0 +1,14 @@
+---
+/** A one-line shell command or snippet with a copy button. */
+interface Props {
+  code: string;
+  label?: string;
+}
+const { code, label } = Astro.props;
+---
+
+<div class="flex min-w-0 items-center gap-2 rounded-lg bg-code-bg py-1.5 ps-3 pe-1.5 shadow-card">
+  {label ? <span class="shrink-0 text-xs text-fg-muted">{label}</span> : null}
+  <code class="min-w-0 flex-1 overflow-x-auto py-1 text-sm whitespace-nowrap">{code}</code>
+  <button type="button" data-copy={code} class="shrink-0 rounded-md px-2.5 py-1 text-sm font-semibold text-fg-muted hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-focus">Copy</button>
+</div>

@@ -1,0 +1,44 @@
+---
+import Command from "../components/Command.astro";
+import Docs from "../layouts/Docs.astro";
+import { REGISTRY_URL } from "../lib/registry";
+---
+
+<Docs title="Installation">
+  <article class="flex max-w-3xl flex-col gap-8">
+    <h1 class="text-2xl">Installation</h1>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-lg">With the shadcn CLI</h2>
+      <p>
+        In a React project with Tailwind CSS v4 and a <code>components.json</code> (run <code>npx shadcn@latest init</code>
+        first), add any component by its URL. The CLI copies the source into <code>components/ui</code>, the helpers into
+        <code>lib/ikada</code>, installs <code>@base-ui/react</code> and the other dependencies, and writes the ikada
+        theme into your CSS.
+      </p>
+      <Command code={`npx shadcn@latest add ${REGISTRY_URL}/button.json`} />
+      <p>Everything at once:</p>
+      <Command code={`npx shadcn@latest add ${REGISTRY_URL}/all.json`} />
+      <p>Or add the registry to <code>components.json</code> once and use short names:</p>
+      <pre class="overflow-x-auto rounded-lg bg-code-bg p-3 text-sm shadow-card"><code>{`"registries": {
+  "@ikada": "${REGISTRY_URL}/{name}.json"
+}`}</code></pre>
+      <Command code="npx shadcn@latest add @ikada/button @ikada/toast" />
+      <p class="text-sm text-fg-muted">
+        The theme uses Figtree and JetBrains Mono when they are installed and falls back to the system faces otherwise.
+        Dark mode follows shadcn's <code>.dark</code> class.
+      </p>
+    </section>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-lg">As a package</h2>
+      <p>The dashboards use the package, so they take every update. It ships TypeScript source for a bundler that compiles it (Vite, Bun, Next.js with <code>transpilePackages</code>).</p>
+      <Command code="bun add @sproutboat/ikada" />
+      <pre class="overflow-x-auto rounded-lg bg-code-bg p-3 text-sm shadow-card"><code>{`/* app.css */
+@import "tailwindcss";
+@import "@sproutboat/ikada/theme.css";
+@source "../node_modules/@sproutboat/ikada/src";`}</code></pre>
+      <p class="text-sm text-fg-muted">The package is not on npm yet.</p>
+    </section>
+  </article>
+</Docs>

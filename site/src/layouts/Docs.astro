@@ -1,0 +1,115 @@
+---
+import "../styles/site.css";
+import { components, REPO_URL } from "../lib/registry";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "ikada, the Sproutboat design system: React components on Base UI and Tailwind v4." } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const here = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+const guides = [
+  { href: `${base}`, label: "Overview" },
+  { href: `${base}/installation`, label: "Installation" },
+  { href: `${base}/theming`, label: "Theming and tokens" },
+  { href: `${base}/blocks`, label: "Blocks" },
+];
+const nav = [
+  { heading: "Get started", links: guides },
+  { heading: "Components", links: components.map((c) => ({ href: `${base}/components/${c.name}`, label: c.title })) },
+];
+const current = (href: string): boolean => here === href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === "ikada" ? "ikada: the Sproutboat design system" : `${title} · ikada`}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script is:inline>
+      // Before first paint: the saved choice, else the system's. ikada is dark unless light is stamped.
+      (() => {
+        const saved = localStorage.getItem("ikada-theme");
+        const light = saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)").matches;
+        document.documentElement.dataset.theme = light ? "light" : "dark";
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh bg-canvas font-sans text-base text-fg">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-(--sb-z-toast) focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
+    <header class="sticky top-0 z-(--sb-z-sticky) border-b border-hairline bg-canvas/90 backdrop-blur">
+      <div class="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
+        <a href={`${base}/`} class="flex items-center gap-2 font-semibold">
+          <span aria-hidden="true" class="text-lg">筏</span> ikada
+        </a>
+        <span class="hidden text-sm text-fg-muted sm:inline">the Sproutboat design system</span>
+        <nav class="ms-auto flex items-center gap-1 text-sm" aria-label="Site">
+          <a class="rounded-md px-2.5 py-1.5 text-fg-muted hover:bg-hover hover:text-fg" href="https://sproutboat.com">Sproutboat</a>
+          <a class="rounded-md px-2.5 py-1.5 text-fg-muted hover:bg-hover hover:text-fg" href={REPO_URL}>GitHub</a>
+          <button type="button" data-theme-toggle class="rounded-md px-2.5 py-1.5 text-fg-muted hover:bg-hover hover:text-fg" aria-label="Switch between light and dark">
+            Theme
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="mx-auto flex max-w-7xl gap-8 px-4 sm:px-6">
+      <aside class="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 shrink-0 overflow-y-auto py-6 md:block">
+        {nav.map((group) => (
+          <div class="mb-6">
+            <p class="mb-2 px-2 text-xs text-fg-muted uppercase">{group.heading}</p>
+            <ul class="flex flex-col gap-0.5">
+              {group.links.map((l) => (
+                <li>
+                  <a href={l.href} aria-current={current(l.href) ? "page" : undefined} class="block rounded-md px-2 py-1.5 text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-hover aria-[current=page]:font-semibold aria-[current=page]:text-fg">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </aside>
+
+      <main id="main" class="min-w-0 flex-1 py-8">
+        <details class="mb-6 rounded-xl bg-surface shadow-card md:hidden">
+          <summary class="cursor-pointer px-4 py-3 font-semibold">Menu</summary>
+          <div class="grid gap-4 px-2 pb-3">
+            {nav.map((group) => (
+              <div>
+                <p class="mb-1 px-2 text-xs text-fg-muted uppercase">{group.heading}</p>
+                <ul class="grid grid-cols-2 gap-0.5">
+                  {group.links.map((l) => (
+                    <li><a href={l.href} aria-current={current(l.href) ? "page" : undefined} class="block truncate rounded-md px-2 py-1.5 text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:font-semibold aria-[current=page]:text-fg">{l.label}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </details>
+        <slot />
+      </main>
+    </div>
+
+    <script>
+      document.querySelector("[data-theme-toggle]")?.addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem("ikada-theme", next);
+      });
+      // Copy buttons: <button data-copy="text">.
+      document.addEventListener("click", async (event) => {
+        const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("[data-copy]") : null;
+        if (!button) return;
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        const label = button.textContent;
+        button.textContent = "Copied";
+        setTimeout(() => (button.textContent = label), 1600);
+      });
+    </script>
+  </body>
+</html>

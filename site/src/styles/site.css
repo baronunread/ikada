@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "../../../src/theme.css";
+@import "@fontsource-variable/figtree";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* ikada's source sits outside the site package, so Tailwind has to be told to scan it. */
+@source "../../../src";
+@source "../";
+
+@layer base {
+  html {
+    background: var(--sb-canvas);
+    color: var(--sb-fg);
+  }
+}

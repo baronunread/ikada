@@ -1,0 +1,31 @@
+---
+import Command from "../components/Command.astro";
+import Docs from "../layouts/Docs.astro";
+import { components, REGISTRY_URL } from "../lib/registry";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<Docs title="ikada">
+  <article class="flex max-w-4xl flex-col gap-10">
+    <header class="flex flex-col gap-3">
+      <h1 class="text-2xl"><span aria-hidden="true">筏</span> ikada</h1>
+      <p class="max-w-2xl text-md font-normal text-fg-muted">
+        The Sproutboat design system: React components on Base UI and Tailwind CSS v4, with typed OKLCH tokens. The
+        Sproutboat dashboards are built from it. Install a component with the shadcn CLI and the source is yours, or use
+        the package and take updates.
+      </p>
+      <Command code={`npx shadcn@latest add ${REGISTRY_URL}/button.json`} />
+    </header>
+
+    <section class="flex flex-col gap-3" aria-labelledby="components">
+      <h2 id="components" class="text-lg">Components</h2>
+      <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        {components.map((c) => (
+          <li>
+            <a href={`${base}/components/${c.name}`} class="block truncate rounded-lg bg-surface px-3 py-2.5 shadow-card hover:bg-hover">{c.title}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Docs>

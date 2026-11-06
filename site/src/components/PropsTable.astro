@@ -1,0 +1,37 @@
+---
+import type { PropsTable } from "../lib/props";
+
+interface Props {
+  table: PropsTable;
+}
+const { table } = Astro.props;
+---
+
+<div class="flex flex-col gap-2">
+  <h3 class="font-mono text-sm font-semibold">{table.name}</h3>
+  {table.extends ? <p class="text-sm text-fg-muted">Also takes every prop of <code class="text-fg">{table.extends}</code>.</p> : null}
+  {
+    table.props.length ? (
+      <div class="overflow-x-auto rounded-xl bg-surface shadow-card">
+        <table class="w-full min-w-[36rem] text-left text-sm">
+          <thead class="text-fg-muted">
+            <tr class="border-b border-hairline">
+              <th class="px-4 py-2 font-medium">Prop</th>
+              <th class="px-4 py-2 font-medium">Type</th>
+              <th class="px-4 py-2 font-medium">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {table.props.map((p) => (
+              <tr class="border-b border-hairline last:border-0 align-top">
+                <td class="px-4 py-2 font-mono whitespace-nowrap">{p.name}{p.optional ? "?" : ""}</td>
+                <td class="px-4 py-2 font-mono text-fg-muted">{p.type}</td>
+                <td class="px-4 py-2">{p.doc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : null
+  }
+</div>
