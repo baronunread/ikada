@@ -33,7 +33,7 @@ const deps = (item.registryDependencies ?? []).map((d) => d.split("/").pop()?.re
 
     <section class="flex flex-col gap-3" aria-labelledby="examples">
       <h2 id="examples" class="text-lg">Examples</h2>
-      <Examples client:only="react" slug={item.name} />
+      <Examples client:load slug={item.name} />
     </section>
 
     <section class="flex flex-col gap-3" aria-labelledby="install">

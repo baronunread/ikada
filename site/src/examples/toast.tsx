@@ -1,6 +1,7 @@
 import { Button } from "../../../src/components/button";
 import { toast } from "../../../src/components/toast";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
+import { StatusGlyph } from "../../../src/components/status-glyph";
 
 export const examples: Example[] = [
   {
@@ -31,3 +32,14 @@ export const examples: Example[] = [
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <div className="flex w-60 items-start gap-2.5 rounded-xl bg-raised p-3 text-sm shadow-float">
+    <StatusGlyph status="success" className="mt-0.5" />
+    <div>
+      <p className="font-semibold">Deployed</p>
+      <p className="text-fg-muted">my-app is live.</p>
+    </div>
+  </div>
+);

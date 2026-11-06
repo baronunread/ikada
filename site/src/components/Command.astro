@@ -1,5 +1,9 @@
 ---
-/** A one-line shell command or snippet with a copy button. */
+/**
+ * A one-line shell command or snippet with a copy button. On narrow screens the line scrolls
+ * sideways inside its box (fading at the end edge, so it reads as more, not cut off) and Copy
+ * stays put.
+ */
 interface Props {
   code: string;
   label?: string;
@@ -9,6 +13,10 @@ const { code, label } = Astro.props;
 
 <div class="flex min-w-0 items-center gap-2 rounded-lg bg-code-bg py-1.5 ps-3 pe-1.5 shadow-card">
   {label ? <span class="shrink-0 text-xs text-fg-muted">{label}</span> : null}
-  <code class="min-w-0 flex-1 overflow-x-auto py-1 text-sm whitespace-nowrap">{code}</code>
+  <code
+    tabindex="0"
+    aria-label={label ? `${label} command` : "Command"}
+    class="min-w-0 flex-1 overflow-x-auto overscroll-x-contain rounded-sm py-1 pe-6 text-sm whitespace-nowrap [mask-image:linear-gradient(to_left,transparent,black_1.5rem)] [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-focus [&::-webkit-scrollbar]:hidden"
+  >{code}</code>
   <button type="button" data-copy={code} class="shrink-0 rounded-md px-2.5 py-1 text-sm font-semibold text-fg-muted hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-focus">Copy</button>
 </div>

@@ -1,5 +1,5 @@
 import { Switch } from "../../../src/components/switch";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
 import { forcedFocus } from "./types";
 
 export const examples: Example[] = [
@@ -11,8 +11,20 @@ export const examples: Example[] = [
         <Switch label="Preview deployments" />
         <Switch label="Auto-promote" defaultChecked />
         <Switch label="Disabled" disabled />
-        <Switch aria-label="Focused" className={forcedFocus} defaultChecked />
+        {/* The forced ring belongs on the track, so the label sits outside the component. */}
+        <span className="inline-flex items-center gap-2.5 text-base text-fg">
+          <Switch id="switch-example-focused" className={forcedFocus} defaultChecked />
+          <label htmlFor="switch-example-focused">Focused</label>
+        </span>
       </div>
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <div className="flex flex-col gap-2">
+    <Switch label="Auto-promote" defaultChecked />
+    <Switch label="Preview builds" />
+  </div>
+);

@@ -1,5 +1,5 @@
 import { Button } from "../../../src/components/button";
-import { forcedFocus, type Example } from "./types";
+import { forcedFocus, type Example, type Preview } from "./types";
 
 const variants = ["primary", "secondary", "ghost", "danger"] as const;
 
@@ -45,3 +45,11 @@ export const examples: Example[] = [
       )),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <div className="flex gap-2">
+    <Button variant="primary">Deploy</Button>
+    <Button>Cancel</Button>
+  </div>
+);

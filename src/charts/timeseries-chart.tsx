@@ -35,14 +35,17 @@ export interface DeployMarker {
 }
 
 export interface TimeseriesChartProps {
+  /** The lines to draw: a label, a colour and the points of each. */
   series: readonly TimeseriesSeries[];
   /** A dashed vertical rule with a label, in the `chart-deploy` color. */
   deploy?: DeployMarker | readonly DeployMarker[];
   /** Accessible name of the chart. Required. */
   ariaLabel: string;
+  /** Height in pixels. Default 210; the width fills the container. */
   height?: number;
   /** [min, max] of the value axis. Defaults to 0 up to the largest value, rounded up. */
   yDomain?: readonly [number, number];
+  /** Time range in ms [from, to]. Defaults to the span of the data. */
   xDomain?: readonly [number, number];
   /**
    * Formats x ticks and the tooltip heading. Defaults to clock times ("14:30") for epoch
@@ -59,6 +62,7 @@ export interface TimeseriesChartProps {
   formatTick?: (value: number) => string;
   /** Approximate number of x ticks. Defaults to 5. */
   xTicks?: number;
+  /** About how many value ticks to draw. Default 4. */
   yTicks?: number;
   className?: string;
 }

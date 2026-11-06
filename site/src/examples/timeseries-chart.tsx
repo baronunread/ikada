@@ -1,5 +1,5 @@
 import { TimeseriesChart } from "../../../src/charts/timeseries-chart";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
 
 const start = Date.UTC(2026, 10, 4);
 const data = Array.from({ length: 48 }, (_, i) => ({
@@ -30,3 +30,15 @@ export const examples: Example[] = [
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <div className="w-60">
+    <TimeseriesChart
+      ariaLabel="Requests, last 48 hours"
+      series={[{ id: "req", label: "Requests", data }]}
+      deploy={{ time: start + 30 * 3_600_000, label: "Deploy" }}
+      height={110}
+    />
+  </div>
+);

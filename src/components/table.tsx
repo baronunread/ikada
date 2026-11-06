@@ -129,7 +129,9 @@ const cellBase = "px-4 text-start align-middle";
 export interface TableHeadProps extends Omit<ComponentProps<"th">, "onClick" | "aria-sort">, HideBelowProps {
   /** Makes the header a button. `undefined` means sortable but not sorted. */
   sortable?: boolean;
+  /** Current sort of this column; shows the arrow and sets aria-sort. */
   sort?: SortDirection;
+  /** Makes the header a sort button; called when it is pressed. */
   onSort?: () => void;
 }
 

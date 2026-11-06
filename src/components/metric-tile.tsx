@@ -14,6 +14,7 @@ export interface MetricDelta {
 }
 
 export interface MetricTileProps extends Omit<ComponentProps<"div">, "children"> {
+  /** What the number measures, above it. */
   label: string;
   /** Already formatted: "0.21". For a plain count prefer `amount`. */
   value?: string;
@@ -23,14 +24,17 @@ export interface MetricTileProps extends Omit<ComponentProps<"div">, "children">
   locale?: string;
   /** "M", "%", "ms p50". */
   unit?: string;
+  /** Change against the previous period, shown as an arrow and a value. */
   delta?: MetricDelta;
   /** A line under the value: "14.8 req/s average". */
   hint?: ReactNode;
   /** A `<Sparkline />` from `@sproutboat/ikada/charts`, flush to the tile's bottom edge. */
   sparkline?: ReactNode;
+  /** Draws a skeleton in place of the value. */
   loading?: boolean;
   /** Nothing to show for this range: an em dash and `emptyText`. */
   noData?: boolean;
+  /** Shown when there is no value. Default "No data for this range". */
   emptyText?: string;
 }
 

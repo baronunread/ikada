@@ -19,6 +19,7 @@ export interface AvatarProps extends Omit<ComponentProps<typeof BaseAvatar.Root>
   src?: string | null;
   /** Whose avatar it is. Becomes the image alt text; its first letter is the fallback. */
   name: string;
+  /** 24px (sm), 32px (md, the default) or 48px (lg). */
   size?: "sm" | "md" | "lg";
   className?: string;
 }

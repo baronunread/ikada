@@ -13,11 +13,15 @@ export interface SegmentedOption<T extends string = string> {
 }
 
 export interface SegmentedControlProps<T extends string = string> {
+  /** The segments, in order: value and label. */
   options: readonly SegmentedOption<T>[];
+  /** The chosen segment's value (controlled). */
   value: T;
+  /** Called with the newly chosen value. */
   onValueChange: (value: T) => void;
   /** Names the group, e.g. "Theme". Required. */
   "aria-label": string;
+  /** Control height: sm or md (the default). */
   size?: "sm" | "md";
   className?: string;
 }

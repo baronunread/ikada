@@ -7,13 +7,17 @@ import type { Status } from "./status";
 import { StatusGlyph } from "./status-glyph";
 
 export interface BannerProps extends Omit<ComponentProps<"div">, "title"> {
+  /** Status that sets the colour and the glyph. Default info. */
   tone?: Status;
+  /** Bold first line; the children follow as the body. */
   title?: ReactNode;
   /** One action, usually a Button or Link. */
   action?: ReactNode;
   /** Shows a close button. The banner hides itself and calls `onDismiss`. */
   dismissible?: boolean;
+  /** Shows a close button and is called when it is pressed. Without it the banner stays. */
   onDismiss?: () => void;
+  /** Accessible name of the close button. Default "Dismiss". */
   dismissLabel?: string;
 }
 

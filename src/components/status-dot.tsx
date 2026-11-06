@@ -4,6 +4,7 @@ import type { Status } from "./status";
 import { StatusGlyph } from "./status-glyph";
 
 export interface StatusDotProps extends Omit<ComponentProps<"span">, "children"> {
+  /** Which status: sets the shape and the colour. */
   status: Status;
   /** Required: a dot is never the only signal. */
   label: string;

@@ -27,6 +27,22 @@ function block(source: string, open: number): string {
   return "";
 }
 
+/**
+ * Descriptions for props whose meaning is the same everywhere, used when the source has no
+ * JSDoc for them. A JSDoc comment on the member always wins.
+ */
+export const standardDocs: Record<string, string> = {
+  className: "Classes merged onto the root element, after ikada's own.",
+  children: "Content rendered inside the component.",
+  ref: "Ref to the underlying DOM element.",
+  id: "Id of the underlying element, for labels and aria references.",
+  side: "Which side of the trigger the popup opens on. Flips when there is no room.",
+  align: "How the popup lines up with the trigger along that side.",
+  open: "Whether it is open (controlled).",
+  defaultOpen: "Whether it starts open (uncontrolled).",
+  onOpenChange: "Called with the new open state when it opens or closes.",
+};
+
 export function propsTables(source: string): PropsTable[] {
   const tables: PropsTable[] = [];
   const re = /export interface (\w+Props)\b([^{]*)\{/g;
@@ -51,13 +67,15 @@ function members(body: string): Prop[] {
     const text = current.trim();
     current = "";
     const m = /^(readonly\s+)?("[^"]+"|[\w$]+)(\?)?\s*:\s*([\s\S]+)$/.exec(text);
-    if (m)
+    if (m) {
+      const name = (m[2] ?? "").replace(/"/g, "");
       out.push({
-        name: (m[2] ?? "").replace(/"/g, ""),
+        name,
         optional: Boolean(m[3]),
         type: (m[4] ?? "").replace(/\s+/g, " ").trim(),
-        doc,
+        doc: doc || standardDocs[name] || "",
       });
+    }
     doc = "";
   };
   for (let i = 0; i < body.length; i++) {

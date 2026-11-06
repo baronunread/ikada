@@ -8,7 +8,9 @@ export interface CheckboxProps extends Omit<ComponentProps<typeof BaseCheckbox.R
   className?: string;
   /** Visible label. Without one, pass aria-label. */
   label?: ReactNode;
+  /** Muted line under the label, linked to the checkbox as its description. */
   description?: ReactNode;
+  /** Marks the checkbox invalid: danger ring and aria-invalid. */
   invalid?: boolean;
 }
 

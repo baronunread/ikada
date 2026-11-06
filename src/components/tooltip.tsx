@@ -17,6 +17,7 @@ export interface TooltipProps {
   /** The element that triggers the tooltip; it receives the trigger props. */
   children: ReactElement;
   side?: "top" | "bottom" | "start" | "end";
+  /** Milliseconds before it opens on hover. Default from TooltipProvider (450). */
   delay?: number;
   defaultOpen?: boolean;
   className?: string;

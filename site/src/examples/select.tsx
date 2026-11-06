@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Field } from "../../../src/components/field";
 import { Select } from "../../../src/components/select";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
 
 const regions = [
   { value: "fra", label: "Frankfurt" },
@@ -45,3 +45,8 @@ export const examples: Example[] = [
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <Select aria-label="Region" options={regions} defaultValue="fra" className="w-48" />
+);

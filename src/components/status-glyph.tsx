@@ -22,6 +22,7 @@ const liveClass =
   "rounded-full border-2 border-brand-dot bg-[radial-gradient(circle,var(--sb-brand-dot)_0_30%,transparent_35%)]";
 
 export interface StatusGlyphProps extends Omit<ComponentProps<"span">, "children"> {
+  /** Which status: sets the shape and the colour. */
   status: Status;
   /** Success that is serving traffic ("Live"): a bullseye instead of the solid "Ready" circle. */
   live?: boolean;

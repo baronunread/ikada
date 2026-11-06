@@ -28,6 +28,7 @@ interface SidebarContextValue {
 const SidebarContext = createContext<SidebarContextValue>({ rail: false, drawer: false, closeDrawer: () => {} });
 
 export interface SidebarProps extends Omit<ComponentProps<"aside">, "children"> {
+  /** Sidebar content: a header, nav and footer. */
   children: ReactNode;
   /** `static` is always a column, `drawer` is always an overlay, `auto` switches at 768px. */
   mode?: "auto" | "static" | "drawer";
@@ -142,11 +143,13 @@ export function SidebarNav({
 export interface SidebarItemProps extends WithClass<Omit<useRender.ComponentProps<"a">, "children">> {
   /** Plain destination. With a router, leave it out and pass `render={<RouterLink to="/x" />}`. */
   href?: string;
+  /** Icon before the label. */
   icon?: ReactNode;
   /** Marks the page you are on: `aria-current="page"` and a raised fill. */
   current?: boolean;
   /** Trailing text or a Badge, hidden in the rail. */
   trailing?: ReactNode;
+  /** The item's label. */
   children: string;
 }
 

@@ -5,6 +5,7 @@ import type { Status } from "./status";
 import { StatusGlyph } from "./status-glyph";
 
 export interface BadgeProps extends ComponentProps<"span"> {
+  /** Status that sets the colour and the glyph. Default neutral. */
   tone?: Status;
   /** Adds a leading status shape. The text is always the primary signal. */
   dot?: boolean;

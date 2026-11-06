@@ -1,6 +1,6 @@
 import { Field } from "../../../src/components/field";
 import { Textarea } from "../../../src/components/textarea";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
 
 export const examples: Example[] = [
   {
@@ -28,3 +28,8 @@ export const examples: Example[] = [
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <Textarea aria-label="Query" mono rows={2} defaultValue={"select * from users\nlimit 10;"} className="w-60" />
+);

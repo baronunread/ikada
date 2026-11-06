@@ -2,13 +2,15 @@ import { lazy, Suspense } from "react";
 import type { ComponentType } from "react";
 import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
-import type { Example } from "../examples/types";
+import type { Example, Preview } from "../examples/types";
 
 /**
  * The live examples of one component page. Each page's examples are their own chunk
- * (examples/<slug>.tsx), loaded on that page only.
+ * (examples/<slug>.tsx), loaded on that page only. The page renders them on the server too
+ * (client:load), so they are in the HTML before hydration. A file with only a `preview` (the
+ * overview tile's render) shows that as its one example.
  */
-const modules = import.meta.glob<{ examples: Example[] }>("../examples/*.tsx");
+const modules = import.meta.glob<{ examples?: Example[]; preview?: Preview }>("../examples/*.tsx");
 
 const cache = new Map<string, ComponentType>();
 
@@ -25,10 +27,10 @@ function make(slug: string): ComponentType {
   const loader = modules[`../examples/${slug}.tsx`];
   if (!loader) return () => <p className="text-fg-muted">No live examples for this component yet.</p>;
   return lazy(() =>
-    loader().then(({ examples }) => ({
+    loader().then(({ examples = [], preview }) => ({
       default: () => (
         <div className="flex flex-col gap-4">
-          {examples.map((ex) => (
+          {(examples.length ? examples : preview ? [{ title: "Preview", render: preview }] : []).map((ex) => (
             <section key={ex.title} className="rounded-xl bg-surface shadow-card">
               <header className="border-b border-hairline px-4 py-2.5">
                 <h3 className="text-md">{ex.title}</h3>
