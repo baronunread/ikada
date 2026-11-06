@@ -1,10 +1,17 @@
 ---
 import { Code } from "astro:components";
 import BlockPreview from "../../components/BlockPreview";
-import Command from "../../components/Command.astro";
+import Install from "../../components/docs/Install.astro";
+import PageHead from "../../components/docs/PageHead.astro";
+import Pager from "../../components/docs/Pager.astro";
+import PropsTable from "../../components/docs/PropsTable.astro";
+import { Icon } from "../../components/icons";
 import Docs from "../../layouts/Docs.astro";
-import { blockFiles, blocks, components, items, REGISTRY_URL, REPO_URL } from "../../lib/registry";
+import { propsTables } from "../../lib/props";
+import { blockFiles, blocks } from "../../lib/registry";
 import type { Item } from "../../lib/registry";
+import { addCommands, fence, gzipKb, href, pagedDeps, pageMarkdown, registryJson, treeUrl, usesBaseUi } from "../../lib/site";
+import type { TocEntry } from "../../lib/site";
 
 export function getStaticPaths() {
   return blocks.map((item) => ({ params: { slug: item.name }, props: { item } }));
@@ -12,59 +19,157 @@ export function getStaticPaths() {
 
 const { item } = Astro.props as { item: Item };
 const files = blockFiles(item);
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-// The ikada components it is built from, linked to their pages (helpers such as cn and icons come along unnamed).
-const byName = new Map(items.map((i) => [i.name, i]));
-const paged = new Set(components.map((c) => c.name));
-const uses = (item.registryDependencies ?? [])
-  .map((d) => byName.get(d.split("/").pop()?.replace(/\.json$/, "") ?? ""))
-  .filter((i): i is Item => i?.type === "registry:ui")
-  .sort((a, b) => a.title.localeCompare(b.title));
+const uses = pagedDeps(item);
+const tables = files.flatMap((f) => propsTables(f.source));
+const commands = addCommands(item.name);
+const id = "bs";
+
+const toc: TocEntry[] = [
+  { id: "preview", label: "Preview" },
+  { id: "install", label: "Installation" },
+  ...(uses.length ? [{ id: "uses", label: "Built from" }] : []),
+  ...(tables.length ? [{ id: "props", label: "Props" }, ...tables.map((t) => ({ id: `props-${t.name}`, label: t.name, sub: true }))] : []),
+];
+
+const markdown = pageMarkdown({
+  title: `${item.title} block`,
+  description: item.description,
+  url: href(`/blocks/${item.name}`),
+  body: [
+    "## Installation",
+    fence(commands.npm, "sh"),
+    `Built from: ${uses.map((u) => u.title).join(", ")}.`,
+    ...files.flatMap((f) => [`## components/${f.name}`, fence(f.source)]),
+  ],
+});
 ---
 
-<Docs title={item.title} description={item.description}>
-  <article class="flex max-w-6xl flex-col gap-10">
-    <header class="flex flex-col gap-2">
-      <p class="text-sm text-fg-muted"><a class="hover:text-fg" href={`${base}/blocks`}>Blocks</a></p>
-      <h1 class="text-2xl">{item.title}</h1>
-      <p class="max-w-2xl text-md font-normal text-fg-muted">{item.description}</p>
-    </header>
+<Docs title={item.title} description={item.description} toc={toc} wide>
+  <PageHead
+    crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Blocks", href: href("/blocks") }, { label: item.title }]}
+    title={item.title}
+    lede={item.description}
+    baseUi={usesBaseUi(item) || uses.some(usesBaseUi)}
+    size={gzipKb(item)}
+    source={treeUrl(`blocks/${item.name}`)}
+    registry={registryJson(item.name)}
+    markdown={markdown}
+  />
 
-    <section class="flex flex-col gap-3" aria-labelledby="preview">
-      <h2 id="preview" class="text-lg">Preview</h2>
-      <div class="rounded-2xl bg-canvas p-3 ring-1 ring-hairline sm:p-6">
-        <BlockPreview client:only="react" slug={item.name} />
+  <section class="stage" data-bstage data-view="preview" id={id} aria-labelledby="preview">
+    <div class="stage-bar">
+      <h2 id="preview" class="ttl" style="margin:0;font-size:14px">Preview <small>Live, with the sample data the block ships with.</small></h2>
+      <div class="right">
+        <div class="seg vp-seg" role="radiogroup" aria-label="Preview width" data-seg data-role="vp">
+          <button class="seg-btn" type="button" role="radio" aria-checked="true" data-value="full">Full</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="768">768</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="390">390</button>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="View" data-seg data-role="view">
+          <button class="seg-btn" type="button" role="radio" aria-checked="true" data-value="preview">Preview</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="code">Code</button>
+        </div>
+        <button class="ibtn" type="button" data-stage-theme aria-pressed="false" aria-label="Preview in the other theme" title="Preview in the other theme"><Icon name="sun" /></button>
+        <button class="copy" type="button" data-copy-file data-copy-from={`#${id}-src-0`} aria-label="Copy the file shown">
+          <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" /><span class="lbl" aria-hidden="true">Copy</span>
+        </button>
       </div>
-      <p class="text-sm text-fg-muted">Live, with the sample data the block ships with. Replace it with your own through the props.</p>
-    </section>
-
-    <section class="flex flex-col gap-3" aria-labelledby="install">
-      <h2 id="install" class="text-lg">Installation</h2>
-      <Command label="shadcn" code={`npx shadcn@latest add ${REGISTRY_URL}/${item.name}.json`} />
-      <p class="text-sm text-fg-muted">
-        Copies {files.map((f, i) => <>{i ? ", " : ""}<code class="font-mono text-[0.8125rem] text-fg">components/{f.name}</code></>)} into your project, with
-        the ikada theme and the components it is built from:
-        {uses.map((u, i) => <>{i ? ", " : " "}{paged.has(u.name) ? <a class="text-fg underline underline-offset-2" href={`${base}/components/${u.name}`}>{u.title}</a> : <span>{u.title}</span>}</>)}.
-      </p>
-    </section>
-
-    <section class="flex flex-col gap-3" aria-labelledby="code">
-      <h2 id="code" class="text-lg">Code</h2>
-      {files.map((f) => (
-        <figure class="block-code min-w-0 overflow-hidden rounded-xl bg-code-bg shadow-card">
-          <figcaption class="flex items-center gap-2 border-b border-hairline py-1.5 ps-4 pe-1.5">
-            <span class="min-w-0 flex-1 truncate font-mono text-sm text-fg-muted">components/{f.name}</span>
-            <button type="button" data-copy={f.source} class="shrink-0 rounded-md px-2.5 py-1 text-sm font-semibold text-fg-muted hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-focus">Copy</button>
-          </figcaption>
-          <div class="max-h-[32rem] overflow-auto">
-            <Code code={f.source} lang="tsx" themes={{ light: "github-light", dark: "github-dark-dimmed" }} defaultColor={false} wrap={false} />
+    </div>
+    <div class="bview" data-vp="full" data-scope data-demo>
+      <div class="inner"><BlockPreview client:only="react" slug={item.name} /></div>
+    </div>
+    <div class="stage-code">
+      {
+        files.length > 1 ? (
+          <div class="file-tabs">
+            <div class="seg" role="radiogroup" aria-label="File" data-seg data-role="file">
+              {files.map((f, i) => (
+                <button class="seg-btn" type="button" role="radio" aria-checked={i === 0 ? "true" : "false"} data-value={String(i)}>
+                  {f.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </figure>
+        ) : (
+          <p class="file-name">components/{files[0]?.name}</p>
+        )
+      }
+      {files.map((f, i) => (
+        <div data-file={String(i)} hidden={i > 0} class="shiki-wrap" tabindex="0" aria-label={`components/${f.name}`}>
+          <Code code={f.source} lang="tsx" themes={{ light: "github-light", dark: "github-dark-dimmed" }} defaultColor={false} wrap={false} />
+          <template id={`${id}-src-${i}`} set:text={f.source} />
+        </div>
       ))}
-    </section>
+    </div>
+  </section>
 
-    <p class="text-sm text-fg-muted">
-      Source: <a class="text-fg underline underline-offset-2" href={`${REPO_URL}/tree/main/blocks/${item.name}`}>blocks/{item.name}</a>
-    </p>
-  </article>
+  <h2 id="install">Installation</h2>
+  <Install commands={commands} />
+  <p>
+    Copies {files.map((f, i) => <>{i ? ", " : ""}<code>components/{f.name}</code></>)} into your project with the ikada theme. It is your
+    code from then on: rename it, restyle it, and feed it your own data through its props.
+  </p>
+
+  {
+    uses.length ? (
+      <>
+        <h2 id="uses">Built from</h2>
+        <ul class="cindex" style="grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))">
+          {uses.map((u) => (
+            <li>
+              <a href={href(`/components/${u.name}`)}>
+                <span>{u.title}</span>
+                <small><span>{u.name}.tsx</span><span>{gzipKb(u)}</span></small>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : null
+  }
+
+  {
+    tables.length ? (
+      <>
+        <h2 id="props">Props</h2>
+        {tables.map((t) => (
+          <section id={`props-${t.name}`} aria-label={t.name}>
+            <PropsTable table={t} />
+          </section>
+        ))}
+      </>
+    ) : null
+  }
+
+  <Pager />
 </Docs>
+
+<style is:global>
+  [data-bstage][data-view="code"] .bview,
+  [data-bstage]:not([data-view="code"]) .stage-code {
+    display: none;
+  }
+  [data-bstage][data-view="code"] .vp-seg {
+    visibility: hidden;
+  }
+  [data-bstage] .shiki-wrap {
+    max-height: 36rem;
+    overflow: auto;
+    background: var(--sb-code-bg);
+  }
+  [data-bstage] .stage-code {
+    background: var(--sb-code-bg);
+  }
+  [data-bstage] .file-name {
+    margin: 0;
+    padding: 10px 16px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--sb-fg-muted);
+  }
+  @media (max-width: 860px) {
+    [data-bstage] .vp-seg {
+      display: none;
+    }
+  }
+</style>

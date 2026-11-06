@@ -1,0 +1,68 @@
+---
+import ComponentIndex from "../components/docs/ComponentIndex.astro";
+import Install from "../components/docs/Install.astro";
+import PageHead from "../components/docs/PageHead.astro";
+import Pager from "../components/docs/Pager.astro";
+import Docs from "../layouts/Docs.astro";
+import { blocks, components } from "../lib/registry";
+import { addCommands, fence, gzipKb, href, pageMarkdown, VERSION } from "../lib/site";
+
+const lede = `ikada is the design system behind Sproutboat's dashboards: ${components.length} React components and ${blocks.length} blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens and Afloat spring motion. Add one file at a time with the shadcn CLI and the source is yours, or install the package and take updates.`;
+const toc = [
+  { id: "start", label: "Quick start" },
+  { id: "components", label: "Components" },
+  { id: "blocks", label: "Blocks" },
+  { id: "guides", label: "Guides" },
+];
+const markdown = pageMarkdown({
+  title: "ikada overview",
+  description: lede,
+  url: href("/docs"),
+  body: [
+    "## Quick start",
+    fence(addCommands("button").npm, "sh"),
+    "## Components",
+    ...components.map((c) => `- ${c.title} (${gzipKb(c)} gzip): ${c.description}`),
+    "## Blocks",
+    ...blocks.map((b) => `- ${b.title}: ${b.description}`),
+  ],
+});
+---
+
+<Docs title="Overview" description={lede} toc={toc}>
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Overview" }]} title="Overview" lede={lede} markdown={markdown} />
+
+  <h2 id="start">Quick start</h2>
+  <p>
+    In a React project with Tailwind CSS v4 and a <code>components.json</code>, add a component by its registry URL. The CLI copies the
+    file into <code>components/ui</code>, installs its dependencies and merges the ikada theme into your CSS. The full setup is on{" "}
+    <a class="ilink" href={href("/installation")}>Installation</a>.
+  </p>
+  <Install commands={addCommands("button")} />
+
+  <h2 id="components">Components</h2>
+  <p>Every component is one file with its own registry entry. Sizes are the gzipped files the CLI writes. ikada {VERSION}.</p>
+  <ComponentIndex />
+
+  <h2 id="blocks">Blocks</h2>
+  <p>Whole dashboard patterns assembled from the components, with sample data. <a class="ilink" href={href("/blocks")}>See them all live</a>.</p>
+  <ul class="cindex">
+    {blocks.map((b) => (
+      <li>
+        <a href={href(`/blocks/${b.name}`)}>
+          <span>{b.title}</span>
+          <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <h2 id="guides">Guides</h2>
+  <ul class="list">
+    <li><a class="ilink" href={href("/installation")}>Installation</a>: the shadcn CLI, the registry alias, or the package.</li>
+    <li><a class="ilink" href={href("/theming")}>Theming and tokens</a>: every colour, type size, radius and layer, light and dark.</li>
+    <li><a class="ilink" href={href("/motion")}>Motion</a>: Afloat, the press, the springs and reduced motion.</li>
+    <li><a class="ilink" href={href("/changelog")}>Changelog</a>: what shipped in each release.</li>
+  </ul>
+  <Pager />
+</Docs>

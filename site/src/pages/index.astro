@@ -1,40 +1,92 @@
 ---
-import Command from "../components/Command.astro";
-import TilePreview, { hasPreview } from "../components/TilePreview";
-import { IkadaMark } from "../components/IkadaMark";
-import Docs from "../layouts/Docs.astro";
-import { components, REGISTRY_URL } from "../lib/registry";
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+import "../styles/home.css";
+import { buttonStyles } from "../../../src/components/button";
+import HomeShowcase from "../components/HomeShowcase";
+import type { Tile } from "../components/HomeShowcase";
+import Install from "../components/docs/Install.astro";
+import { Icon } from "../components/icons";
+import Shell from "../layouts/Shell.astro";
+import { blocks, components } from "../lib/registry";
+import { addCommands, gzipKb, href, VERSION } from "../lib/site";
+
+const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat's own dashboards are built from the same files.`;
+const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
+const tile = (slug: string, span: Tile["span"]): Tile => ({ slug, title: title(slug), href: href(`/components/${slug}`), span });
+const tiles: Tile[] = [
+  tile("button", 4),
+  tile("segmented-control", 4),
+  tile("switch", 4),
+  tile("metric-tile", 5),
+  tile("table", 7),
+  tile("dropdown-menu", 4),
+  tile("dialog", 4),
+  tile("toast", 4),
+  tile("command-palette", 6),
+  tile("tabs", 6),
+];
 ---
 
-<Docs title="ikada">
-  <article class="flex max-w-4xl flex-col gap-10">
-    <header class="flex flex-col gap-3">
-      <h1 class="flex items-center gap-2 text-2xl"><IkadaMark size={28} motion="none" /> ikada</h1>
-      <p class="max-w-2xl text-md font-normal text-fg-muted">
-        The Sproutboat design system: React components on Base UI and Tailwind CSS v4, with typed OKLCH tokens. The
-        Sproutboat dashboards are built from it. Install a component with the shadcn CLI and the source is yours, or use
-        the package and take updates.
-      </p>
-      <Command code={`npx shadcn@latest add ${REGISTRY_URL}/button.json`} />
-    </header>
+<Shell title="ikada" description={lede} home>
+  <main id="main">
+    <section class="hero-shell" data-hero-shell aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true"><canvas class="hero-canvas" data-hero-canvas></canvas></div>
+      <div class="hero">
+        <a class="pill" href={href("/changelog")}>
+          <span class="ver">ikada {VERSION}</span><span class="sep" aria-hidden="true"></span><span>MIT</span><span class="sep" aria-hidden="true"></span>
+          <span class="go">Changelog <Icon name="arrow" /></span>
+        </a>
+        <h1 id="hero-title" data-hero-mask="h1">The components behind <em>Sproutboat's dashboards.</em></h1>
+        <p class="lede" data-hero-mask="lede">{lede}</p>
+        <div class="ctas" data-hero-mask="ctl">
+          <a class={buttonStyles({ variant: "primary", size: "lg" })} href={href("/docs")}>Get started</a>
+          <a class={buttonStyles({ size: "lg" })} href={href("/docs#components")}>Browse components</a>
+        </div>
+        <div data-hero-mask="ctl" class="install-wrap">
+          <Install commands={addCommands("button")} />
+        </div>
+      </div>
+    </section>
 
-    <section class="flex flex-col gap-3" aria-labelledby="components">
-      <h2 id="components" class="text-lg">Components</h2>
-      <ul class="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        {components.map((c) => (
-          <li class="group relative flex flex-col overflow-hidden rounded-xl bg-surface shadow-card">
-            {hasPreview(c.name) ? (
-              <div inert aria-hidden="true" class="pointer-events-none flex h-32 items-center justify-center overflow-hidden bg-canvas p-3 select-none">
-                <div class="max-sm:[zoom:0.6]">
-                  <TilePreview slug={c.name} />
-                </div>
-              </div>
-            ) : null}
-            <a href={`${base}/components/${c.name}`} class="truncate px-3 py-2.5 font-semibold after:absolute after:inset-0 after:rounded-xl group-hover:bg-hover focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-focus">{c.title}</a>
+    <section class="sec" aria-labelledby="live">
+      <div class="sec-head">
+        <div>
+          <h2 id="live">Live components. <em>Press anything.</em></h2>
+          <p>Every tile is the real component from the registry, not a picture. The caption opens its docs.</p>
+        </div>
+        <a class="more" href={href("/docs#components")}>All {components.length} components <Icon name="arrow" /></a>
+      </div>
+      <HomeShowcase client:visible tiles={tiles} />
+    </section>
+
+    <section class="sec" aria-labelledby="blocks">
+      <div class="sec-head">
+        <div>
+          <h2 id="blocks">Whole screens, <em>one command each.</em></h2>
+          <p>{blocks.length} dashboard blocks assembled from the components, with sample data. The CLI writes the files into your app.</p>
+        </div>
+        <a class="more" href={href("/blocks")}>All blocks, live <Icon name="arrow" /></a>
+      </div>
+      <ul class="cindex">
+        {blocks.map((b) => (
+          <li>
+            <a href={href(`/blocks/${b.name}`)}>
+              <span>{b.title}</span>
+              <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
+            </a>
           </li>
         ))}
       </ul>
     </section>
-  </article>
-</Docs>
+
+    <section class="cta" aria-labelledby="cta">
+      <h2 id="cta">Start with one component.</h2>
+      <p>Each component is one file. The CLI writes it into your repo with the tokens it needs, and the source is yours to grow.</p>
+      <Install commands={addCommands("button")} />
+    </section>
+  </main>
+
+  <script>
+    import { bootHero } from "../hero-field/hero";
+    bootHero();
+  </script>
+</Shell>

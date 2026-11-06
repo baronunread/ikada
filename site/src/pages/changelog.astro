@@ -1,0 +1,34 @@
+---
+import PageHead from "../components/docs/PageHead.astro";
+import Pager from "../components/docs/Pager.astro";
+import Docs from "../layouts/Docs.astro";
+import { REPO_URL } from "../lib/registry";
+import { href, pageMarkdown, VERSION } from "../lib/site";
+
+const pr = (n: number): string => `${REPO_URL}/pull/${n}`;
+const entries: { title: string; pr?: number; text: string }[] = [
+  { title: "The docs site, redesigned", text: "A shader hero on the home page, the Waterline docs chrome on every page, prop playgrounds, install tabs for four package managers and a component index with sizes." },
+  { title: "The ikada mark", pr: 6, text: "E4, Buoyed: two lashed logs riding low on one wave line, with a press, a first-paint drop and a loading loop." },
+  { title: "Blocks", pr: 5, text: "Eleven dashboard patterns as shadcn registry:block items, each with a live preview and sample data." },
+  { title: "Docs site and shadcn registry", pr: 3, text: "Every component and helper as a registry item, generated from the source, with a docs page per component." },
+  { title: "Afloat", pr: 4, text: "ikada's motion character: springs, press and release, the focus wake and sprouting success." },
+  { title: "Menus above modals", pr: 2, text: "Menus stack above dialogs and the mobile drawer, so they open from inside them." },
+  { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard's vendored copy." },
+];
+const lede = "What changed in each release of ikada. The package is not on npm yet; everything below is in the first release.";
+const markdown = pageMarkdown({ title: "Changelog", description: lede, url: href("/changelog"), body: [`## ${VERSION} (unreleased)`, ...entries.map((e) => `- ${e.title}${e.pr ? ` (#${e.pr})` : ""}: ${e.text}`)] });
+---
+
+<Docs title="Changelog" description={lede} toc={[{ id: `v${VERSION}`, label: VERSION }]}>
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Changelog" }]} title="Changelog" lede={lede} markdown={markdown} />
+  <h2 id={`v${VERSION}`}>{VERSION} <span class="chip" style="vertical-align:middle;margin-inline-start:8px">Unreleased</span></h2>
+  <ul class="list">
+    {entries.map((e) => (
+      <li>
+        <strong style="color:var(--sb-fg);font-weight:600">{e.title}</strong>
+        {e.pr ? <> (<a class="ilink" href={pr(e.pr)}>#{e.pr}</a>)</> : null}: {e.text}
+      </li>
+    ))}
+  </ul>
+  <Pager />
+</Docs>

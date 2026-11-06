@@ -1,0 +1,401 @@
+/* The homepage: Specimen's minimal centred hero over the Growth field (specimen-shader), then the
+   live components (Waterline's bento, after review) and the blocks. */
+/* Declared first: this file can load before site.css, and the first mention fixes the layer order. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* at scroll 0 the header sits on the field with no strip; the shader fades the band under it */
+  .home .nav:not([data-scrolled]):not([data-open]) {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hero-shell {
+    position: relative;
+    isolation: isolate;
+    margin-top: calc(-1 * var(--nav-h));
+    padding-top: var(--nav-h);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+    mask-image: linear-gradient(180deg, #000 0, #000 72%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 72%, transparent 100%);
+  }
+  /* the CSS fallback and the frame before the field loads: pools at the edges, the centre kept clear */
+  .hero-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 42% 46% at 12% 30%, oklch(0.86 0.12 165), transparent 70%),
+      radial-gradient(ellipse 44% 50% at 90% 36%, oklch(0.8 0.1 205), transparent 70%),
+      radial-gradient(ellipse 60% 36% at 50% 2%, oklch(0.84 0.09 190), transparent 70%),
+      radial-gradient(ellipse 70% 40% at 50% 92%, oklch(0.78 0.11 212), transparent 70%),
+      linear-gradient(180deg, oklch(0.93 0.03 200), oklch(0.88 0.06 208));
+    mask-image: radial-gradient(ellipse 46% 44% at 50% 42%, transparent 55%, #000 100%);
+    -webkit-mask-image: radial-gradient(ellipse 46% 44% at 50% 42%, transparent 55%, #000 100%);
+  }
+  :root:not([data-theme="light"]) .hero-bg::before {
+    background:
+      radial-gradient(ellipse 42% 46% at 12% 30%, oklch(0.48 0.12 170), transparent 70%),
+      radial-gradient(ellipse 44% 50% at 90% 36%, oklch(0.42 0.1 215), transparent 70%),
+      radial-gradient(ellipse 60% 36% at 50% 2%, oklch(0.4 0.09 190), transparent 70%),
+      radial-gradient(ellipse 70% 40% at 50% 92%, oklch(0.34 0.08 230), transparent 70%),
+      linear-gradient(180deg, oklch(0.24 0.045 245), oklch(0.17 0.035 255));
+  }
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .hero-canvas.on {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-canvas {
+      transition-duration: 160ms;
+    }
+  }
+
+  .hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 96px 32px 112px;
+    text-align: center;
+  }
+  .hero .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 30px;
+    padding: 0 12px 0 14px;
+    margin-bottom: 28px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--sb-surface) 94%, transparent);
+    box-shadow: var(--sb-shadow-pill);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--sb-fg-muted);
+    white-space: nowrap;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+      box-shadow 160ms ease,
+      outline-color 120ms ease;
+  }
+  .hero .pill:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+  .hero .pill .ver {
+    color: var(--sb-fg);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero .pill .sep {
+    width: 1px;
+    height: 12px;
+    background: var(--sb-hairline-strong);
+  }
+  .hero .pill .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--sb-fg);
+  }
+  .hero .pill .go .i {
+    width: 14px;
+    height: 14px;
+    transition: translate 160ms var(--ease-out);
+  }
+  .hero h1 {
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    display: block;
+    font-style: normal;
+    color: var(--sb-fg-muted);
+  }
+  .hero .lede {
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--sb-fg-muted);
+    max-width: 50ch;
+    margin: 24px auto 0;
+    text-wrap: pretty;
+  }
+  .hero .ctas {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 32px auto 0;
+  }
+  .hero .ctas a {
+    min-width: 168px;
+  }
+  .hero .install {
+    max-width: 600px;
+    margin: 20px auto 0;
+    text-align: start;
+  }
+
+  /* hero entrance: the statement leads, the rest follows on shrinking beats; opacity only under reduce */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-motion="reduce"]) .hero > * {
+      animation: hero-in 600ms var(--ease-out) backwards;
+      animation-delay: calc(var(--beat, 0) * 1ms);
+    }
+  }
+  .hero > :nth-child(2) {
+    --beat: 40;
+  }
+  .hero > :nth-child(3) {
+    --beat: 100;
+  }
+  .hero > :nth-child(4) {
+    --beat: 150;
+  }
+  .hero > :nth-child(5) {
+    --beat: 190;
+  }
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+
+  /* sections */
+  .sec {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
+  }
+  .sec + .sec {
+    padding-top: 96px;
+  }
+  .sec-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .sec-head h2 {
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.05;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+  .sec-head h2 em {
+    font-style: normal;
+    color: var(--sb-fg-muted);
+  }
+  .sec-head p {
+    color: var(--sb-fg-muted);
+    margin-top: 10px;
+    max-width: 52ch;
+    font-size: 16px;
+  }
+  .sec-head .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 550;
+    color: var(--sb-fg-muted);
+    white-space: nowrap;
+    padding: 4px 2px;
+    border-radius: 6px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .sec-head .more:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+
+  /* live components: still surfaces, the caption is the link */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tile {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 18px 18px 8px;
+    border-radius: 16px;
+    background: var(--sb-surface);
+    box-shadow: var(--sb-shadow-card);
+  }
+  .tile[data-span="5"] {
+    grid-column: span 5;
+  }
+  .tile[data-span="6"] {
+    grid-column: span 6;
+  }
+  .tile[data-span="7"] {
+    grid-column: span 7;
+  }
+  .tile[data-span="8"] {
+    grid-column: span 8;
+  }
+  .tile[data-span="12"] {
+    grid-column: span 12;
+  }
+  .tile .t-body {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 160px;
+    min-width: 0;
+    padding: 12px 0;
+    overflow-x: auto;
+  }
+  .tile .t-cap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 36px;
+    margin: 8px -8px 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--sb-fg-muted);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+      background-color 120ms ease,
+      outline-color 120ms ease;
+  }
+  .tile .t-cap:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+  .tile .t-cap b {
+    font-weight: 600;
+    color: var(--sb-fg);
+  }
+  .tile .t-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cta {
+    margin: 112px auto 0;
+    padding: 72px 32px 80px;
+    border-top: 1px solid var(--sb-hairline);
+    text-align: center;
+  }
+  .cta h2 {
+    font-size: clamp(28px, 3.4vw, 44px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .cta p {
+    color: var(--sb-fg-muted);
+    margin: 12px auto 24px;
+    max-width: 46ch;
+  }
+  .cta .install {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: start;
+  }
+
+  @media (hover: hover) {
+    .hero .pill:hover {
+      box-shadow: var(--sb-shadow-button-hover), var(--sb-shadow-pill);
+    }
+    .hero .pill:hover .go .i {
+      translate: calc(2px * var(--sb-move)) 0;
+    }
+    .sec-head .more:hover,
+    .tile .t-cap:hover {
+      color: var(--sb-fg);
+    }
+    .tile .t-cap:hover {
+      background: var(--sb-hover);
+    }
+  }
+  @media (forced-colors: active) {
+    .tile,
+    .hero .pill {
+      border: 1px solid ButtonBorder;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .tile,
+    .tile[data-span] {
+      grid-column: span 6;
+    }
+  }
+  @media (max-width: 860px) {
+    .hero {
+      padding: 48px 16px 72px;
+    }
+    .hero h1 {
+      font-size: 40px;
+      max-width: 13ch;
+    }
+    .hero h1 em {
+      display: inline;
+    }
+    .hero .lede {
+      font-size: 16px;
+    }
+    .hero .pill {
+      font-size: 12px;
+      gap: 8px;
+    }
+    .hero .ctas a {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .sec {
+      padding: 16px 16px 0;
+    }
+    .sec + .sec {
+      padding-top: 64px;
+    }
+    .sec-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .tile,
+    .tile[data-span] {
+      grid-column: span 12;
+    }
+    .cta {
+      margin-top: 64px;
+      padding: 48px 16px;
+    }
+  }
+}

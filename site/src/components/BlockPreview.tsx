@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import type { ComponentType } from "react";
 import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
+import { demo } from "../lib/demo-href";
 import { IkadaMark } from "./IkadaMark";
 
 /**
@@ -16,6 +17,15 @@ const pascal = (slug: string): string =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join("");
 
+/**
+ * Props that point a block's sample links at real pages of this site. The registry source keeps
+ * its neutral defaults (in-app fragments); only the preview here is retargeted.
+ */
+const siteProps: Record<string, Record<string, unknown>> = {
+  "project-tray": { projectHref: () => demo.projects, sproutHref: () => demo.projects },
+  "usage-line": { href: demo.usage },
+};
+
 const cache = new Map<string, ComponentType>();
 
 function load(slug: string): ComponentType {
@@ -27,7 +37,8 @@ function load(slug: string): ComponentType {
         loader().then((mod) => {
           const Block = mod[pascal(slug)] as ComponentType | undefined;
           if (!Block) throw new Error(`blocks/${slug}/${slug}.tsx does not export ${pascal(slug)}`);
-          return { default: Block };
+          const props = siteProps[slug];
+          return { default: props ? () => <Block {...props} /> : Block };
         }),
       )
     : () => <p className="text-fg-muted">This block has no preview.</p>;

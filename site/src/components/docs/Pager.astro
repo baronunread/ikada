@@ -1,0 +1,25 @@
+---
+import { pager } from "../../lib/site";
+
+const here = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+const { prev, next } = pager(here);
+---
+
+{
+  prev || next ? (
+    <nav class="pager" aria-label="Previous and next page">
+      {prev ? (
+        <a class="prev" href={prev.href} rel="prev">
+          <small>Previous</small>
+          <span>← {prev.label}</span>
+        </a>
+      ) : null}
+      {next ? (
+        <a class="next" href={next.href} rel="next">
+          <small>Next</small>
+          <span>{next.label} →</span>
+        </a>
+      ) : null}
+    </nav>
+  ) : null
+}

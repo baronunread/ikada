@@ -1,13 +1,20 @@
 ---
 import { readFileSync } from "node:fs";
 import { relative } from "node:path";
-import Command from "../../components/Command.astro";
-import Examples from "../../components/Examples";
-import PropsTable from "../../components/PropsTable.astro";
+import Examples, { slugify } from "../../components/Examples";
+import Install from "../../components/docs/Install.astro";
+import PageHead from "../../components/docs/PageHead.astro";
+import Pager from "../../components/docs/Pager.astro";
+import PropsTable from "../../components/docs/PropsTable.astro";
+import Snippet from "../../components/docs/Snippet.astro";
+import type { Example, Playground } from "../../examples/types";
 import Docs from "../../layouts/Docs.astro";
+import { initialValues, writeCode } from "../../lib/playground";
 import { propsTables } from "../../lib/props";
-import { components, REGISTRY_URL, REPO_URL, sourcePath, srcDir } from "../../lib/registry";
+import { components, sourcePath, srcDir } from "../../lib/registry";
 import type { Item } from "../../lib/registry";
+import { addCommands, fence, gzipKb, href, pagedDeps, pageMarkdown, registryJson, sourceUrl, usesBaseUi } from "../../lib/site";
+import type { TocEntry } from "../../lib/site";
 
 export function getStaticPaths() {
   return components.map((item) => ({ params: { slug: item.name }, props: { item } }));
@@ -18,38 +25,112 @@ const file = sourcePath(item);
 const source = readFileSync(file, "utf8");
 const tables = propsTables(source);
 const exported = [...source.matchAll(/export function ([A-Z]\w*)/g)].map((m) => m[1]);
-const from = file.includes("/charts/") ? "@sproutboat/ikada/charts" : "@sproutboat/ikada";
+const fromPkg = file.includes("/charts/") ? "@sproutboat/ikada/charts" : "@sproutboat/ikada";
+const fileName = file.split("/").pop() ?? `${item.name}.tsx`;
 const repoPath = `src/${relative(srcDir, file)}`;
-const deps = (item.registryDependencies ?? []).map((d) => d.split("/").pop()?.replace(/\.json$/, "")).filter((d) => d !== "theme");
+const deps = pagedDeps(item);
+
+const mods = import.meta.glob<{ examples?: Example[]; playground?: Playground }>("../../examples/*.tsx", { eager: true });
+const mod = mods[`../../examples/${item.name}.tsx`] ?? {};
+const examples = mod.examples ?? [];
+const usageJsx = mod.playground ? writeCode(mod.playground, initialValues(mod.playground)) : (examples[0]?.code ?? "");
+const importLine = `import { ${exported.join(", ")} } from "@/components/ui/${fileName.replace(/\.tsx?$/, "")}";`;
+const usage = usageJsx ? `${importLine}\n\n${usageJsx}` : importLine;
+const commands = addCommands(item.name);
+const size = gzipKb(item);
+
+const toc: TocEntry[] = [
+  { id: "install", label: "Installation" },
+  { id: "usage", label: "Usage" },
+  ...(examples.length ? [{ id: "examples", label: "Examples" }, ...examples.map((e) => ({ id: slugify(e.title), label: e.title, sub: true }))] : []),
+  { id: "props", label: "Props" },
+  ...tables.map((t) => ({ id: `props-${t.name}`, label: t.name, sub: true })),
+];
+
+const markdown = pageMarkdown({
+  title: item.title,
+  description: item.description,
+  url: href(`/components/${item.name}`),
+  body: [
+    "## Installation",
+    fence(commands.npm, "sh"),
+    `Or from the package: \`import { ${exported.join(", ")} } from "${fromPkg}";\``,
+    "## Usage",
+    fence(usage),
+    ...(examples.length ? ["## Examples", ...examples.flatMap((e) => [`### ${e.title}`, e.description ?? "", fence(e.code)])] : []),
+    "## Props",
+    ...tables.flatMap((t) => [
+      `### ${t.name}`,
+      t.extends ? `Also takes every prop of \`${t.extends}\`.` : "",
+      ...(t.props.length ? ["| Prop | Type | Description |", "| --- | --- | --- |", ...t.props.map((p) => `| ${p.name}${p.optional ? "?" : ""} | \`${p.type.replace(/\|/g, "\\|")}\` | ${p.doc.replace(/\|/g, "\\|")} |`)] : []),
+    ]),
+    `Source: ${sourceUrl(repoPath)}`,
+  ],
+});
 ---
 
-<Docs title={item.title} description={item.description}>
-  <article class="flex max-w-4xl flex-col gap-10">
-    <header class="flex flex-col gap-2">
-      <p class="text-sm text-fg-muted">Components</p>
-      <h1 class="text-2xl">{item.title}</h1>
-      <p class="max-w-2xl text-md font-normal text-fg-muted">{item.description}</p>
-    </header>
+<Docs title={item.title} description={item.description} toc={toc}>
+  <PageHead
+    crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Components", href: href("/docs#components") }, { label: item.title }]}
+    title={item.title}
+    lede={item.description}
+    baseUi={usesBaseUi(item)}
+    size={size}
+    source={sourceUrl(repoPath)}
+    registry={registryJson(item.name)}
+    markdown={markdown}
+  />
 
-    <section class="flex flex-col gap-3" aria-labelledby="examples">
-      <h2 id="examples" class="text-lg">Examples</h2>
-      <Examples client:load slug={item.name} />
-    </section>
+  <Examples client:load slug={item.name} part="top" />
 
-    <section class="flex flex-col gap-3" aria-labelledby="install">
-      <h2 id="install" class="text-lg">Installation</h2>
-      <Command label="shadcn" code={`npx shadcn@latest add ${REGISTRY_URL}/${item.name}.json`} />
-      <Command label="package" code={`import { ${exported.join(", ")} } from "${from}";`} />
-      {deps.length ? <p class="text-sm text-fg-muted">Also installs: {deps.join(", ")}, and the ikada theme.</p> : null}
-    </section>
+  <h2 id="install">Installation</h2>
+  <Install commands={commands} />
+  <p>
+    The CLI writes <code>components/ui/{fileName}</code> and merges the ikada theme into your CSS.{" "}
+    {deps.length ? (
+      <>
+        It also installs the components it is built from:{" "}
+        {deps.map((d, i) => (
+          <>
+            {i ? (i === deps.length - 1 ? " and " : ", ") : ""}
+            <a class="ilink" href={href(`/components/${d.name}`)}>{d.title}</a>
+          </>
+        ))}
+        .{" "}
+      </>
+    ) : null}
+    Or take it from the package: <code>{`import { ${exported.join(", ")} } from "${fromPkg}";`}</code>
+  </p>
 
-    <section class="flex flex-col gap-4" aria-labelledby="props">
-      <h2 id="props" class="text-lg">Props</h2>
-      {tables.length ? tables.map((t) => <PropsTable table={t} />) : <p class="text-fg-muted">No props interface; see the source.</p>}
-    </section>
+  <h2 id="usage">Usage</h2>
+  <Snippet code={usage} label="Usage" />
 
-    <p class="text-sm text-fg-muted">
-      Source: <a class="text-fg underline underline-offset-2" href={`${REPO_URL}/blob/main/${repoPath}`}>{repoPath}</a>
-    </p>
-  </article>
+  {
+    examples.length ? (
+      <>
+        <h2 id="examples">Examples</h2>
+        <Examples client:visible slug={item.name} part="examples" />
+      </>
+    ) : null
+  }
+
+  <h2 id="props">Props</h2>
+  {
+    tables.length ? (
+      tables.map((t) => (
+        <section id={`props-${t.name}`} aria-label={t.name}>
+          <PropsTable table={t} />
+        </section>
+      ))
+    ) : (
+      <p>
+        No props interface of its own; see <a class="ilink" href={sourceUrl(repoPath)}>{repoPath}</a>.
+      </p>
+    )
+  }
+
+  <p style="font-size:14px">
+    Source: <a class="ilink" href={sourceUrl(repoPath)}>{repoPath}</a>
+  </p>
+  <Pager />
 </Docs>

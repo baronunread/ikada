@@ -15,21 +15,7 @@
 }
 
 @source "../../../blocks";
-
-/* Block code views: Shiki writes both themes as variables; ikada's theme picks one. */
-.block-code pre {
-  margin: 0;
-  padding: 0.875rem 1rem;
-  background: transparent !important;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-}
-.block-code pre span {
-  color: var(--shiki-dark);
-}
-[data-theme="light"] .block-code pre span {
-  color: var(--shiki-light);
-}
+@import "./docs.css";
 
 /* The ikada mark (components/IkadaMark.tsx, motion in components/ikada-mark-motion.ts). Moves are
    in the 24-grid's user units, so they scale with the mark. Transform and opacity only. */
