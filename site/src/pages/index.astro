@@ -1,6 +1,7 @@
 ---
 import Command from "../components/Command.astro";
 import TilePreview, { hasPreview } from "../components/TilePreview";
+import { IkadaMark } from "../components/IkadaMark";
 import Docs from "../layouts/Docs.astro";
 import { components, REGISTRY_URL } from "../lib/registry";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -9,7 +10,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 <Docs title="ikada">
   <article class="flex max-w-4xl flex-col gap-10">
     <header class="flex flex-col gap-3">
-      <h1 class="text-2xl"><span aria-hidden="true">筏</span> ikada</h1>
+      <h1 class="flex items-center gap-2 text-2xl"><IkadaMark size={28} motion="none" /> ikada</h1>
       <p class="max-w-2xl text-md font-normal text-fg-muted">
         The Sproutboat design system: React components on Base UI and Tailwind CSS v4, with typed OKLCH tokens. The
         Sproutboat dashboards are built from it. Install a component with the shadcn CLI and the source is yours, or use

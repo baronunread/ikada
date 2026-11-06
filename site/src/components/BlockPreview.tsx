@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import type { ComponentType } from "react";
 import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
+import { IkadaMark } from "./IkadaMark";
 
 /**
  * The live preview of one block: blocks/<slug>/<slug>.tsx, rendered with no props so it shows
@@ -34,12 +35,21 @@ function load(slug: string): ComponentType {
   return made;
 }
 
+/** The block's chunk is loading: the mark's loading loop, shown only if it takes over 400ms. */
+function Loading() {
+  return (
+    <div className="grid min-h-48 place-items-center rounded-xl bg-surface text-fg-muted" aria-busy="true">
+      <IkadaMark size={48} motion="none" loading className="ikm-spinner" title="Loading the preview" />
+    </div>
+  );
+}
+
 export default function BlockPreview({ slug }: { slug: string }) {
   const Block = load(slug);
   return (
     <ToastProvider>
       <TooltipProvider>
-        <Suspense fallback={<div className="min-h-48 animate-pulse rounded-xl bg-surface" />}>
+        <Suspense fallback={<Loading />}>
           <div data-block-ready={slug}>
             <Block />
           </div>

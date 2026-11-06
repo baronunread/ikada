@@ -30,3 +30,89 @@
 [data-theme="light"] .block-code pre span {
   color: var(--shiki-light);
 }
+
+/* The ikada mark (components/IkadaMark.tsx, motion in components/ikada-mark-motion.ts). Moves are
+   in the 24-grid's user units, so they scale with the mark. Transform and opacity only. */
+.ikm {
+  overflow: visible;
+}
+.ikm .ikm-raft,
+.ikm .ikm-bob {
+  transform-origin: 12px 17px;
+}
+.ikm .ikm-echo {
+  transform-origin: 12px 18px;
+}
+/* Press: the library's press on the raft (settle 1 unit and 3% in 90ms, release on the bob spring).
+   A transition, so a quick tap or a press let go mid-way retargets from where the raft is. */
+.ikm .ikm-raft {
+  transition: transform var(--sb-duration-spring-bob) var(--sb-spring-bob);
+}
+[data-ikm-pressed] .ikm .ikm-raft {
+  transform: translateY(var(--sb-offset-press)) scale(var(--sb-scale-press));
+  transition-duration: var(--sb-duration-press);
+  transition-timing-function: var(--ease-out);
+}
+/* First paint, once per session (the flag is set in Docs.astro's head): the raft drops 2.5 units
+   onto the water on the bob spring, opaque by ~120ms, and the water rings at 200ms. CSS, so it
+   plays before any script has loaded. */
+:root[data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-bob {
+  animation:
+    ikm-drop var(--sb-duration-spring-bob) var(--sb-spring-bob) backwards,
+    ikm-in 120ms var(--ease-out) backwards;
+}
+:root[data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-echo {
+  animation:
+    ikm-ring-move 600ms var(--ease-out) 200ms,
+    ikm-ring-fade 600ms 200ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-bob {
+    animation: ikm-in 160ms var(--ease-out) backwards;
+  }
+  :root[data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-echo {
+    animation: none;
+  }
+}
+:root[data-motion="reduce"][data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-bob {
+  animation: ikm-in 160ms var(--ease-out) backwards;
+}
+:root[data-motion="reduce"][data-ikm-intro] .ikm[data-ikm-motion="interactive"] .ikm-echo {
+  animation: none;
+}
+@keyframes ikm-drop {
+  from {
+    transform: translateY(-2.5px);
+  }
+}
+@keyframes ikm-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ikm-ring-move {
+  to {
+    transform: translateY(2px) scaleX(1.12);
+  }
+}
+/* Peak 0.45 early, then the tail of the ease-out (WAAPI's effect-level easing, unrolled). */
+@keyframes ikm-ring-fade {
+  0% {
+    opacity: 0;
+    animation-timing-function: linear;
+  }
+  5% {
+    opacity: 0.45;
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* As a spinner: hidden until the loading loop actually starts (after 400ms), then fades in. */
+.ikm-spinner {
+  transition: opacity 160ms var(--ease-out);
+}
+.ikm-spinner:not([data-loading]) {
+  opacity: 0;
+}

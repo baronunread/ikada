@@ -1,5 +1,6 @@
 ---
 import "../styles/site.css";
+import { IkadaMark } from "../components/IkadaMark";
 import { blocks, components, REPO_URL } from "../lib/registry";
 
 interface Props {
@@ -30,6 +31,12 @@ const current = (href: string): boolean => here === href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title === "ikada" ? "ikada: the Sproutboat design system" : `${title} · ikada`}</title>
     <meta name="description" content={description} />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}/favicon-light-32.png`} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={`${base}/favicon-dark-32.png`} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href={`${base}/favicon-light-16.png`} type="image/png" sizes="16x16" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={`${base}/favicon-dark-16.png`} type="image/png" sizes="16x16" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <script is:inline>
       // Before first paint: the saved choice, else the system's. ikada is dark unless light is stamped.
@@ -38,14 +45,21 @@ const current = (href: string): boolean => here === href;
         const light = saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)").matches;
         document.documentElement.dataset.theme = light ? "light" : "dark";
       })();
+      // The mark's first-paint drop plays once per session (site.css, .ikm).
+      try {
+        if (!sessionStorage.getItem("ikada-mark-intro")) {
+          sessionStorage.setItem("ikada-mark-intro", "1");
+          document.documentElement.dataset.ikmIntro = "";
+        }
+      } catch {}
     </script>
   </head>
   <body class="min-h-dvh bg-canvas font-sans text-base text-fg">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-(--sb-z-toast) focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
     <header class="sticky top-0 z-(--sb-z-sticky) border-b border-hairline bg-canvas/90 backdrop-blur">
       <div class="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
-        <a href={`${base}/`} class="flex items-center gap-2 font-semibold">
-          <span aria-hidden="true" class="text-lg">筏</span> ikada
+        <a href={`${base}/`} class="-mx-1.5 flex items-center gap-2 rounded-md px-1.5 py-1 font-semibold focus-visible:outline-2 focus-visible:outline-focus">
+          <IkadaMark size={24} motion="interactive" /> ikada
         </a>
         <span class="hidden text-sm text-fg-muted sm:inline">the Sproutboat design system</span>
         <nav class="ms-auto flex items-center gap-1 text-sm" aria-label="Site">
@@ -97,6 +111,8 @@ const current = (href: string): boolean => here === href;
     </div>
 
     <script>
+      import { wireAll } from "../components/ikada-mark-motion";
+      wireAll();
       document.querySelector("[data-theme-toggle]")?.addEventListener("click", () => {
         const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
         document.documentElement.dataset.theme = next;
