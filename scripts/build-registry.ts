@@ -193,6 +193,16 @@ export interface BlockSource {
   files: string[];
 }
 
+/** Sentence case for block titles, keeping acronyms: "kv-browser" is "KV browser". */
+const ACRONYMS = new Set(["kv", "d1", "r2", "sql", "api"]);
+const TITLES: Record<string, string> = { "sign-in-card": "Sign-in card" };
+export const blockTitle = (name: string): string =>
+  TITLES[name] ??
+  name
+    .split("-")
+    .map((w, i) => (ACRONYMS.has(w) ? w.toUpperCase() : i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(" ");
+
 /** Every block folder under blocks/, each with its main file `<name>.tsx`. */
 export function blockSources(): BlockSource[] {
   let dirs: string[];
@@ -256,7 +266,7 @@ function blockItem(
   const item: RegistryItem = {
     name: block.name,
     type: "registry:block",
-    title: kebabToTitle(block.name),
+    title: blockTitle(block.name),
     description,
     categories: ["dashboard"],
     registryDependencies: ["theme", ...[...local].sort()].map(ref),
@@ -299,7 +309,10 @@ function describe(content: string, item: string, fallback: string): string {
     .join("");
   const at = content.search(new RegExp(`\\nexport (?:function|const) ${name}\\b`));
   const before = at < 0 ? "" : content.slice(0, at).trimEnd();
-  const main = before.endsWith("*/") ? firstSentence(before.slice(before.lastIndexOf("/**") + 3, -2)) : null;
+  // Only a JSDoc that is the comment right above the export: a `/* banner */` there belongs to nobody.
+  const open = before.lastIndexOf("/*");
+  const main =
+    before.endsWith("*/") && before.startsWith("/**", open) ? firstSentence(before.slice(open + 3, -2)) : null;
   return main ?? moduleDoc(content) ?? fallback;
 }
 

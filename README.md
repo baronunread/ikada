@@ -62,4 +62,13 @@ Docs, live examples and a shadcn registry live at [sproutboat.com/ikada](https:/
 npx shadcn@latest add https://sproutboat.com/ikada/r/button.json
 ```
 
+Blocks are copyable dashboard patterns built from the components, each with realistic sample data: a project tray,
+usage line, KV browser, D1 console, metrics, traffic chart, logs panel, empty states, toasts with undo, a settings
+section and a sign-in card. They live in [`blocks/`](blocks/) (`blocks/<name>/<name>.tsx` exports a component that
+renders with no props) and install the same way:
+
+```sh
+npx shadcn@latest add https://sproutboat.com/ikada/r/kv-browser.json
+```
+
 MIT licensed.

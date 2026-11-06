@@ -91,7 +91,7 @@ export function UsageLine({
           Today
         </span>
         {loading ? <Skeleton className="h-4 w-[min(28rem,60%)]" /> : quotas.map((q) => <Quota key={q.id} quota={q} />)}
-        <span className="inline-flex items-center gap-1 text-fg-muted max-@3xl:basis-full @3xl:ms-auto">
+        <span className="inline-flex items-center gap-1 text-fg-muted @max-3xl:basis-full @3xl:ms-auto">
           {note}
           <ChevronRightIcon className="transition-transform duration-(--sb-duration-hover) group-hover:translate-x-0.5" />
         </span>
