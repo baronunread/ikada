@@ -1,5 +1,6 @@
 ---
 import "../styles/site.css";
+import { IkadaMark } from "../components/IkadaMark";
 import { blocks, components, REPO_URL } from "../lib/registry";
 
 interface Props {
@@ -30,6 +31,12 @@ const current = (href: string): boolean => here === href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title === "ikada" ? "ikada: the Sproutboat design system" : `${title} · ikada`}</title>
     <meta name="description" content={description} />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}/favicon-light-32.png`} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={`${base}/favicon-dark-32.png`} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href={`${base}/favicon-light-16.png`} type="image/png" sizes="16x16" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={`${base}/favicon-dark-16.png`} type="image/png" sizes="16x16" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <script is:inline>
       // Before first paint: the saved choice, else the system's. ikada is dark unless light is stamped.
@@ -45,7 +52,7 @@ const current = (href: string): boolean => here === href;
     <header class="sticky top-0 z-(--sb-z-sticky) border-b border-hairline bg-canvas/90 backdrop-blur">
       <div class="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <a href={`${base}/`} class="flex items-center gap-2 font-semibold">
-          <span aria-hidden="true" class="text-lg">筏</span> ikada
+          <IkadaMark size={22} /> ikada
         </a>
         <span class="hidden text-sm text-fg-muted sm:inline">the Sproutboat design system</span>
         <nav class="ms-auto flex items-center gap-1 text-sm" aria-label="Site">
