@@ -1,6 +1,6 @@
 ---
 import "../styles/site.css";
-import { components, REPO_URL } from "../lib/registry";
+import { blocks, components, REPO_URL } from "../lib/registry";
 
 interface Props {
   title: string;
@@ -17,6 +17,7 @@ const guides = [
 ];
 const nav = [
   { heading: "Get started", links: guides },
+  { heading: "Blocks", links: blocks.map((b) => ({ href: `${base}/blocks/${b.name}`, label: b.title })) },
   { heading: "Components", links: components.map((c) => ({ href: `${base}/components/${c.name}`, label: c.title })) },
 ];
 const current = (href: string): boolean => here === href;

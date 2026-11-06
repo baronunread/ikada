@@ -15,6 +15,11 @@
  *   src/charts/theme.ts                     ->  components/ui/chart-theme.ts
  *   src/lib/x.ts                            ->  lib/ikada/x.ts        (registry:lib)
  *   src/tokens.generated.ts                 ->  lib/ikada/tokens.ts
+ *   blocks/<name>/<file>.tsx                ->  components/<file>.tsx  (registry:block)
+ *
+ * A block is a copyable dashboard pattern: blocks/<name>/<name>.tsx exports a component named
+ * after the folder that renders with no props (its defaults are sample data), built only from
+ * ikada imports, which are rewritten here like any other file.
  */
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
@@ -31,16 +36,17 @@ import { colorNames, dark, density, fonts, light, motion, radius, shadow, typeSc
 
 const root = join(import.meta.dir, "..");
 const src = join(root, "src");
+const blocksDir = join(root, "blocks");
 const STYLE = "ikada";
 
 export interface RegistryFile {
   path: string;
-  type: "registry:ui" | "registry:lib";
+  type: "registry:ui" | "registry:lib" | "registry:component";
 }
 
 export interface RegistryItem {
   name: string;
-  type: "registry:ui" | "registry:lib" | "registry:theme" | "registry:item";
+  type: "registry:ui" | "registry:lib" | "registry:theme" | "registry:item" | "registry:block";
   title: string;
   description: string;
   dependencies?: string[];
@@ -149,6 +155,22 @@ interface Rewritten {
 
 /** Rewrites relative imports to shadcn aliases; collects local and npm dependencies. */
 export function rewriteImports(file: SourceFile, content: string, bySrc: Map<string, SourceFile>): Rewritten {
+  return rewriteWith(content, file.srcPath, (spec) => {
+    const resolved = posix.normalize(posix.join(posix.dirname(file.srcPath), spec));
+    const target = lookup(bySrc, resolved);
+    return target && { alias: target.alias, item: target.item === file.item ? null : target.item };
+  });
+}
+
+const lookup = (bySrc: Map<string, SourceFile>, resolved: string): SourceFile | undefined =>
+  bySrc.get(`${resolved}.tsx`) ?? bySrc.get(`${resolved}.ts`) ?? bySrc.get(resolved);
+
+/** The import rewrite: `map` turns a relative specifier into an alias and the item it depends on. */
+function rewriteWith(
+  content: string,
+  where: string,
+  map: (spec: string) => { alias: string; item: string | null } | undefined,
+): Rewritten {
   const local = new Set<string>();
   const packages = new Set<string>();
   const next = content.replace(IMPORT_RE, (whole, lead: string, quote: string, spec: string) => {
@@ -157,13 +179,91 @@ export function rewriteImports(file: SourceFile, content: string, bySrc: Map<str
       if (!HOST_PACKAGES.has(pkg)) packages.add(pkg);
       return whole;
     }
-    const resolved = posix.normalize(posix.join(posix.dirname(file.srcPath), spec));
-    const target = bySrc.get(`${resolved}.tsx`) ?? bySrc.get(`${resolved}.ts`) ?? bySrc.get(resolved) ?? undefined;
-    if (!target) throw new Error(`${file.srcPath}: cannot map import "${spec}" to a registry file`);
-    if (target.item !== file.item) local.add(target.item);
+    const target = map(spec);
+    if (!target) throw new Error(`${where}: cannot map import "${spec}" to a registry file`);
+    if (target.item) local.add(target.item);
     return `${lead}${quote}${target.alias}${quote}`;
   });
   return { content: next, local: [...local].sort(), packages: [...packages].sort() };
+}
+
+export interface BlockSource {
+  name: string;
+  /** Files of the block, posix paths under the repo root, the main file first: "blocks/x/x.tsx". */
+  files: string[];
+}
+
+/** Every block folder under blocks/, each with its main file `<name>.tsx`. */
+export function blockSources(): BlockSource[] {
+  let dirs: string[];
+  try {
+    dirs = readdirSync(blocksDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name)
+      .sort();
+  } catch {
+    return [];
+  }
+  return dirs.map((name) => {
+    const all = readdirSync(join(blocksDir, name))
+      .filter((f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f))
+      .sort();
+    if (!all.includes(`${name}.tsx`)) throw new Error(`blocks/${name} has no ${name}.tsx`);
+    const rest = all.filter((f) => f !== `${name}.tsx`);
+    return { name, files: [`${name}.tsx`, ...rest].map((f) => `blocks/${name}/${f}`) };
+  });
+}
+
+/**
+ * A block's files: imports of ikada (`../../src/...`) become the ui and lib aliases, imports of
+ * a sibling file in the block become `@/components/<file>`, where shadcn puts it.
+ */
+function blockItem(
+  block: BlockSource,
+  bySrc: Map<string, SourceFile>,
+  versions: Map<string, string>,
+  ref: (item: string) => string,
+  files: Map<string, string>,
+): RegistryItem {
+  const local = new Set<string>();
+  const packages = new Set<string>();
+  const out: RegistryFile[] = [];
+  let description = "";
+  for (const path of block.files) {
+    const raw = readFileSync(join(root, path), "utf8");
+    const rewritten = rewriteWith(raw, path, (spec) => {
+      const resolved = posix.normalize(posix.join(posix.dirname(path), spec));
+      if (resolved.startsWith("src/")) {
+        const target = lookup(bySrc, resolved.slice(4));
+        return target && { alias: target.alias, item: target.item };
+      }
+      const sibling = block.files.find((f) => f.replace(/\.tsx?$/, "") === resolved);
+      return sibling ? { alias: `@/components/${posix.basename(resolved)}`, item: null } : undefined;
+    });
+    for (const l of rewritten.local) local.add(l);
+    for (const p of rewritten.packages) packages.add(p);
+    const outPath = `registry/${STYLE}/blocks/${block.name}/${posix.basename(path)}`;
+    files.set(outPath, path.endsWith(".tsx") ? `"use client";\n\n${rewritten.content}` : rewritten.content);
+    out.push({ path: outPath, type: "registry:component" });
+    if (!description) description = describe(raw, block.name, "");
+  }
+  if (!description) throw new Error(`${block.files[0]}: describe the block in a JSDoc comment`);
+  const dependencies = [...packages].sort().map((p) => {
+    const version = versions.get(p);
+    if (!version) throw new Error(`blocks/${block.name} imports "${p}", which is not in package.json dependencies`);
+    return `${p}@${version}`;
+  });
+  const item: RegistryItem = {
+    name: block.name,
+    type: "registry:block",
+    title: kebabToTitle(block.name),
+    description,
+    categories: ["dashboard"],
+    registryDependencies: ["theme", ...[...local].sort()].map(ref),
+    files: out,
+  };
+  if (dependencies.length) item.dependencies = dependencies;
+  return item;
 }
 
 /** The first sentence of a JSDoc body, or null when it is too short to say anything. */
@@ -327,6 +427,8 @@ export function buildRegistry(url: string): BuiltRegistry {
     if (dependencies.length) item.dependencies = dependencies;
     items.push(item);
   }
+
+  for (const block of blockSources()) items.push(blockItem(block, bySrc, versions, ref, files));
 
   items.push({
     name: "all",

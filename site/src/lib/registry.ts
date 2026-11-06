@@ -4,6 +4,8 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+// A module import, not a file read, so the dev server reloads when `bun run registry` rewrites it.
+import registry from "../../.registry/registry.json";
 
 export interface Item {
   name: string;
@@ -20,10 +22,8 @@ export const siteDir = process.cwd();
 /** ikada's source, one level up from the site. */
 export const srcDir = join(siteDir, "..", "src");
 
-const registryPath = join(siteDir, ".registry", "registry.json");
-if (!existsSync(registryPath)) throw new Error("Run `bun run registry` first: .registry/registry.json is missing.");
-
-export const items: Item[] = JSON.parse(readFileSync(registryPath, "utf8")).items;
+/** Every registry item; run `bun run registry` first if .registry/registry.json is missing. */
+export const items: Item[] = registry.items as Item[];
 
 /** Where a ui item's source lives under src/. */
 export function sourcePath(item: Item): string {
@@ -50,3 +50,14 @@ export const components = items
 
 export const REGISTRY_URL = "https://sproutboat.com/ikada/r";
 export const REPO_URL = "https://github.com/baronunread/ikada";
+
+/** The dashboard blocks (registry:block), one page each under /blocks. */
+export const blocks = items.filter((i) => i.type === "registry:block").sort((a, b) => a.title.localeCompare(b.title));
+
+/** The installed source of a block's files, as `shadcn add` writes them (aliases rewritten). */
+export function blockFiles(item: Item): { name: string; source: string }[] {
+  return (item.files ?? []).map((f) => ({
+    name: f.path.split("/").pop() ?? f.path,
+    source: readFileSync(join(siteDir, ".registry", f.path), "utf8"),
+  }));
+}
