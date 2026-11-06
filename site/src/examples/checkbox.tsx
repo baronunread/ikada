@@ -1,5 +1,5 @@
 import { Checkbox } from "../../../src/components/checkbox";
-import type { Example } from "./types";
+import type { Example, Preview } from "./types";
 
 export const examples: Example[] = [
   {
@@ -16,3 +16,11 @@ export const examples: Example[] = [
     ),
   },
 ];
+
+/** The compact render on the overview's component tile. */
+export const preview: Preview = () => (
+  <div className="flex flex-col gap-2">
+    <Checkbox label="Preview builds" defaultChecked />
+    <Checkbox label="Notify on failure" />
+  </div>
+);

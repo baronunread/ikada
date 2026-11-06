@@ -1,0 +1,70 @@
+---
+import { Code } from "astro:components";
+import BlockPreview from "../../components/BlockPreview";
+import Command from "../../components/Command.astro";
+import Docs from "../../layouts/Docs.astro";
+import { blockFiles, blocks, components, items, REGISTRY_URL, REPO_URL } from "../../lib/registry";
+import type { Item } from "../../lib/registry";
+
+export function getStaticPaths() {
+  return blocks.map((item) => ({ params: { slug: item.name }, props: { item } }));
+}
+
+const { item } = Astro.props as { item: Item };
+const files = blockFiles(item);
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// The ikada components it is built from, linked to their pages (helpers such as cn and icons come along unnamed).
+const byName = new Map(items.map((i) => [i.name, i]));
+const paged = new Set(components.map((c) => c.name));
+const uses = (item.registryDependencies ?? [])
+  .map((d) => byName.get(d.split("/").pop()?.replace(/\.json$/, "") ?? ""))
+  .filter((i): i is Item => i?.type === "registry:ui")
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<Docs title={item.title} description={item.description}>
+  <article class="flex max-w-6xl flex-col gap-10">
+    <header class="flex flex-col gap-2">
+      <p class="text-sm text-fg-muted"><a class="hover:text-fg" href={`${base}/blocks`}>Blocks</a></p>
+      <h1 class="text-2xl">{item.title}</h1>
+      <p class="max-w-2xl text-md font-normal text-fg-muted">{item.description}</p>
+    </header>
+
+    <section class="flex flex-col gap-3" aria-labelledby="preview">
+      <h2 id="preview" class="text-lg">Preview</h2>
+      <div class="rounded-2xl bg-canvas p-3 ring-1 ring-hairline sm:p-6">
+        <BlockPreview client:only="react" slug={item.name} />
+      </div>
+      <p class="text-sm text-fg-muted">Live, with the sample data the block ships with. Replace it with your own through the props.</p>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="install">
+      <h2 id="install" class="text-lg">Installation</h2>
+      <Command label="shadcn" code={`npx shadcn@latest add ${REGISTRY_URL}/${item.name}.json`} />
+      <p class="text-sm text-fg-muted">
+        Copies {files.map((f, i) => <>{i ? ", " : ""}<code class="font-mono text-[0.8125rem] text-fg">components/{f.name}</code></>)} into your project, with
+        the ikada theme and the components it is built from:
+        {uses.map((u, i) => <>{i ? ", " : " "}{paged.has(u.name) ? <a class="text-fg underline underline-offset-2" href={`${base}/components/${u.name}`}>{u.title}</a> : <span>{u.title}</span>}</>)}.
+      </p>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="code">
+      <h2 id="code" class="text-lg">Code</h2>
+      {files.map((f) => (
+        <figure class="block-code min-w-0 overflow-hidden rounded-xl bg-code-bg shadow-card">
+          <figcaption class="flex items-center gap-2 border-b border-hairline py-1.5 ps-4 pe-1.5">
+            <span class="min-w-0 flex-1 truncate font-mono text-sm text-fg-muted">components/{f.name}</span>
+            <button type="button" data-copy={f.source} class="shrink-0 rounded-md px-2.5 py-1 text-sm font-semibold text-fg-muted hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-focus">Copy</button>
+          </figcaption>
+          <div class="max-h-[32rem] overflow-auto">
+            <Code code={f.source} lang="tsx" themes={{ light: "github-light", dark: "github-dark-dimmed" }} defaultColor={false} wrap={false} />
+          </div>
+        </figure>
+      ))}
+    </section>
+
+    <p class="text-sm text-fg-muted">
+      Source: <a class="text-fg underline underline-offset-2" href={`${REPO_URL}/tree/main/blocks/${item.name}`}>blocks/{item.name}</a>
+    </p>
+  </article>
+</Docs>

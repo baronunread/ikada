@@ -1,10 +1,30 @@
 ---
 import Docs from "../layouts/Docs.astro";
+import { blocks, REGISTRY_URL } from "../lib/registry";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
-<Docs title="Blocks">
-  <article class="flex max-w-3xl flex-col gap-4">
-    <h1 class="text-2xl">Blocks</h1>
-    <p class="text-fg-muted">Dashboard blocks, such as a resource list, a delete-with-confirmation flow and the app shell, will be listed here.</p>
+<Docs title="Blocks" description="Copyable dashboard patterns built from ikada components, with sample data.">
+  <article class="flex max-w-6xl flex-col gap-8">
+    <header class="flex flex-col gap-2">
+      <h1 class="text-2xl">Blocks</h1>
+      <p class="max-w-2xl text-md font-normal text-fg-muted">
+        Dashboard patterns from the Sproutboat dashboards, built from ikada components and shipped with realistic sample
+        data. Install one and it is your code: edit it, rename it, feed it your own data through its props.
+      </p>
+      <p class="text-sm text-fg-muted">
+        Each installs with <code class="font-mono text-[0.8125rem] text-fg">npx shadcn@latest add {REGISTRY_URL}/&lt;block&gt;.json</code>.
+      </p>
+    </header>
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {blocks.map((b) => (
+        <li>
+          <a href={`${base}/blocks/${b.name}`} class="flex h-full flex-col gap-1.5 rounded-xl bg-surface p-4 shadow-card transition-shadow duration-(--sb-duration-hover) ease-hover hover:shadow-float focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
+            <span class="font-semibold">{b.title}</span>
+            <span class="text-sm text-fg-muted">{b.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
   </article>
 </Docs>

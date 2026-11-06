@@ -15,8 +15,11 @@ export interface SelectProps extends Omit<
   ComponentProps<typeof BaseSelect.Root<string>>,
   "children" | "items" | "className"
 > {
+  /** The choices, in order: value and label. */
   options: readonly SelectOption[];
+  /** Shown while nothing is chosen. Default "Select...". */
   placeholder?: string;
+  /** Marks the trigger invalid: danger ring and aria-invalid. */
   invalid?: boolean;
   className?: string;
   /** Accessible name when there is no Field label. */

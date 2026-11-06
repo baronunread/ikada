@@ -2,7 +2,9 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 export interface EmptyStateProps extends Omit<ComponentProps<"div">, "title"> {
+  /** Icon above the title, drawn on a soft tile. */
   icon?: ReactNode;
+  /** What is empty, as a short heading. */
   title: ReactNode;
   /** One line: what this list will hold or what to do next. */
   description?: ReactNode;

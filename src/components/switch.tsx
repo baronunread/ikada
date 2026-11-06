@@ -5,6 +5,7 @@ import { cn, focusRing } from "../lib/cn";
 
 export interface SwitchProps extends Omit<ComponentProps<typeof BaseSwitch.Root>, "className" | "children"> {
   className?: string;
+  /** Visible label beside the switch. Without it, pass aria-label. */
   label?: ReactNode;
 }
 

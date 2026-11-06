@@ -11,5 +11,5 @@
     "types": ["vite/client", "bun"],
     "resolveJsonModule": true
   },
-  "include": ["src", "tokens", "scripts", "test", "playground", "e2e"]
+  "include": ["src", "blocks", "tokens", "scripts", "test", "playground", "e2e"]
 }

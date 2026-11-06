@@ -12,9 +12,11 @@ export interface RadioOption {
 }
 
 export interface RadioGroupProps extends Omit<ComponentProps<typeof BaseRadioGroup>, "className" | "children"> {
+  /** The choices, in order: value, label and an optional description. */
   options: readonly RadioOption[];
   /** The group's visible name. Without one, pass `aria-label`. */
   legend?: ReactNode;
+  /** Marks the group invalid: danger rings and aria-invalid. */
   invalid?: boolean;
   /** `horizontal` lays the options in a wrapping row. */
   orientation?: "vertical" | "horizontal";

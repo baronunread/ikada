@@ -11,6 +11,7 @@ export interface DescriptionItem {
 }
 
 export interface DescriptionListProps extends Omit<ComponentProps<"dl">, "children"> {
+  /** Term and details pairs, in order, each with a stable id. */
   items: readonly DescriptionItem[];
   /** `stacked` puts each term above its details; `inline` puts them side by side from 32rem up. */
   layout?: "stacked" | "inline";

@@ -5,6 +5,7 @@ import { cn, coarseTarget, focusRing, type WithClass } from "../lib/cn";
 export interface PageHeaderProps extends Omit<ComponentProps<"header">, "title"> {
   /** Usually <Breadcrumbs />. */
   breadcrumbs?: ReactNode;
+  /** Page title, rendered as the h1. */
   title: ReactNode;
   /** Next to the title: a StatusDot or Badge. */
   status?: ReactNode;
@@ -68,6 +69,7 @@ export function PageTabs({
 }
 
 export interface PageTabProps extends WithClass<useRender.ComponentProps<"a">> {
+  /** Marks the tab as the current page (aria-current and the underline). */
   current?: boolean;
 }
 

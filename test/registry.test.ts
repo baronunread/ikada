@@ -75,4 +75,23 @@ describe("shadcn registry", () => {
     expect(css["@property --sb-wake"]).toBeTruthy();
     expect(theme?.cssVars?.theme?.["ease-spring-bob"]).toBe("var(--sb-spring-bob)");
   });
+
+  test("every block folder is a registry:block whose files keep no relative import", () => {
+    const dir = join(import.meta.dir, "../blocks");
+    const blocks = registry.items.filter((i) => i.type === "registry:block");
+    expect(blocks.map((b) => b.name).sort()).toEqual(
+      readdirSync(dir)
+        .filter((n) => !n.startsWith("."))
+        .sort(),
+    );
+    for (const block of blocks) {
+      expect(block.files?.[0]?.path).toBe(`registry/ikada/blocks/${block.name}/${block.name}.tsx`);
+      expect(block.registryDependencies?.[0]).toBe(`${URL}/theme.json`);
+      expect(block.description.length).toBeGreaterThan(20);
+      for (const f of block.files ?? []) {
+        expect(f.type).toBe("registry:component");
+        expect(files.get(f.path)).not.toMatch(/from\s+["']\.\.?\//);
+      }
+    }
+  });
 });

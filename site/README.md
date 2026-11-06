@@ -22,8 +22,16 @@ bun run preview             # serve dist/ like the asset server, 0.0.0.0:4410
 - `src/lib/props.ts`: props tables from each exported `…Props` interface (own members and JSDoc; inherited props are
   named by the `extends` clause).
 - `src/pages/components/[slug].astro`: the component page template: examples, install commands, props, source link.
-- `src/examples/<slug>.tsx`: live examples for one component, `export const examples: Example[]`. A component with
-  no file shows a placeholder. Each file is its own chunk, loaded only on its page.
+- `src/examples/<slug>.tsx`: live examples for one component, `export const examples: Example[]`, and its
+  overview tile, `export const preview: Preview`. Both are optional: a file with only a preview shows it as the page's
+  one example, a component with no file shows a placeholder. Each file is its own chunk, loaded only on its page.
+  Examples render on the server (`client:load`) and hydrate, so they are in the HTML before any JS runs: keep them free
+  of `window` and `document` at render time.
+- `src/components/TilePreview.tsx`: the overview tiles' previews, rendered on the server only (static, inert, no JS).
+- `src/pages/blocks/[slug].astro`: one page per block (`../blocks/<name>/`): a live preview of the block with its
+  sample data (`components/BlockPreview.tsx`, client-only), the install command and the installed code, read from
+  `.registry` so it shows the rewritten `@/components/ui/*` imports. A block folder added while `astro dev` runs is
+  not seen by `import.meta.glob` until the dev server restarts.
 
 ## Deploying
 

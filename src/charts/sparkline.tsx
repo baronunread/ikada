@@ -14,7 +14,9 @@ export interface SparklineProps {
   data: readonly number[];
   /** Accessible name, e.g. "Requests, last 24 hours". Required. */
   ariaLabel: string;
+  /** Chart colour token for the line. Default `requests`. */
   color?: ChartColorName;
+  /** Height in pixels. Default 40; the width fills the container. */
   height?: number;
   /** Fill under the line. Defaults to true. */
   area?: boolean;

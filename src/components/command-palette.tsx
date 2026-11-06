@@ -35,12 +35,17 @@ export interface PalettePrefix {
 export interface CommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Results to show, in order: each group a heading and its items. */
   groups: readonly PaletteGroup[];
   /** Shown first while the query is empty. */
   recents?: readonly PaletteItem[];
+  /** Scopes typed as `scope:` that narrow the search, shown as a chip. */
   prefixes?: readonly PalettePrefix[];
+  /** Called with the chosen item; the palette closes after it. */
   onSelect: (item: PaletteItem) => void;
+  /** Shows a spinner while results are fetched. */
   loading?: boolean;
+  /** Placeholder of the search input. */
   placeholder?: string;
   /** Name for screen readers. */
   label?: string;
