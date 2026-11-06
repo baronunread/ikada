@@ -51,7 +51,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "pond-web",
         name: "pond-web",
-        hostname: "pond-web.lily.sprouts.page",
+        hostname: "pond-web.lily.sproutboat.app",
         status: "live",
         liveVersion: 48,
         lastDeploy: "12 min ago",
@@ -60,7 +60,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "pond-api",
         name: "pond-api",
-        hostname: "pond-api.lily.sprouts.page",
+        hostname: "pond-api.lily.sproutboat.app",
         status: "deploying",
         liveVersion: 31,
         requests24h: 96_400,
@@ -68,7 +68,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "nightly-digest",
         name: "nightly-digest",
-        hostname: "nightly-digest.lily.sprouts.page",
+        hostname: "nightly-digest.lily.sproutboat.app",
         status: "live",
         trigger: "cron",
         liveVersion: 7,
@@ -77,7 +77,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "thumbnailer",
         name: "thumbnailer",
-        hostname: "thumbnailer.lily.sprouts.page",
+        hostname: "thumbnailer.lily.sproutboat.app",
         status: "deploy_failed",
         trigger: "queue",
         liveVersion: 12,
@@ -91,7 +91,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "lily-pad-web",
         name: "lily-pad-web",
-        hostname: "lily-pad-web.lily.sprouts.page",
+        hostname: "lily-pad-web.lily.sproutboat.app",
         status: "live",
         liveVersion: 5,
         lastDeploy: "yesterday",
@@ -100,7 +100,7 @@ export const sampleProjects: Project[] = [
       {
         slug: "lily-pad-preview",
         name: "lily-pad-preview",
-        hostname: "lily-pad-preview.lily.sprouts.page",
+        hostname: "lily-pad-preview.lily.sproutboat.app",
         status: "paused",
       },
     ],
