@@ -1,0 +1,18 @@
+---
+/** A highlighted snippet with a copy button that copies exactly what is shown. */
+import { Code } from "../../lib/highlight";
+import { Icon } from "../icons";
+
+interface Props {
+  code: string;
+  label?: string;
+}
+const { code, label = "Code" } = Astro.props;
+---
+
+<div class="codeblock">
+  <Code code={code} label={label} />
+  <button class="copy" type="button" data-copy={code} aria-label={`Copy ${label.toLowerCase()}`}>
+    <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" /><span class="lbl" aria-hidden="true">Copy</span>
+  </button>
+</div>

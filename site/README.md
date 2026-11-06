@@ -18,20 +18,31 @@ bun run preview             # serve dist/ like the asset server, 0.0.0.0:4410
   which Astro copies to `/ikada/r/<name>.json`. Set `IKADA_REGISTRY_URL` to a preview's address when testing
   `npx shadcn add` against it (dependencies between items are absolute URLs).
 - `src/lib/registry.ts`: the item list the pages are built from. A page exists for every ui file that exports a
-  React component.
+  React component. `src/lib/site.ts`: the navigation, page order, gzipped sizes, the install command for each
+  package manager and the "Copy page for AI" markdown.
 - `src/lib/props.ts`: props tables from each exported `…Props` interface (own members and JSDoc; inherited props are
   named by the `extends` clause).
-- `src/pages/components/[slug].astro`: the component page template: examples, install commands, props, source link.
-- `src/examples/<slug>.tsx`: live examples for one component, `export const examples: Example[]`, and its
-  overview tile, `export const preview: Preview`. Both are optional: a file with only a preview shows it as the page's
-  one example, a component with no file shows a placeholder. Each file is its own chunk, loaded only on its page.
-  Examples render on the server (`client:load`) and hydrate, so they are in the HTML before any JS runs: keep them free
-  of `window` and `document` at render time.
-- `src/components/TilePreview.tsx`: the overview tiles' previews, rendered on the server only (static, inert, no JS).
-- `src/pages/blocks/[slug].astro`: one page per block (`../blocks/<name>/`): a live preview of the block with its
-  sample data (`components/BlockPreview.tsx`, client-only), the install command and the installed code, read from
-  `.registry` so it shows the rewritten `@/components/ui/*` imports. A block folder added while `astro dev` runs is
-  not seen by `import.meta.glob` until the dev server restarts.
+- `src/layouts/Shell.astro` (head, header, mobile drawer, footer) and `Docs.astro` (sidebar, prose, "On this page").
+  `src/lib/chrome.ts` is the chrome's only script: theme, copy buttons, drawer, TOC, segmented radios with roving
+  tabindex, install tabs, block stages, and search (ikada's CommandPalette, loaded on the first ⌘K or click).
+- `src/pages/components/[slug].astro`: the component page: the stage (the prop playground, else the first example),
+  install tabs, usage, examples (each with Preview / Code, a scoped theme switch and copy), props, pager.
+- `src/examples/<slug>.tsx`: `examples: Example[]` (each with the `code` a reader would write), an optional
+  `playground: Playground` (the props it edits and how it renders; `examples/types.ts` is the contract) and
+  `preview: Preview` for the homepage tiles. Each file is its own chunk, loaded only where it is used. Examples render
+  on the server and hydrate, so keep them free of `window` and `document` at render time. Sample links in a demo
+  point at in-app fragments (`#logs`), never a bare `#`; `[data-demo]` areas hold those clicks so the page stays put.
+- `src/pages/blocks/[slug].astro`: one page per block (`../blocks/<name>/`): the live block with its sample data
+  (`components/BlockPreview.tsx`, client-only) at full, 768 or 390 px, its code (read from `.registry`, so it shows
+  the rewritten `@/components/ui/*` imports), install tabs, the components it is built from and its props. A block
+  folder added while `astro dev` runs is not seen by `import.meta.glob` until the dev server restarts.
+- `src/hero-field/`: the homepage field (Growth). `common.ts`, `hero-webgpu.ts`, `hero-webgl.ts`, `palette.ts` and
+  `mask.ts` are the shader's own files, copied verbatim from where it is designed with
+  `bun scripts/sync-hero-field.ts <the shader's src/>`. `load.ts` picks WebGPU (TypeGPU) → WebGL2 → the CSS gradient;
+  `hero.ts` loads it after `load` in idle time and feeds it the text mask, the grow-in and planting. `?backend=webgl2`
+  or `?backend=css` forces a fallback.
+- `scripts/check-links.ts`: crawls a running preview (`bun run preview`, then `bun scripts/check-links.ts`) and fails
+  on any 404, missing `#anchor` or bare `href="#"`.
 
 ## Deploying
 

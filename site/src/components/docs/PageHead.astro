@@ -1,0 +1,67 @@
+---
+/**
+ * The top of a docs page: breadcrumbs, the title, the lede over the waterline, and the badge row
+ * (Base UI, gzipped size, Source, Registry JSON, Copy page for AI).
+ */
+import { Icon } from "../icons";
+
+interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  crumbs: Crumb[];
+  title: string;
+  lede?: string;
+  baseUi?: boolean;
+  size?: string;
+  source?: string;
+  registry?: string;
+  /** Markdown of the page for "Copy page for AI". */
+  markdown?: string;
+}
+const { crumbs, title, lede, baseUi, size, source, registry, markdown } = Astro.props;
+const hasMeta = Boolean(baseUi || size || source || registry || markdown);
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol>
+    {crumbs.map((c, i) => (
+      <li>
+        {i > 0 ? <Icon name="chev" /> : null}
+        {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+<h1>{title}</h1>
+{lede ? <p class="lede">{lede}</p> : null}
+{
+  hasMeta ? (
+    <div class="meta">
+      {baseUi ? <span class="chip" title="Built on Base UI primitives">Base UI</span> : null}
+      {size ? <span class="chip" title="Gzipped size of the files the CLI writes">{size} gzip</span> : null}
+      {source ? (
+        <a class="chip" href={source}>
+          Source <Icon name="ext" />
+        </a>
+      ) : null}
+      {registry ? (
+        <a class="chip" href={registry}>
+          Registry JSON <Icon name="ext" />
+        </a>
+      ) : null}
+      {markdown ? (
+        <>
+          <button class="chip" type="button" data-copy-from="#page-md" aria-describedby="page-md-hint">
+            <Icon name="copy" className="i i-copy" />
+            <Icon name="check" className="i i-done" />
+            <span class="lbl">Copy page for AI</span>
+          </button>
+          <span id="page-md-hint" hidden>Copies this page as Markdown</span>
+          <template id="page-md" set:text={markdown} />
+        </>
+      ) : null}
+    </div>
+  ) : null
+}

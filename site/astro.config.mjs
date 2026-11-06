@@ -1,5 +1,6 @@
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
+import typegpu from "unplugin-typegpu/vite";
 import { defineConfig } from "astro/config";
 
 // The docs live at sproutboat.com/ikada. The build writes under dist/ikada so the files sit at
@@ -16,7 +17,8 @@ export default defineConfig({
   integrations: [react()],
   server: { host: true },
   vite: {
-    plugins: [tailwindcss()],
+    // typegpu: the hero field's WebGPU shaders are TypeScript, compiled to WGSL at build time.
+    plugins: [tailwindcss(), typegpu({ include: [/hero-field\/.*\.ts$/] })],
     // ikada's source sits one level up; React must stay a single copy across both.
     resolve: { dedupe: ["react", "react-dom"] },
     server: { fs: { allow: [".."] } },

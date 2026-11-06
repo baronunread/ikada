@@ -5,5 +5,12 @@
   "singleQuote": false,
   "tabWidth": 2,
   "useTabs": false,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "ignorePatterns": [
+    "site/src/hero-field/common.ts",
+    "site/src/hero-field/hero-webgpu.ts",
+    "site/src/hero-field/hero-webgl.ts",
+    "site/src/hero-field/palette.ts",
+    "site/src/hero-field/mask.ts"
+  ]
 }

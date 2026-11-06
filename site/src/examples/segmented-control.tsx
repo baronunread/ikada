@@ -23,8 +23,24 @@ export const examples: Example[] = [
     title: "Range",
     description: "One raised pebble on a recessed tray slides to the choice on the snappy spring.",
     render: () => <Range />,
+    code: `const ranges = [
+  { value: "1h", label: "1h" },
+  { value: "24h", label: "24h" },
+  { value: "7d", label: "7d" },
+  { value: "30d", label: "30d" },
+];
+
+const [value, setValue] = useState("24h");
+
+<SegmentedControl aria-label="Range" options={ranges} value={value} onValueChange={setValue} />`,
   },
-  { title: "Small", render: () => <Range size="sm" /> },
+  {
+    title: "Small",
+    render: () => <Range size="sm" />,
+    code: `const [value, setValue] = useState("24h");
+
+<SegmentedControl aria-label="Range" size="sm" options={ranges} value={value} onValueChange={setValue} />`,
+  },
 ];
 
 /** The compact render on the overview's component tile. */
