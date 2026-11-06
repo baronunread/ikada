@@ -10,6 +10,7 @@ import {
   useSidebarState,
 } from "../../../src/components/sidebar";
 import { FolderIcon, HomeIcon, LogsIcon } from "../../../src/lib/icons";
+import { demo } from "../lib/demo-href";
 import type { Example, Playground, Preview } from "./types";
 
 const pages = ["home", "projects", "logs"] as const;
@@ -23,13 +24,13 @@ function Column({ collapsible = false }: { collapsible?: boolean }) {
           <span className="truncate font-semibold">Sproutboat</span>
         </SidebarHeader>
         <SidebarNav label="Account">
-          <SidebarItem href="#home" icon={<HomeIcon />} current>
+          <SidebarItem href={demo.home} icon={<HomeIcon />} current>
             Home
           </SidebarItem>
-          <SidebarItem href="#sprouts" icon={<FolderIcon />} trailing={<Badge>4</Badge>}>
+          <SidebarItem href={demo.projects} icon={<FolderIcon />} trailing={<Badge>4</Badge>}>
             Sprouts
           </SidebarItem>
-          <SidebarItem href="#logs" icon={<LogsIcon />}>
+          <SidebarItem href={demo.logs} icon={<LogsIcon />}>
             Logs
           </SidebarItem>
         </SidebarNav>
@@ -53,13 +54,13 @@ function Drawer() {
           <span className="truncate font-semibold">Sproutboat</span>
         </SidebarHeader>
         <SidebarNav label="Account">
-          <SidebarItem href="#home" icon={<HomeIcon />} current>
+          <SidebarItem href={demo.home} icon={<HomeIcon />} current>
             Home
           </SidebarItem>
-          <SidebarItem href="#sprouts" icon={<FolderIcon />}>
+          <SidebarItem href={demo.projects} icon={<FolderIcon />}>
             Sprouts
           </SidebarItem>
-          <SidebarItem href="#logs" icon={<LogsIcon />}>
+          <SidebarItem href={demo.logs} icon={<LogsIcon />}>
             Logs
           </SidebarItem>
         </SidebarNav>
@@ -145,6 +146,7 @@ export const examples: Example[] = [
 
 const labels = { home: "Home", projects: "Sprouts", logs: "Logs" } as const;
 const icons = { home: <HomeIcon />, projects: <FolderIcon />, logs: <LogsIcon /> } as const;
+const liveHrefs = { home: demo.home, projects: demo.projects, logs: demo.logs } as const;
 const hrefs = { home: "/", projects: "/sprouts", logs: "/logs" } as const;
 const iconNames = { home: "HomeIcon", projects: "FolderIcon", logs: "LogsIcon" } as const;
 
@@ -159,7 +161,7 @@ function PlaygroundSidebar({ collapsed, current, count }: { collapsed: boolean; 
           {pages.map((page) => (
             <SidebarItem
               key={page}
-              href={`#${page}`}
+              href={liveHrefs[page]}
               icon={icons[page]}
               current={current === page}
               trailing={count && page === "projects" ? <Badge>4</Badge> : undefined}

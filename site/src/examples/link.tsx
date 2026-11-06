@@ -1,4 +1,5 @@
 import { Link } from "../../../src/components/link";
+import { demo } from "../lib/demo-href";
 import type { Example, Playground, Preview } from "./types";
 
 export const examples: Example[] = [
@@ -6,7 +7,7 @@ export const examples: Example[] = [
     title: "Inline",
     render: () => (
       <p className="text-base">
-        Read the <Link href="#deploys">deploy guide</Link> before moving robin to eu-west.
+        Read the <Link href={demo.installation}>deploy guide</Link> before moving robin to eu-west.
       </p>
     ),
     code: `<p>
@@ -28,7 +29,7 @@ export const examples: Example[] = [
   {
     title: "Disabled",
     render: () => (
-      <Link href="#deploys" aria-disabled="true">
+      <Link href={demo.installation} aria-disabled="true">
         Deploy guide
       </Link>
     ),
@@ -48,7 +49,7 @@ export const playground: Playground = {
   initial: { children: "Read the docs" },
   fixed: { href: "/docs" },
   render: (v) => (
-    <Link href="#docs" external={Boolean(v.external)}>
+    <Link href={demo.docs} external={Boolean(v.external)}>
       {String(v.children)}
     </Link>
   ),
@@ -57,7 +58,7 @@ export const playground: Playground = {
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
   <div className="flex flex-col items-center gap-1">
-    <Link href="#docs">Read the docs</Link>
+    <Link href={demo.docs}>Read the docs</Link>
     <Link href="https://sproutboat.com" external>
       sproutboat.com
     </Link>

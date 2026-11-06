@@ -1,11 +1,12 @@
 import { Breadcrumbs } from "../../../src/components/breadcrumbs";
+import { demo } from "../lib/demo-href";
 import type { Example, Playground, Preview } from "./types";
 
 const trail = [
-  { label: "acme", href: "#acme" },
-  { label: "robin", href: "#robin" },
-  { label: "production", href: "#production" },
-  { label: "eu-west", href: "#eu-west" },
+  { label: "acme", href: demo.projects },
+  { label: "robin", href: demo.projects },
+  { label: "production", href: demo.metrics },
+  { label: "eu-west", href: demo.traffic },
   { label: "Logs" },
 ];
 
@@ -22,7 +23,9 @@ export const examples: Example[] = [
     title: "Trail",
     description: "Root first. The last item is the current page: plain text, marked aria-current.",
     render: () => (
-      <Breadcrumbs items={[{ label: "acme", href: "#acme" }, { label: "robin", href: "#robin" }, { label: "Logs" }]} />
+      <Breadcrumbs
+        items={[{ label: "acme", href: demo.projects }, { label: "robin", href: demo.projects }, { label: "Logs" }]}
+      />
     ),
     code: `<Breadcrumbs
   items={[
@@ -61,5 +64,7 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <Breadcrumbs items={[{ label: "acme", href: "#acme" }, { label: "web", href: "#web" }, { label: "Logs" }]} />
+  <Breadcrumbs
+    items={[{ label: "acme", href: demo.projects }, { label: "web", href: demo.projects }, { label: "Logs" }]}
+  />
 );

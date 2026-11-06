@@ -3,9 +3,14 @@ import { Breadcrumbs } from "../../../src/components/breadcrumbs";
 import { Button } from "../../../src/components/button";
 import { PageHeader, PageTab, PageTabs } from "../../../src/components/page-header";
 import { StatusDot } from "../../../src/components/status-dot";
+import { demo } from "../lib/demo-href";
 import type { Example, Playground, Preview } from "./types";
 
-const trail = [{ label: "Sproutboat", href: "#sproutboat" }, { label: "robin", href: "#robin" }, { label: "Overview" }];
+const trail = [
+  { label: "Sproutboat", href: demo.home },
+  { label: "robin", href: demo.projects },
+  { label: "Overview" },
+];
 
 export const examples: Example[] = [
   {
@@ -72,12 +77,12 @@ export const examples: Example[] = [
         actions={<Button variant="primary">Deploy</Button>}
         tabs={
           <PageTabs>
-            <PageTab href="#overview" current>
+            <PageTab href={demo.metrics} current>
               Overview
             </PageTab>
-            <PageTab href="#deployments">Deployments</PageTab>
-            <PageTab href="#logs">Logs</PageTab>
-            <PageTab href="#settings">Settings</PageTab>
+            <PageTab href={demo.deployments}>Deployments</PageTab>
+            <PageTab href={demo.logs}>Logs</PageTab>
+            <PageTab href={demo.settings}>Settings</PageTab>
           </PageTabs>
         }
         className="w-full"
@@ -124,10 +129,10 @@ export const playground: Playground = {
       tabs={
         v.tabs ? (
           <PageTabs>
-            <PageTab href="#overview" current>
+            <PageTab href={demo.metrics} current>
               Overview
             </PageTab>
-            <PageTab href="#logs">Logs</PageTab>
+            <PageTab href={demo.logs}>Logs</PageTab>
           </PageTabs>
         ) : undefined
       }

@@ -261,26 +261,7 @@ function search(): void {
   });
 }
 
-/**
- * Live demos carry sample links (a breadcrumb trail, a project list) that point at their own
- * in-app fragments. On this site those fragments do not exist, so a click stays put instead of
- * jumping the page to its top.
- */
-function holdDemoLinks(): void {
-  document.addEventListener(
-    "click",
-    (e) => {
-      const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('[data-demo] a[href^="#"]');
-      if (!a) return;
-      const id = decodeURIComponent(a.hash.slice(1));
-      if (!id || !document.getElementById(id)) e.preventDefault();
-    },
-    true,
-  );
-}
-
 export function boot(): void {
-  holdDemoLinks();
   wireAll();
   themeToggle();
   scrolled();
