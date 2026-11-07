@@ -1,0 +1,190 @@
+/* Cross-document view transitions between sproutboat.com and sproutboat.com/ikada (same origin through the proxy).
+   Same cast and names as sproutboat.com (mockups-20261104/sproutboat-com-premium/assets/vt.css and the /docs theme):
+     Lead     <main>, named "page" for the moment     the old lifts and fades, the new rises on the bob spring
+     Support  brand-mark                             the sprout sinks below its waterline, the raft surfaces (and back)
+     Support  brand-word, nav-links, nav-action       a crossfade at natural size (no text stretching)
+     Static   site-nav (the header bar)               no animation
+     Carry    dusk-hero (the scene's box)             the new page's first paint is the old page's last frame, so the
+                                                      swap is invisible; without an exact hand-off, a short crossfade
+   Only navigations that cross /ikada get the "sb" type (the head script in Shell.astro); inside /ikada every
+   navigation skips the transition. Reduced motion: an instant swap. */
+@layer components {
+  .nav {
+    view-transition-name: site-nav;
+  }
+  .nav .brand .mark {
+    display: grid;
+    place-items: center;
+    view-transition-name: brand-mark;
+  }
+  .nav .brand .word {
+    view-transition-name: brand-word;
+  }
+  .nav .links {
+    view-transition-name: nav-links;
+  }
+  .nav .ctl {
+    view-transition-name: nav-action;
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+/* lead: page content */
+html:active-view-transition-type(sb)::view-transition-old(root) {
+  animation: none;
+  opacity: 0;
+}
+html:active-view-transition-type(sb)::view-transition-new(root) {
+  animation: none;
+}
+html:active-view-transition-type(sb)::view-transition-old(page) {
+  animation: vt-out 150ms var(--ease-out) both;
+}
+html:active-view-transition-type(sb)::view-transition-new(page) {
+  animation:
+    vt-fade 260ms var(--ease-out) 60ms both,
+    vt-rise var(--sb-duration-spring-bob) var(--sb-spring-bob) 60ms both;
+}
+html:active-view-transition-type(to-sproutboat)::view-transition-old(page) {
+  animation-name: vt-out-down;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+@keyframes vt-out-down {
+  to {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    translate: 0 16px;
+  }
+}
+
+/* static: the header bar */
+html:active-view-transition-type(sb)::view-transition-group(site-nav),
+html:active-view-transition-type(sb)::view-transition-new(site-nav) {
+  animation: none;
+}
+html:active-view-transition-type(sb)::view-transition-old(site-nav) {
+  animation: none;
+  opacity: 0;
+}
+
+/* carry: the scene. An exact hand-off draws the same picture on both sides, so the swap is instant (a crossfade
+   between identical images would only dip). Otherwise a short crossfade, while the camera glides on the new page. */
+::view-transition-group(dusk-hero) {
+  animation-duration: 0s;
+}
+::view-transition-old(dusk-hero),
+::view-transition-new(dusk-hero) {
+  animation: none;
+}
+html:not(.dusk-exact):active-view-transition-type(sb)::view-transition-old(dusk-hero) {
+  animation: vt-fade 360ms var(--ease-out) reverse both;
+}
+html:not(.dusk-exact):active-view-transition-type(sb)::view-transition-new(dusk-hero) {
+  animation: vt-fade 360ms var(--ease-out) both;
+}
+
+/* support: the brand mark hands over (sprout <-> raft) */
+html:active-view-transition-type(sb)::view-transition-group(brand-mark) {
+  animation: none;
+  overflow: visible;
+}
+html:active-view-transition-type(to-ikada)::view-transition-old(brand-mark),
+html:active-view-transition-type(to-sproutboat)::view-transition-old(brand-mark) {
+  animation: vt-sink 260ms var(--ease-out) both;
+}
+html:active-view-transition-type(to-ikada)::view-transition-new(brand-mark) {
+  animation: vt-surface var(--sb-duration-spring-bob) var(--sb-spring-bob) 60ms both;
+}
+@keyframes vt-sink {
+  from {
+    translate: 0 0;
+    clip-path: inset(-4px -4px 0 -4px);
+  }
+  to {
+    translate: 0 26px;
+    clip-path: inset(-4px -4px 26px -4px);
+    opacity: 0.6;
+  }
+}
+@keyframes vt-surface {
+  from {
+    translate: 0 18px;
+    clip-path: inset(-4px -4px 18px -4px);
+  }
+  to {
+    translate: 0 0;
+    clip-path: inset(-4px -4px -4px -4px);
+  }
+}
+
+/* support: wordmark, nav links, nav action */
+html:active-view-transition-type(sb)::view-transition-group(brand-word),
+html:active-view-transition-type(sb)::view-transition-group(nav-links),
+html:active-view-transition-type(sb)::view-transition-group(nav-action) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out);
+}
+html:active-view-transition-type(sb)::view-transition-old(brand-word),
+html:active-view-transition-type(sb)::view-transition-old(nav-links),
+html:active-view-transition-type(sb)::view-transition-old(nav-action) {
+  width: auto;
+  height: auto;
+  animation: vt-chip-out 200ms var(--ease-out) both;
+}
+html:active-view-transition-type(sb)::view-transition-new(brand-word),
+html:active-view-transition-type(sb)::view-transition-new(nav-links),
+html:active-view-transition-type(sb)::view-transition-new(nav-action) {
+  width: auto;
+  height: auto;
+  animation: vt-chip-in 260ms var(--ease-out) 20ms both;
+}
+html:active-view-transition-type(sb)::view-transition-old(nav-action),
+html:active-view-transition-type(sb)::view-transition-new(nav-action) {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+@keyframes vt-chip-out {
+  to {
+    opacity: 0;
+    filter: blur(3px);
+    translate: 0 -3px;
+  }
+}
+@keyframes vt-chip-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    translate: 0 4px;
+  }
+}
+
+/* reduced motion: an instant swap */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+html[data-motion="reduce"]::view-transition-group(*),
+html[data-motion="reduce"]::view-transition-old(*),
+html[data-motion="reduce"]::view-transition-new(*) {
+  animation: none !important;
+}

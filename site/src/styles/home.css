@@ -1,10 +1,10 @@
-/* The homepage: Specimen's minimal centred hero over the Growth field (specimen-shader), then the
-   live components (Waterline's bento, after review) and the blocks. */
+/* The homepage: Specimen's minimal centred hero over Raft at dusk (src/hero/dusk, the raft camera): the copy on
+   the sky, the raft on the water below it; then the live components (Waterline's bento) and the blocks. */
 /* Declared first: this file can load before site.css, and the first mention fixes the layer order. */
 @layer theme, base, components, utilities;
 
 @layer components {
-  /* at scroll 0 the header sits on the field with no strip; the shader fades the band under it */
+  /* at scroll 0 the header sits on the scene with no strip; the shader protects the band under it */
   .home .nav:not([data-scrolled]):not([data-open]) {
     background: transparent;
     backdrop-filter: none;
@@ -15,51 +15,52 @@
     isolation: isolate;
     margin-top: calc(-1 * var(--nav-h));
     padding-top: var(--nav-h);
+    /* the scene's box runs from the top of the page (under the transparent header) to the end of the hero; its
+       size is what a hand-off compares, so pages that share the scene use the same rule: 100svh, clamped */
+    min-height: clamp(640px, 100svh, 1080px);
   }
   .hero-bg {
     position: absolute;
-    inset: 0 0 auto 0;
-    height: 100%;
+    inset: 0;
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
     contain: strict;
-    mask-image: linear-gradient(180deg, #000 0, #000 72%, transparent 100%);
-    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 72%, transparent 100%);
+    view-transition-name: dusk-hero;
+    background: var(--sb-canvas);
+    /* only the last few pixels melt into the page, under the raft's reflection */
+    mask-image: linear-gradient(180deg, #000 0, #000 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 94%, transparent 100%);
   }
-  /* the CSS fallback and the frame before the field loads: pools at the edges, the centre kept clear */
-  .hero-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 42% 46% at 12% 30%, oklch(0.86 0.12 165), transparent 70%),
-      radial-gradient(ellipse 44% 50% at 90% 36%, oklch(0.8 0.1 205), transparent 70%),
-      radial-gradient(ellipse 60% 36% at 50% 2%, oklch(0.84 0.09 190), transparent 70%),
-      radial-gradient(ellipse 70% 40% at 50% 92%, oklch(0.78 0.11 212), transparent 70%),
-      linear-gradient(180deg, oklch(0.93 0.03 200), oklch(0.88 0.06 208));
-    mask-image: radial-gradient(ellipse 46% 44% at 50% 42%, transparent 55%, #000 100%);
-    -webkit-mask-image: radial-gradient(ellipse 46% 44% at 50% 42%, transparent 55%, #000 100%);
-  }
-  :root:not([data-theme="light"]) .hero-bg::before {
-    background:
-      radial-gradient(ellipse 42% 46% at 12% 30%, oklch(0.48 0.12 170), transparent 70%),
-      radial-gradient(ellipse 44% 50% at 90% 36%, oklch(0.42 0.1 215), transparent 70%),
-      radial-gradient(ellipse 60% 36% at 50% 2%, oklch(0.4 0.09 190), transparent 70%),
-      radial-gradient(ellipse 70% 40% at 50% 92%, oklch(0.34 0.08 230), transparent 70%),
-      linear-gradient(180deg, oklch(0.24 0.045 245), oklch(0.17 0.035 255));
-  }
+  .hero-poster,
   .hero-canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
+  }
+  .hero-poster {
+    object-fit: cover;
+  }
+  .hero-poster:not([src]) {
+    visibility: hidden;
+  }
+  /* a fresh load: the live frame fades in over the poster (the same state, so mostly the same picture); after an
+     exact hand-off it is the identical picture, so it simply replaces it */
+  .hero-canvas {
     opacity: 0;
-    transition: opacity 600ms var(--ease-out);
+    transition: opacity 500ms var(--ease-out);
   }
   .hero-canvas.on {
     opacity: 1;
+  }
+  .dusk-exact .hero-canvas,
+  [data-backend="static"] .hero-canvas {
+    transition: none;
+  }
+  [data-backend="static"] .hero-canvas {
+    display: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-canvas {
@@ -70,7 +71,7 @@
   .hero {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 96px 32px 112px;
+    padding: 72px 32px 112px;
     text-align: center;
   }
   .hero .pill {

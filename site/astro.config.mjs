@@ -17,8 +17,8 @@ export default defineConfig({
   integrations: [react()],
   server: { host: true },
   vite: {
-    // typegpu: the hero field's WebGPU shaders are TypeScript, compiled to WGSL at build time.
-    plugins: [tailwindcss(), typegpu({ include: [/hero-field\/.*\.ts$/] })],
+    // typegpu: the hero scene (src/hero/dusk) is TypeScript shaders, compiled to WGSL at build time.
+    plugins: [tailwindcss(), typegpu({ include: [/hero\/dusk\/.*\.ts$/] })],
     // ikada's source sits one level up; React must stay a single copy across both.
     resolve: { dedupe: ["react", "react-dom"] },
     server: { fs: { allow: [".."] } },

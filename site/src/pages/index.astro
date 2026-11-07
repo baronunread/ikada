@@ -8,6 +8,7 @@ import { Icon } from "../components/icons";
 import Shell from "../layouts/Shell.astro";
 import { blocks, components } from "../lib/registry";
 import { addCommands, gzipKb, href, VERSION } from "../lib/site";
+import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/dusk/handoff";
 
 const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat's own dashboards are built from the same files.`;
 const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
@@ -27,9 +28,14 @@ const tiles: Tile[] = [
 ---
 
 <Shell title="ikada" description={lede} home>
+  <script is:inline slot="head" set:html={HEAD_SCRIPT} />
   <main id="main">
     <section class="hero-shell" data-hero-shell aria-labelledby="hero-title">
-      <div class="hero-bg" aria-hidden="true"><canvas class="hero-canvas" data-hero-canvas></canvas></div>
+      <div class="hero-bg" data-hero-media aria-hidden="true">
+        <img class="hero-poster" alt="" decoding="sync" fetchpriority="high" data-dusk-poster={href("/hero/dusk-raft-{theme}-{size}.webp")} />
+        <script is:inline set:html={POSTER_SCRIPT} />
+        <canvas class="hero-canvas"></canvas>
+      </div>
       <div class="hero">
         <a class="pill" href={href("/changelog")}>
           <span class="ver">ikada {VERSION}</span><span class="sep" aria-hidden="true"></span><span>MIT</span><span class="sep" aria-hidden="true"></span>
@@ -40,9 +46,6 @@ const tiles: Tile[] = [
         <div class="ctas" data-hero-mask="ctl">
           <a class={buttonStyles({ variant: "primary", size: "lg" })} href={href("/docs")}>Get started</a>
           <a class={buttonStyles({ size: "lg" })} href={href("/docs#components")}>Browse components</a>
-        </div>
-        <div data-hero-mask="ctl" class="install-wrap">
-          <Install commands={addCommands("button")} />
         </div>
       </div>
     </section>
@@ -86,7 +89,7 @@ const tiles: Tile[] = [
   </main>
 
   <script>
-    import { bootHero } from "../hero-field/hero";
+    import { bootHero } from "../hero/home";
     bootHero();
   </script>
 </Shell>

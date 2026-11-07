@@ -4,6 +4,7 @@
  * client script for the chrome (theme, copy, drawer, TOC, segmented radios, search).
  */
 import "../styles/site.css";
+import "../styles/vt.css";
 import { IkadaMark } from "../components/IkadaMark";
 import { Icon } from "../components/icons";
 import { REPO_URL } from "../lib/registry";
@@ -49,13 +50,53 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
         }
       } catch {}
     </script>
+    <script is:inline>
+      // Cross-document view transitions with sproutboat.com (same origin): the header pieces carry over by name
+      // (vt.css), <main> is named "page" for the moment. Types match sproutboat.com's: "sb" scopes every rule,
+      // "to-ikada" / "to-sproutboat" give the direction. Navigations inside /ikada stay instant, as before.
+      (() => {
+        const kind = (u) => {
+          try {
+            const x = new URL(u, location.href);
+            if (x.origin !== location.origin) return null;
+            return x.pathname === "/ikada" || x.pathname.startsWith("/ikada/") ? "ikada" : "sb";
+          } catch {
+            return null;
+          }
+        };
+        const name = (on) => {
+          const m = document.querySelector("main");
+          if (m) m.style.viewTransitionName = on ? "page" : "";
+          // a hero scrolled out of view does not take part
+          const h = document.querySelector("[data-hero-media]");
+          if (h && on && h.getBoundingClientRect().bottom < 0) h.style.viewTransitionName = "none";
+          if (h && !on) h.style.viewTransitionName = "";
+        };
+        addEventListener("pageswap", (e) => {
+          if (!e.viewTransition) return;
+          if (kind(e.activation?.entry?.url ?? "") !== "sb") return e.viewTransition.skipTransition();
+          name(true);
+          for (const t of ["sb", "to-sproutboat"]) e.viewTransition.types?.add(t);
+        });
+        addEventListener("pageshow", (e) => {
+          if (e.persisted) name(false);
+        });
+        addEventListener("pagereveal", (e) => {
+          if (!e.viewTransition) return;
+          if (kind(window.navigation?.activation?.from?.url ?? document.referrer) !== "sb") return e.viewTransition.skipTransition();
+          name(true);
+          for (const t of ["sb", "to-ikada"]) e.viewTransition.types?.add(t);
+          e.viewTransition.finished.finally(() => name(false));
+        });
+      })();
+    </script>
     <slot name="head" />
   </head>
   <body class:list={["min-h-dvh bg-canvas font-sans text-base text-fg", { home }]}>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-(--sb-z-toast) focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
     <header class="nav" data-nav>
       <a class="brand" href={href("/")} aria-label="ikada home">
-        <IkadaMark size={24} motion="interactive" /> ikada
+        <span class="mark"><IkadaMark size={24} motion="interactive" /></span><span class="word">ikada</span>
       </a>
       <nav class="links" aria-label="Main">
         {topNav.map((l) => <a href={l.href} aria-current={l.match(here) ? "page" : undefined}>{l.label}</a>)}
