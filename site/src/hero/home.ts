@@ -148,7 +148,10 @@ export function bootHero(): void {
     if (performance.now() - savedAt > 1000) save();
   });
   addEventListener("pageshow", (e) => {
-    if ((e as PageTransitionEvent).persisted) handle?.resume();
+    if ((e as PageTransitionEvent).persisted) {
+      handle?.resume();
+      handle?.setCamera("raft"); // back from the other page (bfcache): the zoom runs the other way
+    }
   });
 
   // after first paint: straight away when a hand-off is waiting (the poster is its last frame), else in idle time

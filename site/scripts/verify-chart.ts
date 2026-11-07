@@ -437,13 +437,10 @@ if (on("rec")) {
     await p.mouse.click(bx.x + v.x, bx.y + v.y);
   }
   await sleep(1800);
-  // and back out
-  const back = p.locator('a[href="https://sproutboat.com"], a[href="/"], a[href="https://sproutboat.com/"]').first();
-  await back.hover().catch(() => {});
+  // and back out: the browser's Back
   await sleep(300);
-  await Promise.all([p.waitForNavigation({ waitUntil: "load" }).catch(() => {}), back.click()]);
-  await p.waitForFunction(() => (window as any).__hero, null, { timeout: 15000 });
-  await sleep(3200);
+  await Promise.all([p.waitForNavigation({ waitUntil: "load" }).catch(() => {}), p.goBack()]);
+  await sleep(3600);
   await ctx.close();
   const f = readdirSync(dir).find((x) => x.endsWith(".webm"));
   if (f) renameSync(join(dir, f), join(OUT, `${PREFIX}-zoom.webm`));
