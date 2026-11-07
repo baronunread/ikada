@@ -285,6 +285,9 @@ if (on("perf")) {
         );
         void s0;
       };
+      await measure("rest (idle demo)", async () => {
+        await sleep(4000);
+      });
       await measure("interacting", async () => {
         const box = await canvasBox(p);
         for (let i = 0; i < 4; i++) {
