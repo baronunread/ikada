@@ -131,3 +131,15 @@ together; never draw the triangle N times in one pass, tile-based GPUs discard c
 `site/scripts/verify-hero.ts` (headless Chrome with WebGPU, against `bun run preview`): `posters`, `shots`,
 `contrast` (headline ≥ 3:1, lede and nav ≥ 4.5:1 on the worst rendered pixel), `handoff` (max channel difference
 between the last frame and the first, and the wide → raft glide), `reduced`, `static` (no WebGPU), `perf`, `rec`.
+
+## The container ship (mock, branch `dusk-ship-mock`)
+
+A chunky toy container ship steams across the scene (heading toward the sun, bow left), carrying stacks of coloured
+containers, some open with sprouts in soil; the ikada raft is its tender. It is a second fragment pass
+(`shipFrag` in `shader.ts`, premultiplied over the scene, scissored to the ship's screen rectangle by
+`Sim.shipRect`), so its registers never touch the scene pass; the scene pass only adds the wake (foam skirt, bow
+ridges, stern trail), a flat cut-out reflection and the contact darkening. The ship lies at a fixed place in the world
+(`SHIP_AT`, per aspect); a camera glide is a real move toward the raft. Presets gained `ux` (canvas u of the raft: the
+camera slides sideways), `bl` (defocus in radians: soft silhouette, averaged paint, cheaper marching) and `so` (ship
+opacity; 0 on `sky`). The cargo is a hand-authored table (`CARGO`, uploaded as the `cells` uniform).
+The mock page, build and tools are in `site/mock/dusk-ship/` (`bun build.ts`, `bun serve.ts`, `node tools/shots.sh`).

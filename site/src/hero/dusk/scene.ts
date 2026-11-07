@@ -8,7 +8,7 @@
 import tgpu, { type TgpuRoot } from 'typegpu';
 import * as d from 'typegpu/data';
 import { CANVAS, oklch, v3 } from './gpu';
-import { DI, DI2, DU, L, NSW, NW, SW, duskFrag, fullscreenVert } from './shader';
+import { DI, DI2, DU, L, NSW, NW, SW, duskFrag, fullscreenVert, shipFrag } from './shader';
 
 export type Theme = 'light' | 'dark';
 export type Backend = 'webgpu' | 'static';
@@ -152,25 +152,31 @@ function spring(s: Spring, target: number, r: number, dt: number, zeta = 1) {
 /** A preset is the framing it solves for, as a pair [portrait (aspect ≤ 0.5), landscape (aspect ≥ 1.5)]:
  *  f focal length (in canvas heights), hv horizon height (canvas v, 0 top), rv raft centre (v), pw the raft's width
  *  (in canvas heights, capped by pwW × aspect so it fits a portrait canvas), uS the sun and uI the island (canvas u). */
-interface Framing { f: number; hv: number; rv: number; pw: number; pwW: number; uS: number; uI: number; uI2: number }
+interface Framing { f: number; hv: number; rv: number; pw: number; pwW: number; uS: number; uI: number; uI2: number; ux: number; bl: number; so: number }
 type Preset = [Framing, Framing];
 export const CAMERAS: Record<Camera, Preset> = {
   // sproutboat.com: the raft small and low, drifting toward the island; the headline on open sky
   wide: [
-    { f: 1.45, hv: 0.6, rv: 0.8, pw: 0.15, pwW: 0.34, uS: 0.2, uI: 0.74, uI2: 0.16 },
-    { f: 1.8, hv: 0.62, rv: 0.82, pw: 0.17, pwW: 0.34, uS: 0.235, uI: 0.74, uI2: 0.13 },
+    { f: 1.45, hv: 0.6, rv: 0.8, pw: 0.15, pwW: 0.34, uS: 0.2, uI: 0.74, uI2: 0.16, ux: 0.3, bl: 0, so: 1 },
+    { f: 1.8, hv: 0.62, rv: 0.82, pw: 0.17, pwW: 0.34, uS: 0.235, uI: 0.74, uI2: 0.13, ux: 0.3, bl: 0, so: 1 },
   ],
   // ikada: closer on the raft and the sprout, low in the frame; the headline on the sky above
   raft: [
-    { f: 1.45, hv: 0.6, rv: 0.855, pw: 0.3, pwW: 0.66, uS: 0.18, uI: 0.8, uI2: 0.17 },
-    { f: 1.8, hv: 0.62, rv: 0.86, pw: 0.43, pwW: 0.66, uS: 0.2, uI: 0.8, uI2: 0.13 },
+    { f: 1.45, hv: 0.6, rv: 0.855, pw: 0.3, pwW: 0.66, uS: 0.18, uI: 0.8, uI2: 0.17, ux: 0.4, bl: 0.01, so: 1 },
+    { f: 1.8, hv: 0.62, rv: 0.86, pw: 0.43, pwW: 0.66, uS: 0.2, uI: 0.8, uI2: 0.13, ux: 0.4, bl: 0.01, so: 1 },
   ],
   // docs: tilted up into the calm sky; a strip of sea at the bottom, the raft below the frame
   sky: [
-    { f: 1.45, hv: 0.9, rv: 1.3, pw: 0.15, pwW: 0.34, uS: 0.2, uI: 0.74, uI2: 0.16 },
-    { f: 1.8, hv: 0.92, rv: 1.3, pw: 0.17, pwW: 0.34, uS: 0.235, uI: 0.74, uI2: 0.13 },
+    { f: 1.45, hv: 0.9, rv: 1.3, pw: 0.15, pwW: 0.34, uS: 0.2, uI: 0.74, uI2: 0.16, ux: 0.3, bl: 0, so: 0 },
+    { f: 1.8, hv: 0.92, rv: 1.3, pw: 0.17, pwW: 0.34, uS: 0.235, uI: 0.74, uI2: 0.13, ux: 0.3, bl: 0, so: 0 },
   ],
 };
+/** Where the ship lies in the world (the raft is at the origin, the camera looks down -z): [portrait, landscape].
+ *  A fixed place, so a camera glide is a real move toward the raft and the ship stays where it is. */
+interface ShipPlace { x: number; z: number; yaw: number }
+const SHIP_SCALE = 1.3;
+// heading left (toward the sun), the deckhouse at the right, clear of the headline
+const SHIP_AT: [ShipPlace, ShipPlace] = [{ x: 0.6, z: -26, yaw: Math.PI + 0.3 }, { x: 5.2, z: -17, yaw: Math.PI + 0.3 }];
 const CAMS = Object.keys(CAMERAS) as Camera[];
 /** The glide: critically damped (Afloat: only presses bob), response 0.4 s, so it settles in ~600 ms. */
 const CAM_RESPONSE = 0.4;
@@ -179,11 +185,13 @@ const CAM_RESPONSE = 0.4;
 // OKLCH, converted to linear sRGB. Slate + neutrals, warm only near the sun, green for the sprout.
 const P = (o: Record<string, [number, number, number]>) => Object.fromEntries(Object.entries(o).map(([k, c]) => [k, oklch(c[0], c[1], c[2])])) as unknown as Record<string, V3>;
 const DARK = P({
+  cg: [0.62, 0.17, 145], cb: [0.46, 0.07, 55], ca: [0.78, 0.14, 82], cc: [0.9, 0.03, 90], cs: [0.52, 0.09, 245], ck: [0.55, 0.13, 35], hullC: [0.36, 0.055, 230], winC: [0.85, 0.15, 75],
   zen: [0.18, 0.03, 258], mid: [0.27, 0.035, 250], hor: [0.43, 0.025, 236], warm: [0.6, 0.085, 46], glow: [0.7, 0.12, 50], sunC: [0.88, 0.1, 62],
   deep: [0.17, 0.026, 236], scat: [0.4, 0.06, 205], islC: [0.21, 0.02, 245], bark: [0.5, 0.024, 64], endw: [0.74, 0.045, 74], rope: [0.8, 0.03, 84],
   leaf: [0.44, 0.12, 148], leafT: [0.76, 0.18, 143], moss: [0.32, 0.045, 135], cloudLit: [0.62, 0.06, 40], cloudShd: [0.34, 0.035, 262],
 });
 const LIGHT = P({
+  cg: [0.62, 0.17, 145], cb: [0.46, 0.07, 55], ca: [0.78, 0.14, 82], cc: [0.92, 0.03, 90], cs: [0.52, 0.09, 245], ck: [0.55, 0.13, 35], hullC: [0.36, 0.055, 230], winC: [0.85, 0.15, 75],
   zen: [0.7, 0.08, 240], mid: [0.84, 0.05, 236], hor: [0.925, 0.022, 90], warm: [0.92, 0.06, 78], glow: [0.95, 0.085, 82], sunC: [0.99, 0.05, 88],
   deep: [0.42, 0.06, 234], scat: [0.62, 0.08, 200], islC: [0.5, 0.035, 245], bark: [0.42, 0.024, 62], endw: [0.72, 0.045, 75], rope: [0.8, 0.03, 85],
   leaf: [0.48, 0.13, 148], leafT: [0.8, 0.18, 142], moss: [0.4, 0.05, 135], cloudLit: [0.97, 0.03, 80], cloudShd: [0.84, 0.025, 240],
@@ -192,6 +200,27 @@ const SCAL = {
   dark: { sunEl: 0.028, sunI: 1.5, stars: 1, fog: 0.0105, cloud: 0.8, glare: 1.0, sunR: 0.0085 },
   light: { sunEl: 0.06, sunI: 2.4, stars: 0, fog: 0.0125, cloud: 0.7, glare: 0.6, sunR: 0.008 },
 };
+
+// ------------------------------------------------------------------------------------------------ the cargo
+/** The ship's cargo, authored: 5 bays (stern to bow) x 3 columns. Per cell the table holds [stack height, open top,
+ *  paint (three base-6 digits, one per tier: 0 green, 1 seed brown, 2 amber, 3 cream, 4 slate blue, 5 clay), 0], then
+ *  three sprouts [x, z, height, turn] for the open ones (the shader reads it, shader.ts `cells`). */
+const CARGO_TIERS = [[3, 3, 3], [2, 3, 2], [3, 2, 3], [2, 3, 2], [1, 2, 1]];
+const CARGO_OPEN = [[0, 1, 0], [1, 0, 1], [0, 1, 0], [1, 0, 1], [0, 1, 0]];
+const hullHalfCpu = (x: number, y: number) => { const xb = x - 0.3 * y, t = clamp((xb - 1.7) / 2.2, 0, 1), k = clamp((y + 0.5) / 1.25, 0, 1); return 1.15 * (1 - t * t) * (0.8 + 0.2 * k * k * (3 - 2 * k)); };
+export const CARGO: number[][] = (() => {
+  const r = rng(731), out: number[][] = [];
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 3; j++) {
+    const cx = -2.15 + 0.5 + i, cz = (j - 1) * 0.68;
+    const fits = Math.abs(cz) + 0.34 <= hullHalfCpu(cx + 0.5, 0.7) - 0.04;
+    const n = fits ? CARGO_TIERS[i][j] : 0, open = n > 0 && CARGO_OPEN[i][j] ? 1 : 0;
+    let prev = -1, paint = 0;
+    for (let t = 0; t < 3; t++) { let c = Math.floor(r() * 6); if (c === prev) c = (c + 1 + Math.floor(r() * 4)) % 6; prev = c; paint += c * Math.pow(6, t); }
+    out.push([n, open, paint, 0]);
+    for (let k = 0; k < 3; k++) out.push(open ? [(k - 1) * 0.32 + (r() - 0.5) * 0.08, (r() - 0.5) * 0.16, 0.34 + 0.22 * r(), r() * 6.283] : [0, 0, 0.3, 0]);
+  }
+  return out;
+})();
 
 // ------------------------------------------------------------------------------------------------ the simulation
 /** The raft turns very slowly; a pure function of time so any state renders the same picture. */
@@ -227,14 +256,14 @@ class Sim {
   s: DuskState;
   cam = { pos: [0, 1, 9] as V3, f: [0, 0, -1] as V3, r: [1, 0, 0] as V3, u: [0, 1, 0] as V3, focal: 2.2 };
   raft = { pos: [0, 0, 0] as V3, X: [1, 0, 0] as V3, Y: [0, 1, 0] as V3, Z: [0, 0, 1] as V3, yaw: 0 };
-  lay = { f: 2.2, D: 9, h: 1, pitch: 0, sunAz: -0.3, islX: 20, islS: 5, isl2X: 40, isl2S: 4 };
+  lay = { f: 2.2, D: 9, h: 1, pitch: 0, sunAz: -0.3, islX: 20, islS: 5, isl2X: 40, isl2S: 4, camX: 0, ship: { x: 0, z: -12, yaw: -0.3 }, bl: 0, so: 1 };
   aspect = 1.6;
   constructor(s: DuskState) { this.s = s; this.layout(); }
 
   /** The framing, blended over the presets by their weights, then solved for the aspect ratio. */
   framing(): Framing {
     const k = clamp((this.aspect - 0.5) / 1.0, 0, 1);
-    const out = { f: 0, hv: 0, rv: 0, pw: 0, pwW: 0, uS: 0, uI: 0, uI2: 0 };
+    const out = { f: 0, hv: 0, rv: 0, pw: 0, pwW: 0, uS: 0, uI: 0, uI2: 0, ux: 0, bl: 0, so: 0 };
     let sum = 0;
     for (const c of CAMS) sum += Math.max(0, this.s.springs[camKey(c)][0]);
     for (const c of CAMS) {
@@ -264,7 +293,11 @@ class Sim {
     const wI = clamp(0.2 * aspect, 0.16, 0.3);
     const islS = ((wI / 2) / f) * (DI + D);
     const isl2Az = Math.atan(((F.uI + F.uI2 - 0.5) * aspect) / f);
-    this.lay = { f, D, h, pitch, sunAz, islX: Math.tan(islAz) * (DI + D), islS, isl2X: Math.tan(isl2Az) * (DI2 + D), isl2S: islS * 0.62 * ((DI2 + D) / (DI + D)) };
+    // the camera slides sideways so the raft sits at canvas u = ux (it looks straight down -z)
+    const camX = (-(F.ux - 0.5) * aspect * D) / f;
+    const kA = clamp((aspect - 0.5) / 1.0, 0, 1);
+    const ship = { x: mix(SHIP_AT[0].x, SHIP_AT[1].x, kA), z: mix(SHIP_AT[0].z, SHIP_AT[1].z, kA), yaw: mix(SHIP_AT[0].yaw, SHIP_AT[1].yaw, kA) };
+    this.lay = { f, D, h, pitch, sunAz, islX: camX + Math.tan(islAz) * (DI + D), islS, isl2X: camX + Math.tan(isl2Az) * (DI2 + D), isl2S: islS * 0.62 * ((DI2 + D) / (DI + D)), camX, ship, bl: F.bl, so: F.so };
   }
 
   /** Is the camera still gliding? */
@@ -314,7 +347,7 @@ class Sim {
     const truck = S.truck[0];
     const yaw = (-truck / L0.D) * 0.72;
     const pitch = L0.pitch + S.tilt[0];
-    const pos: V3 = [truck, L0.h + S.tilt[0] * 2, L0.D];
+    const pos: V3 = [truck + L0.camX, L0.h + S.tilt[0] * 2, L0.D];
     const f = norm([Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), -Math.cos(yaw) * Math.cos(pitch)]);
     const r = norm(cross(f, [0, 1, 0]));
     const u = cross(r, f);
@@ -326,6 +359,14 @@ class Sim {
     Y = rot(Y, X, S.roll[0]); Z = rot(Z, X, S.roll[0]);
     this.raft.X = X; this.raft.Y = Y; this.raft.Z = Z;
     this.raft.pos = [0, S.bob[0] + 0.035, 0];
+    // the ship: slow roll and pitch, a pure function of time (it never needs the wave solver)
+    const shipT = s.time;
+    const sy = L0.ship.yaw + 0.012 * Math.sin(shipT * 0.05);
+    let sX: V3 = [Math.cos(sy), 0, -Math.sin(sy)], sY: V3 = [0, 1, 0], sZ: V3 = [Math.sin(sy), 0, Math.cos(sy)];
+    const spitch = 0.011 * Math.sin(shipT * 0.45 + 1), sroll = 0.016 * Math.sin(shipT * 0.37);
+    sX = rot(sX, sZ, spitch); sY = rot(sY, sZ, spitch);
+    sY = rot(sY, sX, sroll); sZ = rot(sZ, sX, sroll);
+    const shipPos: V3 = [L0.ship.x, 0.02 + 0.025 * Math.sin(shipT * 0.62 + 0.5), L0.ship.z];
     // sprout (raft-local): stem top bends with the sway; leaves face the camera, tilt up to the sky
     const sw = S.sway[0];
     const X0: V3 = [Math.cos(ry), 0, -Math.sin(ry)], Z0: V3 = [Math.sin(ry), 0, Math.cos(ry)];
@@ -363,8 +404,37 @@ class Sim {
       leaf: col('leaf'), leafT: col('leafT'), moss: col('moss'), canvas: v3(canvas), cloudLit: col('cloudLit'), cloudShd: col('cloudShd'),
       mask0: d.vec4f(m[0], m[1], m[2], m[3]), mask1: d.vec4f(m[4], m[5], m[6], m[7]), mask2: d.vec4f(m[8], m[9], m[10], m[11]), mask3: d.vec4f(m[12], m[13], m[14], m[15]),
       maskK: d.vec4f(k[0], k[1], k[2], k[3]),
+      shipPos: d.vec3f(...shipPos), dof: L0.bl, shipX: d.vec3f(...sX), smoke: 1, shipY: d.vec3f(...sY), shipOn: L0.so, shipZ: d.vec3f(...sZ), shipS: SHIP_SCALE,
+      cells: CARGO.map((a) => d.vec4f(a[0], a[1], a[2], a[3])),
+      cg: col('cg'), cb: col('cb'), ca: col('ca'), cc: col('cc'), cs: col('cs'), ck: col('ck'), hullC: col('hullC'), winC: col('winC'),
       wv: WAVES.wv.map((a) => d.vec4f(a[0], a[1], a[2], a[3])), wq: WAVES.wq.map((a) => d.vec4f(a[0], a[1], a[2], a[3])), sw: sw4,
     };
+  }
+
+  /** The ship's pixel rectangle [x, y, w, h] (its box, its smoke and its blur, clipped to the canvas), or null. */
+  shipRect(w: number, h: number): [number, number, number, number] | null {
+    const L0 = this.lay, c = this.cam;
+    if (L0.so < 0.01) return null;
+    const sy = L0.ship.yaw, S = SHIP_SCALE;
+    const X: V3 = [Math.cos(sy), 0, -Math.sin(sy)], Z: V3 = [Math.sin(sy), 0, Math.cos(sy)];
+    let u0 = 9, v0 = 9, u1 = -9, v1 = -9, behind = false;
+    const pts: [number, number, number][] = [];
+    for (const x of [-3.9, 4.1]) for (const y of [-0.7, 3.8]) for (const z of [-1.4, 1.4]) pts.push([x, y, z]);
+    for (const x of [-7.2, -3]) for (const y of [3.2, 6]) for (const z of [-1.2, 1.2]) pts.push([x, y, z]); // the smoke
+    for (const [x, y, z] of pts) {
+      const wp: V3 = [L0.ship.x + (X[0] * x + Z[0] * z) * S, y * S, L0.ship.z + (X[2] * x + Z[2] * z) * S];
+      const v = add(wp, c.pos, -1), zc = dot(v, c.f);
+      if (zc < 0.2) { behind = true; break; }
+      const px = (L0.f * dot(v, c.r)) / zc, py = (L0.f * dot(v, c.u)) / zc;
+      const uu = px / this.aspect + 0.5, vv = 0.5 - py;
+      u0 = Math.min(u0, uu); u1 = Math.max(u1, uu); v0 = Math.min(v0, vv); v1 = Math.max(v1, vv);
+    }
+    if (behind) return [0, 0, w, h];
+    const pad = 0.02 + L0.bl * L0.f * 2.2;
+    u0 = clamp(u0 - pad, 0, 1); u1 = clamp(u1 + pad, 0, 1); v0 = clamp(v0 - pad, 0, 1); v1 = clamp(v1 + pad, 0, 1);
+    if (u1 <= u0 || v1 <= v0) return null;
+    const x0 = Math.floor(u0 * w), y0 = Math.floor(v0 * h);
+    return [x0, y0, Math.max(1, Math.ceil(u1 * w) - x0), Math.max(1, Math.ceil(v1 * h) - y0)];
   }
 
   /** A press at canvas uv sends a swell from the sea under it (or from the horizon under a press on the sky). */
@@ -412,8 +482,11 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   const uni = root.createBuffer(DU).$usage('uniform');
   const bg = root.createBindGroup(L, { u: uni });
   const makePipe = () => root.createRenderPipeline({ vertex: fullscreenVert, fragment: duskFrag, targets: { format } });
-  let pipe: ReturnType<typeof makePipe>;
-  try { pipe = makePipe(); } catch (e) { console.error(e); root.destroy(); return staticHandle(); }
+  // the ship: a second pipeline, premultiplied over the scene, drawn only inside the ship's screen rectangle
+  const blend = { color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' } } as const;
+  const makeShipPipe = () => root.createRenderPipeline({ vertex: fullscreenVert, fragment: shipFrag, targets: { format, blend } as never });
+  let pipe: ReturnType<typeof makePipe>, shipPipe: ReturnType<typeof makeShipPipe>;
+  try { pipe = makePipe(); shipPipe = makeShipPipe(); } catch (e) { console.error(e); root.destroy(); return staticHandle(); }
 
   const host = opts.host ?? canvas.parentElement!;
   const coarse = matchMedia('(pointer: coarse)').matches || innerWidth <= 820;
@@ -492,6 +565,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     configure();
     const t0 = performance.now();
     uni.write(sim.pack(w, h, mask, maskK) as never);
+    const box = sim.shipRect(w, h);
     const enc = device.createCommandEncoder();
     const timedOk = timed && qs && qFree.length;
     const view = ctx!.getCurrentTexture().createView();
@@ -500,6 +574,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       const ts = timedOk && (i === 0 || i === BENCH - 1) ? { querySet: qs!, ...(i === 0 ? { beginningOfPassWriteIndex: 0 } : {}), ...(i === BENCH - 1 ? { endOfPassWriteIndex: 1 } : {}) } : undefined;
       const rp = enc.beginRenderPass({ colorAttachments: [{ view, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 1] }], timestampWrites: ts });
       pipe.with(bg).with(rp).draw(3);
+      if (box) { rp.setScissorRect(box[0], box[1], box[2], box[3]); shipPipe.with(bg).with(rp).draw(3); }
       rp.end();
     }
     let rb: GPUBuffer | undefined;
