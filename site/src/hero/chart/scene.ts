@@ -1413,8 +1413,8 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       if (ly < 70) ly = l.y + 22;
       const hit = (r: Rect, p: number): boolean =>
         lx < r.x1 + p && lx + w > r.x0 - p && ly < r.y1 + p && ly + h > r.y0 - p;
-      if (m.copy && hit(m.copy, 6)) ly = Math.max(ly, m.copy.y1 + 10);
       for (const r of avoid) if (hit(r, 6)) ly = Math.min(ly, r.y0 - h - 8);
+      if (m.copy && hit(m.copy, 6)) ly = Math.max(ly, m.copy.y1 + 10);
       for (let n = 0; n < 8; n++) {
         const o = placed.find((q) => Math.abs(q.x - lx) < (q.w + w) / 2 + 4 && Math.abs(q.y - ly) < h + 8);
         if (!o) break;
