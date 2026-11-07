@@ -4,7 +4,7 @@
      Support  brand-mark                             the sprout sinks below its waterline, the raft surfaces (and back)
      Support  brand-word, nav-links, nav-action       a crossfade at natural size (no text stretching)
      Static   site-nav (the header bar)               no animation
-     Carry    dusk-hero (the scene's box)             the new page's first paint is the old page's last frame, so the
+     Carry    chart-hero (the chart's box)             the new page's first paint is the old page's last frame, so the
                                                       swap is invisible; without an exact hand-off, a short crossfade
    Only navigations that cross /ikada get the "sb" type (the head script in Shell.astro); inside /ikada every
    navigation skips the transition. Reduced motion: an instant swap. */
@@ -86,17 +86,17 @@ html:active-view-transition-type(sb)::view-transition-old(site-nav) {
 
 /* carry: the scene. An exact hand-off draws the same picture on both sides, so the swap is instant (a crossfade
    between identical images would only dip). Otherwise a short crossfade, while the camera glides on the new page. */
-::view-transition-group(dusk-hero) {
+::view-transition-group(chart-hero) {
   animation-duration: 0s;
 }
-::view-transition-old(dusk-hero),
-::view-transition-new(dusk-hero) {
+::view-transition-old(chart-hero),
+::view-transition-new(chart-hero) {
   animation: none;
 }
-html:not(.dusk-exact):active-view-transition-type(sb)::view-transition-old(dusk-hero) {
+html:not(.chart-exact):active-view-transition-type(sb)::view-transition-old(chart-hero) {
   animation: vt-fade 360ms var(--ease-out) reverse both;
 }
-html:not(.dusk-exact):active-view-transition-type(sb)::view-transition-new(dusk-hero) {
+html:not(.chart-exact):active-view-transition-type(sb)::view-transition-new(chart-hero) {
   animation: vt-fade 360ms var(--ease-out) both;
 }
 

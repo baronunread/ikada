@@ -36,15 +36,15 @@ bun run preview             # serve dist/ like the asset server, 0.0.0.0:4410
   (`components/BlockPreview.tsx`, client-only) at full, 768 or 390 px, its code (read from `.registry`, so it shows
   the rewritten `@/components/ui/*` imports), install tabs, the components it is built from and its props. A block
   folder added while `astro dev` runs is not seen by `import.meta.glob` until the dev server restarts.
-- `src/hero/dusk/`: Raft at dusk, the homepage scene (TypeGPU/WebGPU), shared with sproutboat.com and its docs,
-  each at its own camera (ikada: `raft`). This folder is the source of truth; its README is the contract (API, cameras,
-  the cross-page hand-off). Other sites vendor it with `bun scripts/sync-dusk.ts <their folder>`. `src/hero/home.ts`
-  is this page's glue: the poster first, the module after first paint, the text mask, theme and reduced motion, and
-  the hand-off on `pageswap`. `?backend=static` keeps the poster (the no-WebGPU path).
+- `src/hero/chart/`: the nautical chart, the homepage hero (Canvas 2D, no WebGPU), shared with sproutboat.com and its docs,
+  each at its own camera (ikada: `raft`; the zoom between pages is one continuous camera move). This folder is the
+  source of truth; its README is the contract (API, cameras, the cross-page hand-off). Other sites vendor it with
+  `bun scripts/sync-chart.ts <their folder>`. `src/hero/home.ts` is this page's glue: the poster first, the module after
+  first paint, the text mask, theme and reduced motion, and the hand-off on `pageswap`. `?backend=static` keeps the poster.
 - `src/styles/vt.css` and the head script in `Shell.astro`: cross-document view transitions with sproutboat.com
   (shared header names, the `sb` / `to-ikada` / `to-sproutboat` types). Navigations inside /ikada stay instant.
-- `scripts/verify-hero.ts`: the hero in headless Chrome with WebGPU against `bun run preview`: posters
-  (`public/hero/dusk-raft-*.webp`), screenshots, text contrast, the hand-off, reduced motion, no WebGPU, frame cost.
+- `scripts/verify-chart.ts`: the hero in headless Chrome against `bun run preview`: posters
+  (`public/hero/chart-raft-*.webp`), screenshots, the hand-off, reduced motion, keyboard use, frame cost.
 - `scripts/check-links.ts`: crawls a running preview (`bun run preview`, then `bun scripts/check-links.ts`) and fails
   on any 404, missing `#anchor` or bare `href="#"`.
 

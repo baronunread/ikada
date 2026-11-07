@@ -1,5 +1,6 @@
-/* The homepage: Specimen's minimal centred hero over Raft at dusk (src/hero/dusk, the raft camera): the copy on
-   the sky, the raft on the water below it; then the live components (Waterline's bento) and the blocks. */
+/* The homepage: the headline over the nautical chart (src/hero/chart, the raft camera): the copy on the calm sea at
+   the top left, the raft moored by Sprout Harbour at the lower right; then the live components (Waterline's bento)
+   and the blocks. */
 /* Declared first: this file can load before site.css, and the first mention fixes the layer order. */
 @layer theme, base, components, utilities;
 
@@ -11,12 +12,13 @@
     -webkit-backdrop-filter: none;
   }
   .hero-shell {
+    --hero-pad: clamp(20px, 5vw, 72px);
     position: relative;
     isolation: isolate;
     margin-top: calc(-1 * var(--nav-h));
     padding-top: var(--nav-h);
-    /* the scene's box runs from the top of the page (under the transparent header) to the end of the hero; its
-       size is what a hand-off compares, so pages that share the scene use the same rule: 100svh, clamped */
+    /* the chart's box runs from the top of the page (under the transparent header) to the end of the hero; its
+       size is what a hand-off compares, so sproutboat.com uses exactly this rule: 100svh, clamped */
     min-height: clamp(640px, 100svh, 1080px);
   }
   .hero-bg {
@@ -26,11 +28,8 @@
     overflow: hidden;
     pointer-events: none;
     contain: strict;
-    view-transition-name: dusk-hero;
+    view-transition-name: chart-hero;
     background: var(--sb-canvas);
-    /* only the last few pixels melt into the page, under the raft's reflection */
-    mask-image: linear-gradient(180deg, #000 0, #000 94%, transparent 100%);
-    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 94%, transparent 100%);
   }
   .hero-poster,
   .hero-canvas {
@@ -46,8 +45,8 @@
   .hero-poster:not([src]) {
     visibility: hidden;
   }
-  /* a fresh load: the live frame fades in over the poster (the same state, so mostly the same picture); after an
-     exact hand-off it is the identical picture, so it simply replaces it */
+  /* a fresh load: the live frame fades in over the poster (the same state, so the same picture); after an exact
+     hand-off it is the identical picture, so it simply replaces it */
   .hero-canvas {
     opacity: 0;
     transition: opacity 500ms var(--ease-out);
@@ -55,7 +54,7 @@
   .hero-canvas.on {
     opacity: 1;
   }
-  .dusk-exact .hero-canvas,
+  .chart-exact .hero-canvas,
   [data-backend="static"] .hero-canvas {
     transition: none;
   }
@@ -67,12 +66,23 @@
       transition-duration: 160ms;
     }
   }
+  /* the marker buttons (the chart module fills it): same box as the chart, over the text, clicks only on the markers */
+  .hero-markers {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
 
+  /* the copy sits on the calm sea at the top left; the chart takes every press that is not on a link */
   .hero {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 72px 32px 112px;
-    text-align: center;
+    position: relative;
+    padding: clamp(96px, 15vh, 150px) var(--hero-pad) 112px;
+    text-align: left;
+    pointer-events: none;
+  }
+  .hero a,
+  .hero code {
+    pointer-events: auto;
   }
   .hero .pill {
     display: inline-flex;
@@ -126,7 +136,8 @@
     font-weight: 600;
     letter-spacing: -0.035em;
     line-height: 1.02;
-    margin: 0 auto;
+    margin: 0;
+    max-width: 14em;
     text-wrap: balance;
   }
   .hero h1 em {
@@ -138,23 +149,22 @@
     font-size: 19px;
     line-height: 1.5;
     color: var(--sb-fg-muted);
-    max-width: 50ch;
-    margin: 24px auto 0;
+    max-width: 46ch;
+    margin: 24px 0 0;
     text-wrap: pretty;
   }
   .hero .ctas {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 32px auto 0;
+    margin: 32px 0 0;
   }
   .hero .ctas a {
     min-width: 168px;
   }
   .hero .install {
     max-width: 600px;
-    margin: 20px auto 0;
+    margin: 20px 0 0;
     text-align: start;
   }
 
@@ -359,7 +369,7 @@
   }
   @media (max-width: 860px) {
     .hero {
-      padding: 48px 16px 72px;
+      padding: 84px var(--hero-pad) 72px;
     }
     .hero h1 {
       font-size: 40px;
