@@ -279,7 +279,7 @@ export function freshState(
     const r = st.ships[best]!;
     r.aw = 1;
     r.ms = 6;
-    r.pings = [T0 - 800];
+    r.pings = reduced ? [] : [T0 - 800];
     r.awUntil = reduced ? NEVER : T0 + 2100;
     r.rt = reduced ? -1 : T0 - 800;
     st.labels.push({
@@ -2218,7 +2218,15 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       stamps.push(performance.now());
       if (stamps.length > 130) stamps.shift();
     }
-    return b || busy || camMoving || maskMoving() || st.labels.length > 0 || hover !== null || focusShip !== null;
+    return (
+      b ||
+      busy ||
+      camMoving ||
+      maskMoving() ||
+      st.labels.some((l) => l.until < NEVER / 2) ||
+      hover !== null ||
+      focusShip !== null
+    );
   }
   let lastCKey = "";
 
