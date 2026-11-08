@@ -527,3 +527,10 @@ html[data-theme="light"] .bp {
 .bp[data-open] ~ .hero-markers {
   pointer-events: none;
 }
+
+/* a real outline too (SVG draws it around the label's box): the focus ring a keyboard user looks for */
+.sheet .lab:focus-visible {
+  outline: 2px solid var(--accc);
+  outline-offset: 3px;
+  border-radius: 8px;
+}

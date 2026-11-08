@@ -139,7 +139,8 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
         const cs = getComputedStyle(el);
         if (!r.width || !r.height || cs.visibility === "hidden" || cs.display === "none" || el.closest("[hidden]"))
           return;
-        if (el.matches('a[href="#"], a.sbc-m, .sr-only')) return;
+        if (el.matches('a[href="#"], a.sbc-m, .sr-only, :disabled') || el.closest("[inert], [aria-hidden=true]"))
+          return;
         el.setAttribute("data-qa", String(n++));
       });
       return n;
