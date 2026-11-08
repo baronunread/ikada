@@ -20,6 +20,7 @@ export interface MeterProps extends Omit<ComponentProps<typeof BaseMeter.Root>, 
   locale?: string;
   /** Visible label above the bar. Without one, pass `aria-label`. */
   label?: ReactNode;
+  /** Fill colour: normal, warning (amber) or danger (red). Default normal. */
   tone?: MeterTone;
   /** Right of the label; defaults to the formatted value. */
   valueLabel?: ReactNode;
@@ -50,6 +51,7 @@ export function Meter({ label, tone = "normal", valueLabel, className, locale, .
 }
 
 export interface UsageMeterProps extends Omit<MeterProps, "value" | "max" | "min" | "tone" | "valueLabel" | "format"> {
+  /** Amount used so far, in the same unit as the limit. */
   used: number;
   /** `null` is unlimited: the bar is replaced by the number alone. */
   limit: number | null;

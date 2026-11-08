@@ -17,6 +17,7 @@ const iconSize = tv({
 export interface IconButtonProps extends Omit<ButtonProps, "children" | "aria-label"> {
   /** Required. Becomes the accessible name and the tooltip text. */
   label: string;
+  /** The icon. The accessible name comes from `label`. */
   children: ButtonProps["children"];
   /** Set false when a parent already explains the button. */
   tooltip?: boolean;

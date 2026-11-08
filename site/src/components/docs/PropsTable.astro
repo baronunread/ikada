@@ -1,0 +1,40 @@
+---
+import type { PropsTable } from "../../lib/props";
+
+interface Props {
+  table: PropsTable;
+}
+const { table } = Astro.props;
+---
+
+<div class="props-wrap">
+  <table class="props">
+    <caption>{table.name}</caption>
+    {
+      table.props.length ? (
+        <>
+          <thead>
+            <tr>
+              <th scope="col">Prop</th>
+              <th scope="col">Type</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {table.props.map((p) => (
+              <tr>
+                <td>
+                  {p.name}
+                  {p.optional ? null : <span class="req">required</span>}
+                </td>
+                <td><code>{p.type}</code></td>
+                <td>{p.doc || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </>
+      ) : null
+    }
+  </table>
+  {table.extends ? <p style="margin-top:8px;font-size:14px">Also takes every prop of <code>{table.extends}</code>.</p> : null}
+</div>

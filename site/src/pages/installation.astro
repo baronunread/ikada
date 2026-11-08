@@ -1,0 +1,64 @@
+---
+import Install from "../components/docs/Install.astro";
+import PageHead from "../components/docs/PageHead.astro";
+import Pager from "../components/docs/Pager.astro";
+import Snippet from "../components/docs/Snippet.astro";
+import Docs from "../layouts/Docs.astro";
+import { REGISTRY_URL } from "../lib/registry";
+import { addCommands, fence, href, pageMarkdown } from "../lib/site";
+
+const lede = "Add components one file at a time with the shadcn CLI and own the source, or install the package and take every update.";
+const alias = `"registries": {\n  "@ikada": "${REGISTRY_URL}/{name}.json"\n}`;
+const css = `/* app.css */\n@import "tailwindcss";\n@import "@sproutboat/ikada/theme.css";\n@source "../node_modules/@sproutboat/ikada/src";`;
+const toc = [
+  { id: "cli", label: "With the shadcn CLI" },
+  { id: "all", label: "Everything at once", sub: true },
+  { id: "alias", label: "Short names", sub: true },
+  { id: "package", label: "As a package" },
+  { id: "fonts", label: "Fonts and dark mode" },
+];
+const markdown = pageMarkdown({
+  title: "Installation",
+  description: lede,
+  url: href("/installation"),
+  body: ["## With the shadcn CLI", fence(addCommands("button").npm, "sh"), "## Everything at once", fence(addCommands("all").npm, "sh"), "## Short names", fence(alias, "json"), fence(addCommands(["@ikada/button", "@ikada/toast"]).npm, "sh"), "## As a package", fence("bun add @sproutboat/ikada", "sh"), fence(css, "css")],
+});
+---
+
+<Docs title="Installation" description={lede} toc={toc}>
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Installation" }]} title="Installation" lede={lede} markdown={markdown} />
+
+  <h2 id="cli">With the shadcn CLI</h2>
+  <p>
+    In a React project with Tailwind CSS v4 and a <code>components.json</code> (run <code>npx shadcn@latest init</code> first), add any
+    component by its URL. The CLI copies the source into <code>components/ui</code>, the helpers into <code>lib/ikada</code>, installs{" "}
+    <code>@base-ui/react</code> and the other dependencies, and writes the ikada theme into your CSS.
+  </p>
+  <Install commands={addCommands("button")} />
+
+  <h3 id="all">Everything at once</h3>
+  <p>Every component, helper and the theme in one go:</p>
+  <Install commands={addCommands("all")} />
+
+  <h3 id="alias">Short names</h3>
+  <p>Add the registry to <code>components.json</code> once:</p>
+  <Snippet code={alias} label="components.json" />
+  <p>Then use short names:</p>
+  <Install commands={addCommands(["@ikada/button", "@ikada/toast"])} />
+
+  <h2 id="package">As a package</h2>
+  <p>
+    The Sproutboat dashboards use the package, so they take every update. It ships TypeScript source for a bundler that compiles it
+    (Vite, Bun, Next.js with <code>transpilePackages</code>). It is not on npm yet.
+  </p>
+  <Install commands={{ npm: "npm install @sproutboat/ikada", pnpm: "pnpm add @sproutboat/ikada", bun: "bun add @sproutboat/ikada", yarn: "yarn add @sproutboat/ikada" }} />
+  <Snippet code={css} label="app.css" />
+
+  <h2 id="fonts">Fonts and dark mode</h2>
+  <p>
+    The theme uses Figtree and JetBrains Mono when they are installed and falls back to the system faces otherwise. Dark is the default;
+    light opts in with <code>data-theme="light"</code> on <code>&lt;html&gt;</code>. The shadcn theme maps light to <code>:root</code> and dark to{" "}
+    <code>.dark</code>. See <a class="ilink" href={href("/theming")}>Theming and tokens</a>.
+  </p>
+  <Pager />
+</Docs>

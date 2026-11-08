@@ -5,10 +5,13 @@ import { labelStyles } from "./label";
 
 export interface FieldProps extends Omit<ComponentProps<typeof BaseField.Root>, "className" | "children"> {
   className?: string;
+  /** Visible label, linked to the control inside. */
   label: ReactNode;
+  /** Muted help text under the control, linked as its description. */
   description?: ReactNode;
   /** When set the field is invalid and the message is announced. */
   error?: ReactNode;
+  /** Adds an asterisk to the label. Set `required` on the control too for validation. */
   required?: boolean;
   /** One control: Input, Select, Checkbox... Base UI wires id and aria. */
   children: ReactNode;

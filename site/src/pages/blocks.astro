@@ -1,0 +1,46 @@
+---
+import BlockPreview from "../components/BlockPreview";
+import PageHead from "../components/docs/PageHead.astro";
+import { Icon } from "../components/icons";
+import Docs from "../layouts/Docs.astro";
+import { blocks } from "../lib/registry";
+import { blockHeightStyle } from "../lib/block-heights";
+import { addCommands, fence, href, pageMarkdown } from "../lib/site";
+
+const toc = blocks.map((b) => ({ id: `block-${b.name}`, label: b.title }));
+const markdown = pageMarkdown({
+  title: "Blocks",
+  description: "Copyable dashboard patterns built from ikada components, with sample data.",
+  url: href("/blocks"),
+  body: blocks.flatMap((b) => [`## ${b.title}`, b.description, fence(addCommands(b.name).npm, "sh")]),
+});
+---
+
+<Docs title="Blocks" description="Copyable dashboard patterns built from ikada components, with sample data." toc={toc} wide>
+  <PageHead
+    crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Blocks" }]}
+    title="Blocks"
+    lede={`${blocks.length} dashboard patterns from the Sproutboat dashboards, built from ikada components and shipped with realistic sample data. Install one and it is your code: edit it, rename it, feed it your own data through its props.`}
+    markdown={markdown}
+  />
+
+  {blocks.map((b) => (
+    <section class="bframe" id={`block-${b.name}`} aria-labelledby={`bt-${b.name}`}>
+      <div class="bhead">
+        <h2 class="nm" id={`bt-${b.name}`} style="margin:0">
+          <a href={href(`/blocks/${b.name}`)}>{b.title}</a>
+          <small>{b.description}</small>
+        </h2>
+        <div class="acts">
+          <button class="copy" type="button" data-copy={addCommands(b.name).npm} aria-label={`Copy the ${b.title} install command`}>
+            <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" /><span class="lbl" aria-hidden="true">Copy command</span>
+          </button>
+          <a class="copy" href={href(`/blocks/${b.name}`)} aria-label={`${b.title}: docs and code`}><span>Docs</span><Icon name="arrow" /></a>
+        </div>
+      </div>
+      <div class="bview" data-demo>
+        <div class="inner" data-reserve style={blockHeightStyle(b.name)}><BlockPreview client:only="react" slug={b.name} defer /></div>
+      </div>
+    </section>
+  ))}
+</Docs>

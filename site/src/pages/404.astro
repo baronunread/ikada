@@ -1,0 +1,10 @@
+---
+import PageHead from "../components/docs/PageHead.astro";
+import Docs from "../layouts/Docs.astro";
+import { href } from "../lib/site";
+---
+
+<Docs title="Not found">
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Not found" }]} title="Not found" lede="There is no page at this address." />
+  <p>Try the <a class="ilink" href={href("/docs")}>overview</a>, the <a class="ilink" href={href("/docs#components")}>component index</a> or the <a class="ilink" href={href("/blocks")}>blocks</a>, or press ⌘K to search.</p>
+</Docs>

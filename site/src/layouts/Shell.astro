@@ -1,0 +1,189 @@
+---
+/**
+ * Every page's frame: head, the header with the E4 mark, the mobile drawer, the footer, and the one
+ * client script for the chrome (theme, copy, drawer, TOC, segmented radios, search).
+ */
+import "../styles/site.css";
+import "../styles/vt.css";
+import { IkadaMark } from "../components/IkadaMark";
+import { Icon } from "../components/icons";
+import { REPO_URL } from "../lib/registry";
+import { href, sideNav, topNav, VERSION } from "../lib/site";
+// Preloaded so the first paint already has the real fonts: a swap after first paint reflows the headings (layout shift).
+import figtreeUrl from "@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url";
+import monoUrl from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** The homepage: the header sits on the hero field with no strip until scrolled. */
+  home?: boolean;
+}
+const { title, description = "ikada, the Sproutboat design system: React components on Base UI and Tailwind CSS v4.", home = false } = Astro.props;
+const here = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+const isCurrent = (h: string): boolean => here === h.replace(/\/$/, "");
+const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.heading, label: l.label, href: l.href })));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === "ikada" ? "ikada: the Sproutboat design system" : `${title} · ikada`}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="preload" href={figtreeUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
+    <link rel="icon" href={href("/favicon-light-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={href("/favicon-dark-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script is:inline>
+      // Before first paint: the saved choice, else the system's. ikada is dark unless light is stamped.
+      (() => {
+        const saved = localStorage.getItem("ikada-theme");
+        const light = saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)").matches;
+        document.documentElement.dataset.theme = light ? "light" : "dark";
+      })();
+      // The mark's first-paint drop plays once per session (site.css, .ikm).
+      try {
+        if (!sessionStorage.getItem("ikada-mark-intro")) {
+          sessionStorage.setItem("ikada-mark-intro", "1");
+          document.documentElement.dataset.ikmIntro = "";
+        }
+      } catch {}
+    </script>
+    <script is:inline>
+      // Cross-document view transitions with sproutboat.com (same origin): the header pieces carry over by name
+      // (vt.css), <main> is named "page" for the moment. Types match sproutboat.com's: "sb" scopes every rule,
+      // "to-ikada" / "to-sproutboat" give the direction. Navigations inside /ikada stay instant, as before.
+      (() => {
+        const kind = (u) => {
+          try {
+            const x = new URL(u, location.href);
+            if (x.origin !== location.origin) return null;
+            return x.pathname === "/ikada" || x.pathname.startsWith("/ikada/") ? "ikada" : "sb";
+          } catch {
+            return null;
+          }
+        };
+        const name = (on) => {
+          const m = document.querySelector("main");
+          if (m) m.style.viewTransitionName = on ? "page" : "";
+          // a hero scrolled out of view does not take part
+          const h = document.querySelector("[data-hero-media]");
+          if (h && on && h.getBoundingClientRect().bottom < 0) h.style.viewTransitionName = "none";
+          if (h && !on) h.style.viewTransitionName = "";
+        };
+        addEventListener("pageswap", (e) => {
+          if (!e.viewTransition) return;
+          if (kind(e.activation?.entry?.url ?? "") !== "sb") return e.viewTransition.skipTransition();
+          name(true);
+          for (const t of ["sb", "to-sproutboat"]) e.viewTransition.types?.add(t);
+        });
+        addEventListener("pageshow", (e) => {
+          if (e.persisted) name(false);
+        });
+        addEventListener("pagereveal", (e) => {
+          if (!e.viewTransition) return;
+          if (kind(window.navigation?.activation?.from?.url ?? document.referrer) !== "sb") return e.viewTransition.skipTransition();
+          name(true);
+          for (const t of ["sb", "to-ikada"]) e.viewTransition.types?.add(t);
+          e.viewTransition.finished.finally(() => name(false));
+        });
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body class:list={["min-h-dvh bg-canvas font-sans text-base text-fg", { home }]}>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-(--sb-z-toast) focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
+    <header class="nav" data-nav>
+      <a class="brand" href={href("/")} aria-label="ikada home">
+        <span class="mark"><IkadaMark size={24} motion="interactive" /></span><span class="word">ikada</span>
+      </a>
+      <nav class="links" aria-label="Main">
+        {topNav.map((l) => <a href={l.href} aria-current={l.match(here) ? "page" : undefined}>{l.label}</a>)}
+      </nav>
+      <span class="spacer"></span>
+      <button class="search" type="button" data-search aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K">
+        <Icon name="search" /> Search docs <kbd data-kbd>⌘K</kbd>
+      </button>
+      <div class="ctl">
+        <a class="ibtn" href={REPO_URL} aria-label="ikada on GitHub"><Icon name="github" /></a>
+        <button class="ibtn" type="button" data-theme-toggle aria-label="Switch to light theme">
+          <svg class="i theme-sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1" /></svg>
+          <svg class="i theme-moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z" /></svg>
+        </button>
+        <button class="ibtn burger" type="button" data-burger aria-label="Menu" aria-expanded="false" aria-controls="drawer">
+          <Icon name="menu" className="i i-menu" /><Icon name="x" className="i i-x" />
+        </button>
+      </div>
+    </header>
+
+    <div class="drawer" id="drawer" data-drawer>
+      <nav aria-label="Menu">
+        <ul class="top">
+          <li><a href={href("/")} aria-current={isCurrent(href("/")) ? "page" : undefined}>Home</a></li>
+          {topNav.map((l) => <li><a href={l.href} aria-current={l.match(here) ? "page" : undefined}>{l.label}</a></li>)}
+          <li><a href={REPO_URL}>GitHub</a></li>
+        </ul>
+        <div class="groups">
+          {sideNav.map((g) => (
+            <>
+              <h2>{g.heading}</h2>
+              <ul>
+                {g.links.map((l) => <li><a href={l.href} aria-current={isCurrent(l.href) ? "page" : undefined}>{l.label}</a></li>)}
+              </ul>
+            </>
+          ))}
+        </div>
+      </nav>
+    </div>
+
+    <slot />
+
+    <footer class="foot">
+      <div class="inner">
+        <div>
+          <a class="brand" href={href("/")}><IkadaMark size={22} motion="none" /> ikada</a>
+          <p style="margin-top:12px;max-width:34ch">The Sproutboat design system: the components and blocks behind Sproutboat’s dashboards.</p>
+        </div>
+        <div>
+          <h2>Docs</h2>
+          <ul>
+            <li><a href={href("/installation")}>Installation</a></li>
+            <li><a href={href("/theming")}>Theming</a></li>
+            <li><a href={href("/motion")}>Motion</a></li>
+            <li><a href={href("/changelog")}>Changelog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Registry</h2>
+          <ul>
+            <li><a href={href("/docs#components")}>Components</a></li>
+            <li><a href={href("/blocks")}>Blocks</a></li>
+            <li><a href={href("/r/registry.json")}>registry.json</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Sproutboat</h2>
+          <ul>
+            <li><a href="https://sproutboat.com">sproutboat.com</a></li>
+            <li><a href={REPO_URL}>GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fine"><span>MIT licensed. Built on Base UI and Tailwind CSS v4.</span><span>ikada {VERSION} · 筏 is Japanese for raft</span></div>
+    </footer>
+
+    <div class="sr-only" role="status" aria-live="polite" data-announce></div>
+    <script type="application/json" id="search-pages" set:html={JSON.stringify(searchPages)} />
+
+    <script>
+      import { boot } from "../lib/chrome";
+      boot();
+    </script>
+  </body>
+</html>

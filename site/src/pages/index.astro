@@ -1,0 +1,108 @@
+---
+import "../styles/home.css";
+import { buttonStyles } from "../../../src/components/button";
+import HomeShowcase from "../components/HomeShowcase";
+import type { Tile } from "../components/HomeShowcase";
+import Install from "../components/docs/Install.astro";
+import { Icon } from "../components/icons";
+import Shell from "../layouts/Shell.astro";
+import { blocks, components } from "../lib/registry";
+import { addCommands, gzipKb, href, VERSION } from "../lib/site";
+import HeroBlueprint from "../components/HeroBlueprint";
+import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/chart/handoff";
+import { INTRO_SCRIPT } from "../hero/intro";
+
+const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat’s own dashboards are built from the same files.`;
+const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
+const tile = (slug: string, span: Tile["span"]): Tile => ({ slug, title: title(slug), href: href(`/components/${slug}`), span });
+// The home page leads with three blocks; the catalogue (/blocks) shows all of them.
+const highlights = ["metric-row", "logs-panel", "settings-section"].flatMap((n) => blocks.filter((b) => b.name === n));
+const tiles: Tile[] = [
+  tile("button", 4),
+  tile("segmented-control", 4),
+  tile("switch", 4),
+  tile("metric-tile", 5),
+  tile("table", 7),
+  tile("dropdown-menu", 4),
+  tile("dialog", 4),
+  tile("toast", 4),
+  tile("command-palette", 6),
+  tile("tabs", 6),
+];
+---
+
+<Shell title="ikada" description={lede} home>
+  <script is:inline slot="head" set:html={HEAD_SCRIPT} />
+  <script is:inline slot="head" set:html={INTRO_SCRIPT} />
+  <main id="main">
+    <section class="hero-shell" data-hero-shell aria-labelledby="hero-title">
+      <div class="hero-bg" data-hero-media aria-hidden="true">
+        <img class="hero-poster" alt="" decoding="sync" fetchpriority="high" data-chart-poster={href("/hero/chart-raft-{theme}-{size}.webp")} />
+        <script is:inline set:html={POSTER_SCRIPT} />
+        <canvas class="hero-canvas"></canvas>
+      </div>
+      <div class="hero">
+        <a class="pill" href={href("/changelog")} data-hero-mask="pill">
+          <span class="ver">ikada {VERSION}</span><span class="sep" aria-hidden="true"></span><span>MIT</span><span class="sep" aria-hidden="true"></span>
+          <span class="go">Changelog <Icon name="arrow" /></span>
+        </a>
+        <h1 id="hero-title" data-hero-mask="h1">The components behind <em>Sproutboat’s dashboards.</em></h1>
+        <p class="lede" data-hero-mask="lede">{lede}</p>
+        <div class="ctas" data-hero-mask="ctl">
+          <a class={buttonStyles({ variant: "primary", size: "lg" })} href={href("/docs")}>Get started</a>
+          <a class={buttonStyles({ size: "lg" })} href={href("/docs#components")}>Browse components</a>
+        </div>
+      </div>
+      <div class="hero-markers" data-hero-markers></div>
+      <HeroBlueprint client:only="react" />
+    </section>
+
+    <section class="sec" aria-labelledby="live">
+      <div class="sec-head">
+        <div>
+          <h2 id="live">Live components. <em>Press anything.</em></h2>
+          <p>Every tile is the real component from the registry, not a picture. The caption opens its docs.</p>
+        </div>
+        <a class="more" href={href("/docs#components")}>All {components.length} components <Icon name="arrow" /></a>
+      </div>
+      <HomeShowcase client:visible tiles={tiles} />
+    </section>
+
+    <section class="sec" aria-labelledby="blocks">
+      <div class="sec-head">
+        <div>
+          <h2 id="blocks">Whole screens, <em>one command each.</em></h2>
+          <p>Dashboard blocks assembled from the components, with sample data. The CLI writes the files into your app. Three to start with; there are {blocks.length} in all.</p>
+        </div>
+        <a class="more" href={href("/blocks")}>All {blocks.length} blocks <Icon name="arrow" /></a>
+      </div>
+      <ul class="cindex">
+        {highlights.map((b) => (
+          <li>
+            <a href={href(`/blocks/`)}>
+              <span>{b.title}</span>
+              <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href={href("/blocks")}>
+            <span>All {blocks.length} blocks</span>
+            <small><span>the full catalogue</span><span><Icon name="arrow" /></span></small>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="cta" aria-labelledby="cta">
+      <h2 id="cta">Start with one component.</h2>
+      <p>Each component is one file. The CLI writes it into your repo with the tokens it needs, and the source is yours to grow.</p>
+      <Install commands={addCommands("button")} />
+    </section>
+  </main>
+
+  <script>
+    import { bootHero } from "../hero/home";
+    bootHero();
+  </script>
+</Shell>

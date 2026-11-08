@@ -1,0 +1,24 @@
+---
+/** The install command with npm / pnpm / bun / yarn tabs and a copy button. */
+import { Icon } from "../icons";
+import { PMS } from "../../lib/site";
+import type { Pm } from "../../lib/site";
+
+interface Props {
+  commands: Record<Pm, string>;
+  label?: string;
+}
+const { commands, label = "Package manager" } = Astro.props;
+---
+
+<div class="install" data-install={JSON.stringify(commands)}>
+  <div class="bar">
+    <div class="seg" role="radiogroup" aria-label={label} data-seg>
+      {PMS.map((pm, i) => <button class="seg-btn" type="button" role="radio" aria-checked={i === 0 ? "true" : "false"} data-value={pm}>{pm}</button>)}
+    </div>
+    <button class="copy" type="button" data-copy={commands.npm} aria-label="Copy command">
+      <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" /><span class="lbl" aria-hidden="true">Copy</span>
+    </button>
+  </div>
+  <code class="line" data-line tabindex="0">{commands.npm}</code>
+</div>

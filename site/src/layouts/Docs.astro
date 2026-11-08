@@ -1,0 +1,64 @@
+---
+/**
+ * The docs chrome (Waterline): sidebar, the page in the prose column, "On this page" on the right.
+ * Pages pass their TOC; `wide` gives blocks the room a dashboard needs.
+ */
+import Shell from "./Shell.astro";
+import { sideNav } from "../lib/site";
+import type { TocEntry } from "../lib/site";
+
+interface Props {
+  title: string;
+  description?: string;
+  toc?: TocEntry[];
+  wide?: boolean;
+}
+const { title, description, toc = [], wide = false } = Astro.props;
+const here = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+---
+
+<Shell title={title} description={description}>
+  <Fragment slot="head"><slot name="head" /></Fragment>
+  <div class:list={["docs", { wide }]}>
+    <aside class="side" aria-label="Docs">
+      <nav aria-label="Docs">
+        {sideNav.map((g) => (
+          <>
+            <h2>{g.heading}</h2>
+            <ul>
+              {g.links.map((l) => (
+                <li>
+                  <a href={l.href} aria-current={here === l.href ? "page" : undefined}>
+                    {l.label}
+                    {l.badge ? <span class="chip-s">{l.badge}</span> : null}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
+      </nav>
+    </aside>
+
+    <main id="main" class="prose">
+      <slot />
+    </main>
+
+    {
+      toc.length ? (
+        <aside class="toc" aria-labelledby="toc-h">
+          <h2 id="toc-h">On this page</h2>
+          <nav aria-labelledby="toc-h">
+            {toc.map((t) => (
+              <a href={`#${t.id}`} class:list={{ sub: t.sub }}>
+                {t.label}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      ) : (
+        <span aria-hidden="true" />
+      )
+    }
+  </div>
+</Shell>

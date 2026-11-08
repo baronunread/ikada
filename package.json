@@ -17,6 +17,9 @@
     "type": "git",
     "url": "git+https://github.com/baronunread/ikada.git"
   },
+  "workspaces": [
+    "site"
+  ],
   "files": [
     "src",
     "DESIGN.md",
@@ -47,7 +50,10 @@
     "typecheck": "tsc --noEmit",
     "fmt": "oxfmt .",
     "fmt:check": "oxfmt --check .",
-    "check": "bun run tokens:check && bun run typecheck && bun run test"
+    "check": "bun run tokens:check && bun run typecheck && bun run test",
+    "registry": "bun scripts/build-registry.ts",
+    "site": "bun run --cwd site dev",
+    "site:build": "bun run --cwd site build"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

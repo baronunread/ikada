@@ -5,7 +5,9 @@ import { ChevronLeftIcon, ChevronRightIcon } from "../lib/icons";
 export interface PaginationProps extends Omit<ComponentProps<"nav">, "onChange"> {
   /** Current page, starting at 1. */
   page: number;
+  /** Total number of pages. */
   pageCount: number;
+  /** Called with the page to go to. */
   onPageChange: (page: number) => void;
   /** Previous and next plus "Page 3 of 12", no number buttons. Use it on narrow screens. */
   compact?: boolean;

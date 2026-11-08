@@ -1,0 +1,76 @@
+---
+import MotionDemos from "../components/MotionDemos";
+import PageHead from "../components/docs/PageHead.astro";
+import Pager from "../components/docs/Pager.astro";
+import Docs from "../layouts/Docs.astro";
+import { motion } from "../../../src/tokens.generated";
+import { href, pageMarkdown } from "../lib/site";
+
+const lede = "Afloat is ikada’s motion: the raft takes your weight. A press settles, the release springs back once, and nothing else bounces.";
+const rules = [
+  ["Press and release", `A press settles the control 1px down and to scale 0.97 in ${motion.duration.press}ms ease-out and presses the shadow in; letting go returns it on the bob spring.`],
+  ["Nothing else bounces", `Hover is colour plus a lift in the cast shadow (${motion.duration.hover}ms). Menus and table rows do not animate their highlight. Exits are short and plain: popups and toasts ${motion.duration["popup-out"]}ms, dialogs ${motion.duration["dialog-out"]}ms, all ease-out.`],
+  ["Controls", "The switch thumb squishes toward its travel while pressed and slides on snappy. A checkbox bobs once as it fills. The segmented control and tabs share one raised pebble on a recessed tray."],
+  ["Success sprouts", "StatusGlyph sprout grows the success shape up from its base and sends one ring out, once. Only success and creation sprout."],
+  ["Keyboard opens do not animate", "A menu, select, popover or dialog opened with a key press skips the transition; ⌘K palettes do not animate at all."],
+  ["Reduced motion substitutes, never removes", `Every scale becomes 1 and every offset 0, every spring collapses to a ${motion.reducedSpring.duration}ms ease-out, and opacity and colour fades stay. data-motion="reduce" on <html> does the same from an app setting.`],
+] as const;
+const toc = [
+  { id: "demos", label: "Try it" },
+  { id: "rules", label: "Rules" },
+  { id: "springs", label: "Springs" },
+  { id: "durations", label: "Durations" },
+];
+const markdown = pageMarkdown({
+  title: "Motion: Afloat",
+  description: lede,
+  url: href("/motion"),
+  body: [
+    "## Rules",
+    ...rules.map(([t, d]) => `- **${t}.** ${d}`),
+    "## Springs",
+    ...Object.entries(motion.spring).map(([n, s]) => `- --sb-spring-${n}: ${s.seconds}s, bounce ${s.bounce}. ${s.use}`),
+    "## Durations",
+    ...Object.entries(motion.duration).map(([n, d]) => `- --sb-duration-${n}: ${d}ms`),
+  ],
+});
+---
+
+<Docs title="Motion" description={lede} toc={toc}>
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Motion" }]} title="Motion" lede={lede} markdown={markdown} />
+
+  <h2 id="demos">Try it</h2>
+  <p>Live ikada components. Press and hold, then let go. With reduced motion on, the same controls fade instead of moving.</p>
+  <MotionDemos client:visible />
+
+  <h2 id="rules">Rules</h2>
+  <ul class="list">
+    {rules.map(([t, d]) => <li><strong style="color:var(--sb-fg);font-weight:600">{t}.</strong> {d}</li>)}
+  </ul>
+
+  <h2 id="springs">Springs</h2>
+  <p>Each spring is a duration and a bounce, sampled to a CSS <code>linear()</code> curve at build time, so it runs on the compositor and an interrupted spring needs no JavaScript.</p>
+  <div class="props-wrap">
+    <table class="props">
+      <thead><tr><th scope="col">Token</th><th scope="col">Spring</th><th scope="col">Used for</th></tr></thead>
+      <tbody>
+        {Object.entries(motion.spring).map(([n, s]) => (
+          <tr><td>--sb-spring-{n}</td><td><code style="white-space:nowrap">{s.seconds}s, bounce {s.bounce}</code></td><td>{s.use}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="durations">Durations</h2>
+  <div class="props-wrap">
+    <table class="props">
+      <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Reduced motion</th></tr></thead>
+      <tbody>
+        {Object.entries(motion.duration).map(([n, d]) => (
+          <tr><td>--sb-duration-{n}</td><td><code>{d}ms</code></td><td>Unchanged: fades stay</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <Pager />
+</Docs>

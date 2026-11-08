@@ -1,0 +1,433 @@
+/* The homepage: the headline over the nautical chart (src/hero/chart, the raft camera): the copy on the calm sea at
+   the top left, the raft moored by Sprout Harbour at the lower right; then the live components (Waterline's bento)
+   and the blocks. */
+/* Declared first: this file can load before site.css, and the first mention fixes the layer order. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* at scroll 0 the header sits on the scene with no strip; the shader protects the band under it */
+  .home .nav:not([data-scrolled]):not([data-open]) {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hero-shell {
+    --hero-pad: clamp(20px, 5vw, 72px);
+    position: relative;
+    isolation: isolate;
+    margin-top: calc(-1 * var(--nav-h));
+    padding-top: var(--nav-h);
+    /* the chart's box runs from the top of the page (under the transparent header) to the end of the hero; its
+       size is what a hand-off compares, so sproutboat.com uses exactly this rule: 100svh, clamped */
+    min-height: clamp(640px, 100svh, 1080px);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+    view-transition-name: chart-hero;
+    background: var(--sb-canvas);
+  }
+  /* the intro was seen this session (head script, hero/intro.ts): the first paint is the sheet's paper, not the chart */
+  html[data-intro="seen"] .hero-bg {
+    background: oklch(0.255 0.07 252);
+  }
+  html[data-intro="seen"][data-theme="light"] .hero-bg {
+    background: oklch(0.972 0.012 92);
+  }
+  html[data-intro="seen"] .hero-poster,
+  html[data-intro="seen"] .hero-canvas {
+    visibility: hidden;
+  }
+  .hero-poster,
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hero-poster {
+    object-fit: cover;
+  }
+  .hero-poster:not([src]) {
+    visibility: hidden;
+  }
+  /* a fresh load: the live frame fades in over the poster (the same state, so the same picture); after an exact
+     hand-off it is the identical picture, so it simply replaces it */
+  .hero-canvas {
+    opacity: 0;
+    transition: opacity 500ms var(--ease-out);
+  }
+  .hero-canvas.on {
+    opacity: 1;
+  }
+  .chart-exact .hero-canvas,
+  [data-backend="static"] .hero-canvas {
+    transition: none;
+  }
+  [data-backend="static"] .hero-canvas {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-canvas {
+      transition-duration: 160ms;
+    }
+  }
+  /* the marker buttons (the chart module fills it): same box as the chart, over the text, clicks only on the markers */
+  .hero-markers {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* the copy sits on the calm sea at the top left; the chart takes every press that is not on a link */
+  .hero {
+    position: relative;
+    z-index: 3;
+    padding: clamp(96px, 15vh, 150px) var(--hero-pad) 112px;
+    text-align: left;
+    pointer-events: none;
+  }
+  .hero a,
+  .hero code {
+    pointer-events: auto;
+  }
+  .hero .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 30px;
+    padding: 0 12px 0 14px;
+    margin-bottom: 28px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--sb-surface) 94%, transparent);
+    box-shadow: var(--sb-shadow-pill);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--sb-fg-muted);
+    white-space: nowrap;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+      box-shadow 160ms ease,
+      outline-color 120ms ease;
+  }
+  .hero .pill:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+  .hero .pill .ver {
+    color: var(--sb-fg);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero .pill .sep {
+    width: 1px;
+    height: 12px;
+    background: var(--sb-hairline-strong);
+  }
+  .hero .pill .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--sb-fg);
+  }
+  .hero .pill .go .i {
+    width: 14px;
+    height: 14px;
+    transition: translate 160ms var(--ease-out);
+  }
+  .hero h1 {
+    font-size: clamp(40px, 4.4vw, 64px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0;
+    max-width: 10.4em;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    display: inline;
+    font-style: normal;
+    color: var(--sb-fg-muted);
+  }
+  .hero .lede {
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--sb-fg-muted);
+    max-width: 46ch;
+    margin: 24px 0 0;
+    text-wrap: pretty;
+  }
+  .hero .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 32px 0 0;
+  }
+  .hero .ctas a {
+    min-width: 168px;
+  }
+  .hero .install {
+    max-width: 600px;
+    margin: 20px 0 0;
+    text-align: start;
+  }
+
+  /* hero entrance: the statement leads, the rest follows on shrinking beats; opacity only under reduce */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-motion="reduce"]):not([data-intro="seen"]) .hero > * {
+      animation: hero-in 600ms var(--ease-out) backwards;
+      animation-delay: calc(var(--beat, 0) * 1ms);
+    }
+  }
+  .hero > :nth-child(2) {
+    --beat: 40;
+  }
+  .hero > :nth-child(3) {
+    --beat: 100;
+  }
+  .hero > :nth-child(4) {
+    --beat: 150;
+  }
+  .hero > :nth-child(5) {
+    --beat: 190;
+  }
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+
+  /* sections */
+  .sec {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
+  }
+  .sec + .sec {
+    padding-top: 96px;
+  }
+  .sec-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .sec-head h2 {
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.05;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+  .sec-head h2 em {
+    font-style: normal;
+    color: var(--sb-fg-muted);
+  }
+  .sec-head p {
+    color: var(--sb-fg-muted);
+    margin-top: 10px;
+    max-width: 52ch;
+    font-size: 16px;
+  }
+  .sec-head .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 550;
+    color: var(--sb-fg-muted);
+    white-space: nowrap;
+    padding: 4px 2px;
+    border-radius: 6px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .sec-head .more:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+
+  /* live components: still surfaces, the caption is the link */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tile {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 18px 18px 8px;
+    border-radius: 16px;
+    background: var(--sb-surface);
+    box-shadow: var(--sb-shadow-card);
+  }
+  .tile[data-span="5"] {
+    grid-column: span 5;
+  }
+  .tile[data-span="6"] {
+    grid-column: span 6;
+  }
+  .tile[data-span="7"] {
+    grid-column: span 7;
+  }
+  .tile[data-span="8"] {
+    grid-column: span 8;
+  }
+  .tile[data-span="12"] {
+    grid-column: span 12;
+  }
+  .tile .t-body {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 160px;
+    min-width: 0;
+    padding: 12px 0;
+    overflow-x: auto;
+  }
+  .tile .t-cap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 36px;
+    margin: 8px -8px 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--sb-fg-muted);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+      background-color 120ms ease,
+      outline-color 120ms ease;
+  }
+  .tile .t-cap:focus-visible {
+    outline-color: var(--sb-focus);
+  }
+  .tile .t-cap b {
+    font-weight: 600;
+    color: var(--sb-fg);
+  }
+  .tile .t-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cta {
+    margin: 112px auto 0;
+    padding: 72px 32px 80px;
+    border-top: 1px solid var(--sb-hairline);
+    text-align: center;
+  }
+  .cta h2 {
+    font-size: clamp(28px, 3.4vw, 44px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .cta p {
+    color: var(--sb-fg-muted);
+    margin: 12px auto 24px;
+    max-width: 46ch;
+  }
+  .cta .install {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: start;
+  }
+
+  @media (hover: hover) {
+    .hero .pill:hover {
+      box-shadow: var(--sb-shadow-button-hover), var(--sb-shadow-pill);
+    }
+    .hero .pill:hover .go .i {
+      translate: calc(2px * var(--sb-move)) 0;
+    }
+    .sec-head .more:hover,
+    .tile .t-cap:hover {
+      color: var(--sb-fg);
+    }
+    .tile .t-cap:hover {
+      background: var(--sb-hover);
+    }
+  }
+  @media (forced-colors: active) {
+    .tile,
+    .hero .pill {
+      border: 1px solid ButtonBorder;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .tile,
+    .tile[data-span] {
+      grid-column: span 6;
+    }
+  }
+  @media (max-width: 860px) {
+    .hero {
+      padding: 28px var(--hero-pad) 72px;
+    }
+    .hero .pill {
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 8.4vw, 40px);
+      max-width: none;
+    }
+    .hero h1 em {
+      display: inline;
+    }
+    .hero .lede {
+      font-size: 15px;
+      margin-top: 16px;
+    }
+    .hero .pill {
+      font-size: 12px;
+      gap: 8px;
+    }
+    .hero .ctas {
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .hero .ctas a {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 48px;
+    }
+    .sec {
+      padding: 16px 16px 0;
+    }
+    .sec + .sec {
+      padding-top: 64px;
+    }
+    .sec-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .tile,
+    .tile[data-span] {
+      grid-column: span 12;
+    }
+    .cta {
+      margin-top: 64px;
+      padding: 48px 16px;
+    }
+  }
+}

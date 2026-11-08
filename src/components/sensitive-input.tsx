@@ -14,7 +14,9 @@ export interface SensitiveInputProps extends Omit<InputProps, "type"> {
   defaultRevealed?: boolean;
   /** Accessible names of the two buttons. */
   revealLabel?: string;
+  /** Accessible name of the hide button. Default "Hide value". */
   hideLabel?: string;
+  /** Accessible name of the copy button. Default "Copy value". */
   copyLabel?: string;
   /** Extra buttons or text after the built-in ones. */
   trailing?: ReactNode;

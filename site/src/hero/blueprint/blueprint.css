@@ -1,0 +1,602 @@
+/* ---------------------------------------------------------------------------------------------
+   Concept A: blueprint of the raft. The sheet is a drafting paper revealed by a circle that opens
+   from the raft marker; its ink is drawn stroke by stroke (dash-offset), then the labels arrive.
+--------------------------------------------------------------------------------------------- */
+.bp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --out: cubic-bezier(0.23, 1, 0.32, 1);
+  --paper: oklch(0.255 0.07 252);
+  --paper-edge: oklch(0.2 0.06 255);
+  --grid1: oklch(0.72 0.1 240 / 0.075);
+  --grid2: oklch(0.8 0.09 240 / 0.15);
+  --inkc: oklch(0.93 0.035 235);
+  --inkd: oklch(0.78 0.07 240);
+  --inkf: oklch(0.78 0.07 240 / 0.7);
+  --accc: oklch(0.86 0.17 152);
+  --accf: oklch(0.86 0.17 152 / 0.9);
+  --pf: var(--paper);
+  --ring: oklch(0.85 0.09 225 / 0.6);
+}
+html[data-theme="light"] .bp {
+  --paper: oklch(0.972 0.012 92);
+  --paper-edge: oklch(0.93 0.02 92);
+  --grid1: oklch(0.62 0.09 240 / 0.1);
+  --grid2: oklch(0.55 0.1 240 / 0.2);
+  --inkc: oklch(0.3 0.08 255);
+  --inkd: oklch(0.45 0.08 250);
+  --inkf: oklch(0.45 0.08 250 / 0.75);
+  --accc: oklch(0.5 0.15 152);
+  --accf: oklch(0.5 0.15 152 / 0.9);
+  --ring: oklch(0.4 0.08 240 / 0.5);
+}
+
+.art-a {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.paper {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid2) 1px, transparent 1px), linear-gradient(90deg, var(--grid2) 1px, transparent 1px),
+    linear-gradient(var(--grid1) 1px, transparent 1px), linear-gradient(90deg, var(--grid1) 1px, transparent 1px),
+    radial-gradient(120% 90% at 62% 55%, transparent 55%, var(--paper-edge) 100%);
+  background-size:
+    var(--gs) var(--gs),
+    var(--gs) var(--gs),
+    calc(var(--gs) / 4) calc(var(--gs) / 4),
+    calc(var(--gs) / 4) calc(var(--gs) / 4),
+    100% 100%;
+  background-position:
+    11px 7px,
+    11px 7px,
+    11px 7px,
+    11px 7px,
+    0 0;
+  clip-path: circle(0px at var(--rx) var(--ry));
+  transition: clip-path 640ms var(--ease) 120ms;
+}
+.bp[data-open] .paper {
+  clip-path: circle(2200px at var(--rx) var(--ry));
+  transition: clip-path 980ms var(--ease) 500ms;
+  pointer-events: auto;
+}
+/* a scrim so the veil of the paper reads as a lens opening on the chart */
+.sheet {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: visible;
+}
+.sheet .ring {
+  fill: none;
+  stroke: var(--ring);
+  stroke-width: 1;
+  r: 0px;
+  opacity: 0;
+  transition:
+    r 640ms var(--ease) 120ms,
+    opacity 200ms linear 120ms;
+}
+.bp[data-open] .sheet .ring {
+  r: 1500px;
+  opacity: 0;
+  animation: ring-fade 980ms linear 500ms both;
+  transition: r 980ms var(--ease) 500ms;
+}
+@keyframes ring-fade {
+  0% {
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ink */
+.sheet .ln {
+  fill: none;
+  stroke: var(--inkc);
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sheet .ln.fine {
+  stroke: var(--inkf);
+  stroke-width: 0.8;
+}
+.sheet .ln.center {
+  stroke: var(--inkf);
+  stroke-width: 0.75;
+  stroke-dasharray: none;
+}
+.sheet .ln.dash {
+  stroke: var(--inkf);
+  stroke-width: 0.8;
+}
+.sheet .ln.acc {
+  stroke: var(--accc);
+  stroke-width: 1.5;
+}
+.sheet .ln.accfine {
+  stroke: var(--accc);
+  stroke-width: 0.9;
+}
+/* line draw: every stroke is normalised to length 1 (pathLength) and un-dashed over its delay */
+.sheet .draw {
+  stroke-dasharray: 1 1.1;
+  stroke-dashoffset: 1.05;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 340ms cubic-bezier(0.5, 0, 0.75, 0) var(--dr, 0ms),
+    opacity 0s linear calc(var(--dr, 0ms) + 340ms);
+}
+.sheet .ln.center.draw,
+.sheet .ln.dash.draw {
+  stroke-dasharray: none;
+}
+.bp[data-open] .sheet .draw {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 640ms var(--out) var(--dl, 0ms),
+    opacity 0s linear var(--dl, 0ms);
+}
+/* centre lines and connectors reveal by opacity (a dash pattern is their look) */
+.sheet .ln.center {
+  stroke-dasharray: 10 3 2 3;
+}
+.sheet .ln.dash {
+  stroke-dasharray: 3 4;
+}
+.sheet .ln.center.draw,
+.sheet .ln.dash.draw {
+  stroke-dashoffset: 0;
+  transition: opacity 360ms ease var(--dr, 0ms);
+}
+.bp[data-open] .sheet .ln.center.draw,
+.bp[data-open] .sheet .ln.dash.draw {
+  transition: opacity 500ms ease var(--dl, 0ms);
+}
+
+.sheet .pf {
+  fill: var(--paper);
+  stroke: none;
+  opacity: 0;
+  transition: opacity 120ms linear;
+}
+.bp[data-open] .sheet .pf {
+  opacity: 1;
+  transition: opacity 360ms ease var(--dl, 0ms);
+}
+.sheet .part[data-on] .pf {
+  fill: color-mix(in oklch, var(--paper), var(--accc) 9%);
+}
+.sheet .arr {
+  fill: var(--inkc);
+  opacity: 0;
+  transition: opacity 120ms linear;
+}
+.bp[data-open] .sheet .arr {
+  opacity: 1;
+  transition: opacity 300ms ease var(--dl, 0ms);
+}
+.sheet .dot,
+.sheet .bal {
+  opacity: 0;
+  transition: opacity 120ms linear;
+}
+.sheet .dot {
+  fill: var(--inkc);
+}
+.sheet .bal {
+  fill: var(--paper);
+  stroke: var(--inkc);
+  stroke-width: 1.2;
+}
+.bp[data-open] .sheet .dot,
+.bp[data-open] .sheet .bal {
+  opacity: 1;
+  transition: opacity 300ms ease var(--dl, 0ms);
+}
+
+/* text */
+.sheet .tx {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  fill: var(--inkd);
+  opacity: 0;
+  transition: opacity 120ms linear;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  user-select: none;
+}
+.bp[data-open] .sheet .tx {
+  opacity: 1;
+  transition: opacity 420ms ease var(--dl, 0ms);
+}
+.sheet .tx.zn {
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  stroke: none;
+  fill: var(--inkd);
+}
+.sheet .tx.dimtx {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  fill: var(--inkc);
+}
+.sheet .tx.cap {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+}
+.sheet .tx.balt {
+  font-size: 9.5px;
+  fill: var(--inkc);
+  stroke: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.sheet .tx.name {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  fill: var(--inkc);
+  font-weight: 600;
+}
+.sheet .tx.note {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 0;
+  fill: var(--inkd);
+}
+.sheet .tx.hint {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  letter-spacing: 0;
+  fill: var(--inkd);
+}
+.sheet .tx.tb-main {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  fill: var(--inkc);
+}
+.sheet .tx.tb-k {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+}
+.sheet .tx.tb-serif {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  letter-spacing: 0;
+  fill: var(--inkc);
+}
+.sheet .tx.tb-v {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+/* interaction */
+.sheet .part,
+.sheet .lab {
+  pointer-events: none;
+  outline: none;
+}
+.bp[data-open] .sheet .part,
+.bp[data-open] .sheet .lab {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.sheet .hit {
+  fill: transparent;
+  stroke: none;
+}
+.sheet .part,
+.sheet .lead,
+.sheet .lab {
+  transition: opacity 120ms ease;
+}
+.sheet[data-active] .part:not([data-on]),
+.sheet[data-active] .lead:not([data-on]),
+.sheet[data-active] .lab:not([data-on]) {
+  opacity: 0.32;
+}
+.sheet .part[data-on] .ln:not(.acc):not(.accfine) {
+  stroke: var(--accc);
+}
+.sheet .lab[data-on] .bal {
+  fill: var(--accc);
+  stroke: var(--accc);
+}
+.sheet .lab[data-on] .tx.balt {
+  fill: var(--paper);
+}
+.sheet .lab[data-on] .tx.name {
+  fill: var(--accc);
+}
+.sheet .lead[data-on] .ln,
+.sheet .lead[data-on] .dot {
+  stroke: var(--accc);
+  fill: var(--accc);
+}
+.sheet .part:focus-visible .ln,
+.sheet .lab:focus-visible .bal {
+  stroke: var(--accc);
+}
+.sheet .part:focus-visible,
+.sheet .lab:focus-visible {
+  outline: none;
+}
+
+/* callout: the real component, in place */
+.callout {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 8;
+  background: var(--sb-raised);
+  color: var(--sb-fg);
+  border-radius: 14px;
+  box-shadow: var(--sb-shadow-float);
+  overflow: hidden;
+  transform-origin: 100% 40%;
+  /* one callout for the whole sheet: it enters when the first part is hovered, glides between parts (transform, 180 ms,
+     interruptible), and leaves when the last is let go */
+  opacity: 0;
+  scale: 0.97;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease-out,
+    scale 140ms ease-out,
+    transform 180ms var(--out);
+}
+.callout[data-on] {
+  opacity: 1;
+  scale: 1;
+  pointer-events: auto;
+}
+.co-stack {
+  display: grid;
+}
+.co-layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.co-layer.in {
+  animation: co-fade-in 120ms ease-out both;
+}
+.co-layer.out {
+  animation: co-fade-out 120ms ease-out both;
+  pointer-events: none;
+}
+@keyframes co-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes co-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.co-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px 10px 14px;
+  border-bottom: 1px solid var(--sb-hairline);
+}
+.co-n {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-brand);
+  color: var(--sb-on-brand);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.co-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.co-pkg {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--sb-fg-muted);
+}
+.co-x {
+  all: unset;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--sb-fg-muted);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+.co-x:hover {
+  background: var(--sb-hover);
+  color: var(--sb-fg);
+}
+.co-x:focus-visible {
+  outline: 2px solid var(--sb-focus);
+}
+.co-body {
+  padding: 18px 16px;
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+}
+.co-foot {
+  padding: 9px 14px 11px;
+  background: var(--sb-code-bg);
+  border-top: 1px solid var(--sb-hairline);
+}
+.co-foot code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--sb-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* the order of the swap: forward and back */
+/* the chart's own raft marker, drawn on the paper at the same place and size, then let go as the sheet inks in */
+.sheet .ghost {
+  opacity: 0;
+  pointer-events: none;
+}
+.sheet .ghost .g-ring {
+  fill: none;
+  stroke: var(--inkc);
+  stroke-width: 0.9;
+  stroke-dasharray: 1.2 4.4;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+.sheet .ghost .g-log {
+  fill: var(--paper);
+  stroke: var(--inkc);
+  stroke-width: 0.9;
+}
+.sheet .ghost .g-lash {
+  fill: none;
+  stroke: var(--inkf);
+  stroke-width: 0.7;
+}
+.sheet .ghost .g-sp {
+  fill: none;
+  stroke: var(--accc);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.sheet .ghost .g-leaf {
+  fill: var(--accf);
+  stroke: var(--accc);
+  stroke-width: 0.6;
+}
+.bp[data-open] .sheet .ghost {
+  animation: ghost-in 1000ms linear 460ms both;
+}
+@keyframes ghost-in {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* keyboard: the numbered labels are the tab stops; a focus ring that reads on paper */
+.sheet .lab:focus-visible > rect {
+  stroke: var(--accc);
+  stroke-width: 1.5;
+  rx: 8px;
+  stroke-dasharray: 4 3;
+}
+.sheet .lab:focus-visible .bal {
+  stroke: var(--accc);
+  stroke-width: 2;
+}
+.callout:focus-visible {
+  outline: 2px solid var(--accc, var(--sb-focus));
+  outline-offset: 2px;
+}
+.sheet .tx.dimtx,
+.sheet .tx.name {
+  font-variant-numeric: tabular-nums;
+}
+
+/* reduced motion: every change is a cut */
+.bp[data-reduced] *,
+.bp[data-reduced] *::before {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp *,
+  .bp *::before {
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+    animation: none !important;
+  }
+}
+/* the chart's markers and the press-and-hold are off while the sheet covers the chart */
+.bp[data-open] ~ .hero-markers {
+  pointer-events: none;
+}
+
+/* a real outline too (SVG draws it around the label's box): the focus ring a keyboard user looks for */
+.sheet .lab:focus-visible {
+  outline: 2px solid var(--accc);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.co-skel {
+  width: 100%;
+  min-height: 56px;
+}
+
+/* seen this session: the settled sheet, with a short fade instead of the reveal */
+.bp[data-settled] .art-a {
+  animation: bp-settle 200ms ease-out both;
+}
+.bp[data-settled] .sheet .ghost {
+  animation: none;
+  opacity: 0;
+}
+@keyframes bp-settle {
+  from {
+    opacity: 0;
+  }
+}
+
+/* the leader is part of its part's hover zone: a wide invisible stroke along it, so the pointer can travel from a part to
+   its label without leaving the zone */
+.sheet .leadhit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.bp[data-open] .sheet .leadhit {
+  pointer-events: stroke;
+}
