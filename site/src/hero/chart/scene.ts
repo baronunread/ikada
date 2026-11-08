@@ -21,7 +21,9 @@ import {
   mkRoute,
   S,
   sstep,
+  prepareWorld,
   world,
+  yieldToMain,
   WH,
   WW,
   type Route,
@@ -373,7 +375,8 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   if (!g) return staticHandle(opts);
   await loadFonts();
   injectStyle();
-  const wd = world();
+  // the map is made in slices, with the page painting between them (a long task here is the first seconds of the hero)
+  const wd = await prepareWorld();
   const words: Words = { ...WORDS, ...opts.words };
   const host = opts.host ?? canvas.parentElement!;
   const maxDpr = opts.maxDpr ?? (matchMedia("(pointer: coarse)").matches ? 1.5 : 2);
@@ -598,7 +601,8 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   let camMoving = false;
 
   // ----- the tint raster (world space, 0.5 px per unit) -----
-  function ensureTint(): void {
+  // built in slices (a generator): prepareTint yields to the page between them, ensureTint runs it to the end
+  function* tintSteps(): Generator<void> {
     if (tintC && tintFor === st.theme) return;
     const x0 = -150;
     const y0 = -150;
@@ -610,7 +614,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const img = new ImageData(tw, th);
     const d = img.data;
     const P = pal;
-    for (let j = 0; j < th; j++)
+    for (let j = 0; j < th; j++) {
       for (let i = 0; i < tw; i++) {
         const e = S(x0 + i * 2, y0 + j * 2);
         const k = (j * tw + i) * 4;
@@ -634,8 +638,25 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
         d[k + 2] = b;
         d[k + 3] = 255;
       }
+      if ((j & 15) === 15) yield;
+    }
     c.getContext("2d")!.putImageData(img, 0, 0);
     tintFor = st.theme;
+  }
+  function ensureTint(): void {
+    const g2 = tintSteps();
+    while (!g2.next().done);
+  }
+  async function prepareTint(): Promise<void> {
+    const g2 = tintSteps();
+    let t = performance.now();
+    for (;;) {
+      if (g2.next().done) return;
+      if (performance.now() - t > 6) {
+        await yieldToMain();
+        t = performance.now();
+      }
+    }
   }
   function ensureTextures(): void {
     if (!grain) {
@@ -1369,6 +1390,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     // mooring ring
     g!.lineWidth = 0.9;
     g!.lineCap = "round";
+    g!.lineDashOffset = 0; // the dash phase is canvas state: a frame must not inherit the last frame's
     g!.setLineDash([1.2, 4.4]);
     g!.strokeStyle = `rgba(${pal.ink},${0.55 + 0.35 * hv})`;
     g!.beginPath();
@@ -1651,6 +1673,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       polyPath(c, s.route, 0, s.route.len * p);
       c.stroke();
       c.setLineDash([]);
+      c.lineDashOffset = 0;
     }
     // vessels being launched along their routes
     for (let i = st.launches.length - 1; i >= 0; i--) {
@@ -2285,7 +2308,8 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const camNow = `${st.cam.cx.toFixed(3)}|${st.cam.cy.toFixed(3)}|${st.cam.lz.toFixed(5)}`;
     const m = maskNow();
     const L = layout(m);
-    frameLogic(st.t, L, m);
+    // the idle demo only moves with the clock: a re-render at dt = 0 (a snapshot) must not add a label the state lacks
+    if (dt > 0) frameLogic(st.t, L, m);
     const key = `${camNow}|${W}|${H}|${dpr}|${st.theme}|${L.compass.y.toFixed(1)}|${m.copy ? m.copy.y1.toFixed(0) : 0}|${camMoving ? "c" : "f"}|${nameStyle}|${furn.toFixed(2)}|${veil}`;
     if (key !== baseKey) {
       drawBase(L, camMoving);
@@ -2385,6 +2409,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   if (st.cam.to !== opts.camera) st.cam.to = opts.camera;
   if (opts.state && opts.state.theme !== opts.theme) st.theme = opts.theme;
   pal = palette(st.theme);
+  await prepareTint();
   settleLocals();
   buildMarkers();
   renderFrame(0);

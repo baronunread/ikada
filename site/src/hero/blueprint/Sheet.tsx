@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { raftMarkerScale, raftScreenPx } from "../chart/cameras";
 import { buildIso, makeIso, poly, R, type Kind, type PartGeo, type Seg, type V } from "./iso";
-import { Live, META, type PartId } from "./live";
+import { META, type PartId } from "./meta";
+
+// the live components (Dialog, Select, Tabs ...) are a separate chunk: the sheet draws without them
+const Live = lazy(() => import("./live").then((m) => ({ default: m.Live })));
 
 /** one path per stroke kind: a few long pens instead of hundreds of short ones (the dash-draw repaints per element) */
 const mergeSegs = (segs: Seg[]): Seg[] => {
@@ -750,7 +753,9 @@ function Callout({
         </button>
       </div>
       <div className="co-body">
-        <Live id={id} />
+        <Suspense fallback={<div className="co-skel" aria-busy="true" />}>
+          <Live id={id} />
+        </Suspense>
       </div>
       <div className="co-foot">
         <code>{meta.snippet}</code>

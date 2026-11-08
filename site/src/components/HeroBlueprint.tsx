@@ -19,6 +19,7 @@ declare global {
 export default function HeroBlueprint() {
   const root = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number; copyBottom: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [reduced, setReduced] = useState(false);
 
@@ -58,7 +59,9 @@ export default function HeroBlueprint() {
     const go = (): void => {
       if (done) return;
       done = true;
-      requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)));
+      // draw the closed sheet first (one frame), then open it: the page is never asked for both at once
+      setMounted(true);
+      requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true))));
     };
     if (window.__heroReady) go();
     window.addEventListener("hero:ready", go, { once: true });
@@ -82,11 +85,23 @@ export default function HeroBlueprint() {
     window.dispatchEvent(new CustomEvent("hero:sheet", { detail: open }));
   }, [open]);
 
+  // the live components are a lazy chunk: fetch it in idle time once the sheet is up
+  useEffect(() => {
+    if (!open) return undefined;
+    const idle = (window as unknown as { requestIdleCallback?: (f: () => void, o?: object) => number })
+      .requestIdleCallback;
+    const t = idle
+      ? idle(() => void import("../hero/blueprint/live"), { timeout: 3000 })
+      : window.setTimeout(() => void import("../hero/blueprint/live"), 1500);
+    return () =>
+      idle ? (window as unknown as { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(t) : clearTimeout(t);
+  }, [open]);
+
   return (
     <div ref={root} className="bp" data-open={open || undefined} data-reduced={reduced || undefined} data-chart-ignore>
       <ToastProvider>
         <TooltipProvider>
-          {size && <Sheet w={size.w} h={size.h} armed={open} copyBottom={size.copyBottom} />}
+          {size && mounted && <Sheet w={size.w} h={size.h} armed={open} copyBottom={size.copyBottom} />}
         </TooltipProvider>
       </ToastProvider>
     </div>

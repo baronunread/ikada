@@ -130,12 +130,23 @@ export const GRID = { x0: -150, y0: -150, cs: 3, gw: 0, gh: 0 };
 GRID.gw = Math.ceil((WW + 300) / GRID.cs) + 2;
 GRID.gh = Math.ceil((WH + 300) / GRID.cs) + 2;
 let sField: Float32Array | null = null;
+// The field and the world are built by generators that yield between slices, so a page can build them without one long
+// task (prepareWorld, below); world() and S() drive the same code to the end when nothing has prepared them.
+function* fieldSteps(): Generator<void, Float32Array> {
+  const d = new Float32Array(GRID.gw * GRID.gh);
+  for (let j = 0; j < GRID.gh; j++) {
+    for (let i = 0; i < GRID.gw; i++) d[j * GRID.gw + i] = exact(GRID.x0 + i * GRID.cs, GRID.y0 + j * GRID.cs);
+    if ((j & 7) === 7) yield;
+  }
+  return (sField = d);
+}
 function field(): Float32Array {
   if (sField) return sField;
-  const d = new Float32Array(GRID.gw * GRID.gh);
-  for (let j = 0; j < GRID.gh; j++)
-    for (let i = 0; i < GRID.gw; i++) d[j * GRID.gw + i] = exact(GRID.x0 + i * GRID.cs, GRID.y0 + j * GRID.cs);
-  return (sField = d);
+  const g = fieldSteps();
+  for (;;) {
+    const r = g.next();
+    if (r.done) return r.value;
+  }
 }
 /** depth field at a world point (bilinear from the grid) */
 export function S(x: number, y: number): number {
@@ -386,9 +397,8 @@ export interface World {
 }
 
 let cached: World | null = null;
-export function world(): World {
-  if (cached) return cached;
-  const f = field();
+function* worldSteps(): Generator<void, World> {
+  const f = sField ?? (yield* fieldSteps());
   // harbour: the first water on the ray from the land's centre outward
   const out = DIR;
   let hp: V2 = BAY;
@@ -448,6 +458,7 @@ export function world(): World {
     ships.push({ i, x, y, hd: rnd() * Math.PI * 2, n: nm.n, host: nm.host, off: r.off });
   };
   for (let a = 0; a < 9000 && ships.length < 24; a++) {
+    if (a % 300 === 299) yield;
     const x = MARGIN + 34 + rnd() * (WW - 2 * MARGIN - 68);
     const y = MARGIN + 34 + rnd() * (WH - 2 * MARGIN - 68);
     if (exact(x, y) > -0.17 || inQuiet(x, y, 14)) continue;
@@ -459,6 +470,7 @@ export function world(): World {
   }
   const mainCount = ships.length;
   for (let a = 0; a < 4000 && ships.length < mainCount + 10; a++) {
+    if (a % 300 === 299) yield;
     const ang = Math.atan2(out[1], out[0]) + (rnd() - 0.5) * 2.3;
     const d = 95 + rnd() * 210;
     const x = harbour.x + Math.cos(ang) * d;
@@ -512,9 +524,11 @@ export function world(): World {
     const p = new Path2D();
     march(f, GRID.gw, GRID.gh, GRID.cs, L, p, GRID.x0, GRID.y0);
     land.push(p);
+    yield;
   }
   const hachure = new Path2D();
   march(f, GRID.gw, GRID.gh, GRID.cs, 0.035, hachure, GRID.x0, GRID.y0);
+  yield;
   const coast = new Path2D();
   march(f, GRID.gw, GRID.gh, GRID.cs, 0, coast, GRID.x0, GRID.y0);
 
@@ -538,3 +552,42 @@ export function world(): World {
   };
   return cached;
 }
+
+/** the world, built to the end in one go (the first call pays for it) */
+export function world(): World {
+  if (cached) return cached;
+  const g = worldSteps();
+  for (;;) {
+    const r = g.next();
+    if (r.done) return r.value;
+  }
+}
+
+let yielding: Promise<World> | null = null;
+const yieldToMain = (): Promise<void> => {
+  const sch = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (sch?.yield) return sch.yield();
+  return new Promise((r) => {
+    const ch = new MessageChannel();
+    ch.port1.onmessage = () => r();
+    ch.port2.postMessage(0);
+  });
+};
+/** Build the world in slices of about `budget` ms with a yield to the main thread between them (a page keeps painting
+ *  and answering input while the map is made). Resolves with the world; a concurrent call shares the work. */
+export function prepareWorld(budget = 6): Promise<World> {
+  if (cached) return Promise.resolve(cached);
+  return (yielding ??= (async () => {
+    const g = worldSteps();
+    let t = performance.now();
+    for (;;) {
+      const r = g.next();
+      if (r.done) return r.value;
+      if (performance.now() - t > budget) {
+        await yieldToMain();
+        t = performance.now();
+      }
+    }
+  })());
+}
+export { yieldToMain };

@@ -669,6 +669,12 @@ if (what === "reveal") {
     await ctx.addInitScript(() => {
       const w2 = window as any;
       w2.__f = [];
+      w2.__lt = [];
+      try {
+        new PerformanceObserver((l) => {
+          for (const e of l.getEntries()) w2.__lt.push([e.startTime, e.duration]);
+        }).observe({ type: "longtask", buffered: true });
+      } catch {}
       let last = performance.now();
       const tick = (t: number) => {
         w2.__f.push([t, t - last]);
@@ -682,6 +688,10 @@ if (what === "reveal") {
     await p.goto(URL0);
     await sleep(6500);
     const f = (await p.evaluate(() => (window as any).__f)) as [number, number][];
+    const lt = (await p.evaluate(() => (window as any).__lt)) as [number, number][];
+    log(
+      `reveal ${name} · long tasks (>50 ms) in the first 6 s: ${lt.length}, longest ${Math.max(0, ...lt.map((x) => x[1])).toFixed(0)} ms, total ${lt.reduce((a, x) => a + x[1], 0).toFixed(0)} ms; the ones after 2 s: ${lt.filter((x) => x[0] > 2000).length}`,
+    );
     const seg = (a: number, z: number) => f.filter(([t]) => t >= a && t < z).map(([, d]) => d);
     for (const [label, a, z] of [
       ["0-2 s (load, chart, paper opens)", 0, 2000],

@@ -534,3 +534,8 @@ html[data-theme="light"] .bp {
   outline-offset: 3px;
   border-radius: 8px;
 }
+
+.co-skel {
+  width: 100%;
+  min-height: 56px;
+}
