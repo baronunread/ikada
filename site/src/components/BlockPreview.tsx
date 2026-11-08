@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
-import { ToastProvider } from "../../../src/components/toast";
+import { ToastProvider, toast } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import { demo } from "../lib/demo-href";
 import { IkadaMark } from "./IkadaMark";
@@ -22,8 +22,18 @@ const pascal = (slug: string): string =>
  * its neutral defaults (in-app fragments); only the preview here is retargeted.
  */
 const siteProps: Record<string, Record<string, unknown>> = {
-  "project-tray": { projectHref: () => demo.projects, sproutHref: () => demo.projects },
+  "project-tray": {
+    projectHref: () => demo.projects,
+    sproutHref: () => demo.projects,
+    // the sample has no app behind it: say what the button does in a real one
+    onNewSprout: () =>
+      toast.add({ title: "New project", description: "In your app this opens the create dialog.", duration: 3200 }),
+  },
   "usage-line": { href: demo.usage },
+  "empty-states": {
+    onCreate: () =>
+      toast.add({ title: "New project", description: "In your app this opens the create dialog.", duration: 3200 }),
+  },
 };
 
 const cache = new Map<string, ComponentType>();

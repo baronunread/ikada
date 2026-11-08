@@ -140,12 +140,14 @@ export function LoadFailed({
 
 export interface EmptyStatesProps {
   className?: string;
+  /** What "New project" does in the first-run state. */
+  onCreate?: () => void;
 }
 
 // All four as a gallery: keep the one your view needs and delete the rest.
-export function EmptyStates({ className }: EmptyStatesProps) {
+export function EmptyStates({ className, onCreate }: EmptyStatesProps) {
   const items = [
-    { id: "first", title: "First run", body: <NoProjectsYet /> },
+    { id: "first", title: "First run", body: <NoProjectsYet onCreate={onCreate} /> },
     { id: "filter", title: "No results", body: <NoResults /> },
     { id: "deploy", title: "Nothing deployed", body: <NothingDeployed /> },
     { id: "error", title: "Load failed", body: <LoadFailed /> },

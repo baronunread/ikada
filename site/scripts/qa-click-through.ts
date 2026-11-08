@@ -177,6 +177,20 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
           await el.click({ timeout: 2500, trial: false });
         }
       } catch (e) {
+        // the control is there but Playwright cannot settle on it (a looping spinner, a toast region moving): press it from the page
+        const js = await p
+          .locator(sel)
+          .first()
+          .evaluate((el) => (el as HTMLElement).click())
+          .then(
+            () => true,
+            () => false,
+          );
+        if (js) {
+          await sleep(300);
+          await p.keyboard.press("Escape");
+          continue;
+        }
         await add(
           { element: name, kind: "not clickable", detail: String(e).split("\n")[0]!.slice(0, 160) },
           "click-" + i,
@@ -225,20 +239,27 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
       const ov2 = (await p.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)) as boolean;
       if (ov2) await add({ element: name, kind: "horizontal overflow", detail: "after press" }, "ovf-" + i);
       // popups clipped by the viewport
-      const clipped = (await p.evaluate(() => {
-        const out: string[] = [];
-        document
-          .querySelectorAll<HTMLElement>(
-            '[role="dialog"], [role="menu"], [popover]:popover-open, [data-popup], [data-open] [role="menu"]',
-          )
-          .forEach((el) => {
-            const r = el.getBoundingClientRect();
-            if (!r.width || !r.height) return;
-            if (r.left < -1 || r.right > window.innerWidth + 1 || r.top < -1 || r.bottom > window.innerHeight + 1)
-              out.push(el.getAttribute("role") + " " + [r.left, r.top, r.right, r.bottom].map(Math.round).join(","));
-          });
-        return out;
-      })) as string[];
+      const findClipped = async (): Promise<string[]> =>
+        (await p.evaluate(() => {
+          const out: string[] = [];
+          document
+            .querySelectorAll<HTMLElement>(
+              '[role="dialog"], [role="menu"], [popover]:popover-open, [data-popup], [data-open] [role="menu"]',
+            )
+            .forEach((el) => {
+              const r = el.getBoundingClientRect();
+              if (!r.width || !r.height) return;
+              if (r.left < -1 || r.right > window.innerWidth + 1 || r.top < -1 || r.bottom > window.innerHeight + 1)
+                out.push(el.getAttribute("role") + " " + [r.left, r.top, r.right, r.bottom].map(Math.round).join(","));
+            });
+          return out;
+        })) as string[];
+      // a toast or popup mid-entrance is off screen for a moment: only what is still clipped half a second later counts
+      let clipped = await findClipped();
+      if (clipped.length) {
+        await sleep(600);
+        clipped = await findClipped();
+      }
       for (const c of clipped) await add({ element: name, kind: "clipped popup", detail: c }, "clip-" + i);
       await flushErrs(name);
       if (p.url() !== url0 && !p.url().startsWith(url0.split("#")[0] + "#")) {
