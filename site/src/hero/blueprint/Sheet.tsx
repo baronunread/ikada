@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import { raftMarkerScale, raftScreenPx } from "../chart/cameras";
 import { buildIso, makeIso, poly, R, type Kind, type PartGeo, type Seg, type V } from "./iso";
 import { META, type PartId } from "./meta";
@@ -217,34 +217,94 @@ export function Sheet({
   const [active, setActive] = useState<PartId | null>(null);
   const [pinned, setPinned] = useState(false);
   const closeT = useRef<number>(0);
-  const openT = useRef<number>(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const calloutEl = useRef<HTMLDivElement>(null);
   const lastLab = useRef<PartId | null>(null);
   const kbd = useRef(false);
+  /** after Escape the pointer may be resting on a label: it must move before that opens anything again */
+  const supp = useRef<{ x: number; y: number } | null>(null);
+  const pt = useRef<{ x: number; y: number; px: number; py: number }>({ x: 0, y: 0, px: 0, py: 0 });
 
-  const open = (id: PartId, pin = false): void => {
-    clearTimeout(closeT.current);
-    clearTimeout(openT.current);
-    if (pin) {
-      setActive(id);
-      setPinned((p) => (active === id ? !p : true));
-      return;
-    }
-    if (pinned) return;
-    openT.current = window.setTimeout(() => setActive(id), active ? 0 : 90);
+  // A part, its leader, its label and the callout are one hover zone (data-pid). Moving between zones switches at once:
+  // there is no delay to open, no null state in between, and a short grace to cross a gap or travel to the callout.
+  const cancelClose = (): void => clearTimeout(closeT.current);
+  const hover = (id: PartId): void => {
+    cancelClose();
+    if (pinned || supp.current) return;
+    setActive(id);
   };
-  const leave = (): void => {
-    clearTimeout(openT.current);
+  /** the pointer is heading for the callout: give it longer to arrive (a safe-triangle check, by direction) */
+  const heading = (): boolean => {
+    const c = calloutEl.current?.getBoundingClientRect();
+    const { x, y, px, py } = pt.current;
+    if (!c || (x === px && y === py)) return false;
+    return (x - px) * ((c.left + c.right) / 2 - x) + (y - py) * ((c.top + c.bottom) / 2 - y) > 0;
+  };
+  /** the pointer is still over the drawing (its parts and labels, with some air): crossing the paper between two parts */
+  const inDrawing = (): boolean => {
+    const root = rootRef.current;
+    if (!root) return false;
+    let x0 = 1e9;
+    let y0 = 1e9;
+    let x1 = -1e9;
+    let y1 = -1e9;
+    root.querySelectorAll(".part .hit, .lab rect").forEach((n) => {
+      const r = n.getBoundingClientRect();
+      x0 = Math.min(x0, r.left);
+      y0 = Math.min(y0, r.top);
+      x1 = Math.max(x1, r.right);
+      y1 = Math.max(y1, r.bottom);
+    });
+    const { x, y } = pt.current;
+    return x > x0 - 28 && x < x1 + 28 && y > y0 - 28 && y < y1 + 28;
+  };
+  const graceClose = (): void => {
     if (pinned) return;
-    clearTimeout(closeT.current);
-    closeT.current = window.setTimeout(() => setActive(null), 260);
+    cancelClose();
+    // 120 ms on leaving the drawing; longer while crossing it between parts or heading for the callout
+    const ms = heading() ? 360 : inDrawing() ? 420 : 120;
+    closeT.current = window.setTimeout(() => setActive(null), ms);
+  };
+  const open = (id: PartId, pin = false): void => {
+    cancelClose();
+    setActive(id);
+    if (pin) setPinned((p) => (active === id ? !p : true));
   };
   const close = (): void => {
-    clearTimeout(closeT.current);
-    clearTimeout(openT.current);
+    cancelClose();
     setActive(null);
     setPinned(false);
   };
+  const pidOf = (t: EventTarget | null): PartId | null =>
+    ((t as Element | null)?.closest?.("[data-pid]")?.getAttribute("data-pid") as PartId | null) ?? null;
+
+  // one callout, mounted while any part is active: it glides between parts and crossfades its content; it enters only
+  // when opening from nothing and leaves only when closing to nothing
+  const [co, setCo] = useState<{ id: PartId | null; prev: PartId | null; mounted: boolean; on: boolean }>({
+    id: null,
+    prev: null,
+    mounted: false,
+    on: false,
+  });
+  const coT = useRef<number[]>([]);
+  useEffect(() => {
+    coT.current.forEach((t) => clearTimeout(t));
+    coT.current = [];
+    if (active) {
+      setCo((c) => ({
+        id: active,
+        prev: c.mounted && c.id && c.id !== active ? c.id : null,
+        mounted: true,
+        on: c.mounted,
+      }));
+      const r = requestAnimationFrame(() => requestAnimationFrame(() => setCo((c) => (c.on ? c : { ...c, on: true }))));
+      coT.current.push(window.setTimeout(() => setCo((c) => ({ ...c, prev: null })), 140));
+      return () => cancelAnimationFrame(r);
+    }
+    setCo((c) => ({ ...c, on: false }));
+    coT.current.push(window.setTimeout(() => setCo({ id: null, prev: null, mounted: false, on: false }), 190));
+    return undefined;
+  }, [active]);
   useEffect(() => {
     if (!armed) close();
   }, [armed]);
@@ -262,6 +322,7 @@ export function Sheet({
       if (document.querySelector('[role="dialog"]:not(.callout), [role="listbox"], [role="menu"]')) return;
       const inside = !!document.activeElement?.closest(".callout");
       const id = lastLab.current;
+      supp.current = { x: pt.current.x, y: pt.current.y };
       close();
       if (inside && id)
         requestAnimationFrame(() =>
@@ -444,7 +505,23 @@ export function Sheet({
   const activeLabel = active ? labelOf(active) : null;
 
   return (
-    <div ref={rootRef} className="art-a" data-active={active ?? undefined}>
+    <div
+      ref={rootRef}
+      className="art-a"
+      data-active={active ?? undefined}
+      onPointerOver={(e) => {
+        if (e.pointerType === "touch") return;
+        const id = pidOf(e.target);
+        if (id) hover(id);
+        else graceClose();
+      }}
+      onPointerMove={(e) => {
+        const p = pt.current;
+        pt.current = { px: p.x, py: p.y, x: e.clientX, y: e.clientY };
+        if (supp.current && Math.hypot(e.clientX - supp.current.x, e.clientY - supp.current.y) > 4) supp.current = null;
+      }}
+      onPointerLeave={graceClose}
+    >
       <div
         className="paper"
         style={sv({ "--rx": `${raftP.x}px`, "--ry": `${raftP.y}px`, "--gs": mobile ? "72px" : "96px" })}
@@ -512,12 +589,9 @@ export function Sheet({
                 className="part"
                 data-id={id}
                 data-on={active === id || undefined}
+                data-pid={id}
                 tabIndex={-1}
                 aria-hidden="true"
-                onPointerEnter={() => open(id)}
-                onPointerLeave={leave}
-                onFocus={() => open(id, false)}
-                onBlur={leave}
                 onClick={() => open(id, true)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
@@ -546,6 +620,7 @@ export function Sheet({
             return (
               <g key={lb.id} className="lead" data-id={lb.id} data-on={active === lb.id || undefined}>
                 <Ln d={d} k="fine" dl={B0 + 1000 + i * 55} />
+                <path d={d} className="leadhit" data-pid={lb.id} />
                 <circle
                   cx={lb.anchor[0]}
                   cy={lb.anchor[1]}
@@ -568,10 +643,11 @@ export function Sheet({
                 tabIndex={armed ? 0 : -1}
                 role="button"
                 aria-label={`${lb.n} ${meta.comp}`}
-                onPointerEnter={() => open(lb.id)}
-                onPointerLeave={leave}
-                onFocus={() => open(lb.id)}
-                onBlur={leave}
+                data-pid={lb.id}
+                onFocus={() => hover(lb.id)}
+                onBlur={(e) => {
+                  if (!(e.relatedTarget as Element | null)?.closest?.(".callout, .lab")) graceClose();
+                }}
                 onClick={(e) => {
                   lastLab.current = lb.id;
                   kbd.current = e.detail === 0;
@@ -588,9 +664,9 @@ export function Sheet({
               >
                 <rect
                   x={lb.x - 14}
-                  y={lb.y - (mobile ? 16 : 20)}
+                  y={lb.y - (mobile ? 21 : 26)}
                   width={mobile ? 118 : 262}
-                  height={mobile ? 32 : 40}
+                  height={mobile ? 42 : 52}
                   fill="transparent"
                 />
                 <circle
@@ -684,18 +760,16 @@ export function Sheet({
         )}
       </svg>
 
-      {active && (
+      {co.mounted && co.id && (
         <Callout
-          key={active}
-          id={active}
+          elRef={calloutEl}
+          id={co.id}
+          prev={co.prev}
+          on={co.on}
           autoFocus={kbd.current && pinned}
-          label={activeLabel!}
+          label={labelOf(co.id)}
           L={L}
           pinned={pinned}
-          onEnter={() => {
-            clearTimeout(closeT.current);
-          }}
-          onLeave={leave}
           onClose={close}
         />
       )}
@@ -704,61 +778,91 @@ export function Sheet({
 }
 
 function Callout({
+  elRef,
   id,
+  prev,
+  on,
   label,
   L,
   pinned,
   autoFocus,
-  onEnter,
-  onLeave,
   onClose,
 }: {
+  elRef: RefObject<HTMLDivElement | null>;
   id: PartId;
+  prev: PartId | null;
+  on: boolean;
   label: Label;
   L: Layout;
   pinned: boolean;
   autoFocus: boolean;
-  onEnter(): void;
-  onLeave(): void;
   onClose(): void;
 }): ReactNode {
-  const ref = useRef<HTMLDivElement>(null);
+  const [hgt, setHgt] = useState(0);
+  useLayoutEffect(() => {
+    const el = elRef.current;
+    if (!el) return undefined;
+    const ro = new ResizeObserver(() => setHgt(el.offsetHeight));
+    ro.observe(el);
+    setHgt(el.offsetHeight);
+    return () => ro.disconnect();
+  }, [elRef]);
   useEffect(() => {
-    if (autoFocus) ref.current?.focus();
-  }, [autoFocus]);
+    if (autoFocus) elRef.current?.focus();
+  }, [autoFocus, elRef]);
   const meta = META[id];
   const w = L.mobile ? L.W - 2 * (L.m + 8) : 304;
   const low = label.y > L.H * 0.56;
-  const style: CSSProperties = L.mobile
-    ? { left: L.m + 8, width: w, ...(low ? { top: 64 } : { bottom: L.m + 8 }) }
-    : { width: w, left: L.W - L.m - 14 - w, top: Math.max(80, Math.min(label.y - 52, L.title.y - 214)) };
+  const x = L.mobile ? L.m + 8 : L.W - L.m - 14 - w;
+  const y = L.mobile ? (low ? 64 : L.H - L.m - 8 - hgt) : Math.max(80, Math.min(label.y - 52, L.title.y - 214));
+  const style: CSSProperties = { width: w, transform: `translate3d(${x}px, ${y}px, 0)` };
+  const inner = (pid: PartId, lab: Label, live: boolean): ReactNode => (
+    <>
+      <div className="co-head">
+        <span className="co-n">{lab.n}</span>
+        <span className="co-name">{META[pid].comp}</span>
+        <span className="co-pkg">@sproutboat/ikada</span>
+        {live && (
+          <button className="co-x" type="button" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        )}
+      </div>
+      <div className="co-body">
+        {live ? (
+          <Suspense fallback={<div className="co-skel" aria-busy="true" />}>
+            <Live id={pid} />
+          </Suspense>
+        ) : (
+          <div className="co-skel" />
+        )}
+      </div>
+      <div className="co-foot">
+        <code>{META[pid].snippet}</code>
+      </div>
+    </>
+  );
   return (
     <div
-      ref={ref}
+      ref={elRef}
       tabIndex={-1}
       className="callout"
       style={style}
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
+      data-pid={id}
+      data-on={on || undefined}
       role="dialog"
       aria-label={`${meta.comp}, live`}
       data-pinned={pinned || undefined}
     >
-      <div className="co-head">
-        <span className="co-n">{label.n}</span>
-        <span className="co-name">{meta.comp}</span>
-        <span className="co-pkg">@sproutboat/ikada</span>
-        <button className="co-x" type="button" onClick={onClose} aria-label="Close">
-          ×
-        </button>
-      </div>
-      <div className="co-body">
-        <Suspense fallback={<div className="co-skel" aria-busy="true" />}>
-          <Live id={id} />
-        </Suspense>
-      </div>
-      <div className="co-foot">
-        <code>{meta.snippet}</code>
+      <div className="co-stack">
+        {prev && (
+          <div key={"out-" + prev} className="co-layer out" aria-hidden="true">
+            {inner(prev, L.labels.find((l) => l.id === prev) ?? label, false)}
+          </div>
+        )}
+        <div key={id} className="co-layer in">
+          {inner(id, label, true)}
+        </div>
       </div>
     </div>
   );

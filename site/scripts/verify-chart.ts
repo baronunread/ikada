@@ -809,4 +809,201 @@ if (on("intro") || what === "intro") {
   }
 }
 
+// ------------------------------------------------------------------------------------------------ hover
+/** a pointer sweep over every part and label of the blueprint: no flicker, one callout that never remounts (desktop, with a video), taps on 390 */
+if (on("hover") || what === "hover") {
+  const result = (name: string, ok: boolean, detail: string) =>
+    log(`hover ${ok ? "PASS" : "FAIL"} · ${name} · ${detail}`);
+  const watch = (p: Page) =>
+    p.evaluate(() => {
+      const w = window as any;
+      w.__h = {
+        seq: [] as (string | null)[],
+        nulls: 0,
+        remounts: 0,
+        mounts: 0,
+        el: null as Element | null,
+        t0: performance.now(),
+      };
+      const sheet = document.querySelector(".sheet")!;
+      const root = document.querySelector(".art-a")!;
+      addEventListener(
+        "pointermove",
+        (e) => ((w.__x = (e as PointerEvent).clientX), (w.__y = (e as PointerEvent).clientY)),
+        true,
+      );
+      const read = (): void => {
+        const a = sheet.getAttribute("data-active");
+        const h = w.__h;
+        if (h.seq[h.seq.length - 1] !== a) {
+          h.seq.push(a);
+          if (a === null && h.seq.length > 1) {
+            h.nulls++;
+            (h.at ??= []).push([
+              h.seq[h.seq.length - 2],
+              Math.round(w.__x ?? 0),
+              Math.round(w.__y ?? 0),
+              Math.round(performance.now() - h.t0),
+            ]);
+          }
+        }
+        const c = document.querySelector(".callout");
+        if (c && c !== h.el) {
+          if (h.el && document.contains(h.el)) h.remounts++;
+          else if (h.el) h.mounts++;
+          else h.mounts++;
+          h.el = c;
+        } else if (!c && h.el && !document.contains(h.el)) h.el = null;
+      };
+      new MutationObserver(read).observe(root, {
+        attributes: true,
+        attributeFilter: ["data-active"],
+        childList: true,
+        subtree: true,
+      });
+      read();
+    });
+  const read = (p: Page) =>
+    p.evaluate(() => {
+      const h = (window as any).__h;
+      return {
+        at: h.at as unknown[],
+        seq: h.seq as (string | null)[],
+        nulls: h.nulls as number,
+        remounts: h.remounts as number,
+        mounts: h.mounts as number,
+      };
+    });
+  // ---- desktop, with a video
+  {
+    const dir = join(OUT, "hover-tmp");
+    rmSync(dir, { recursive: true, force: true });
+    const { ctx, p, errors } = await open(1440, "dark", { url: URL0, video: dir });
+    await sleep(4500);
+    await watch(p);
+    const labs = (await p.evaluate(() =>
+      [...document.querySelectorAll<SVGGElement>(".sheet .lab")].map((l) => {
+        const r = l.querySelector("circle")!.getBoundingClientRect();
+        return { id: l.dataset.id!, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }),
+    )) as { id: string; x: number; y: number }[];
+    const parts = (await p.evaluate(() =>
+      [...document.querySelectorAll<SVGGElement>(".sheet .part")].map((g) => {
+        const r = g.querySelector(".hit")!.getBoundingClientRect();
+        return { id: g.dataset.id!, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }),
+    )) as { id: string; x: number; y: number }[];
+    await p.mouse.move(700, 120);
+    // first hover opens at once
+    const t = Date.now();
+    await p.mouse.move(labs[0]!.x + 40, labs[0]!.y, { steps: 6 });
+    await sleep(48);
+    const early = (await p.evaluate(
+      () => !!document.querySelector(".callout[data-on]") || !!document.querySelector(".callout"),
+    )) as boolean;
+    result(
+      "first hover mounts the callout at once (no open delay)",
+      early,
+      `callout present 48 ms after the pointer stopped on the first label (the whole move took ${Date.now() - t - 48} ms)`,
+    );
+    for (const l of labs.slice(1)) await p.mouse.move(l.x + 40, l.y, { steps: 14 });
+    for (const q of parts) await p.mouse.move(q.x, q.y, { steps: 16 });
+    for (const l of labs.slice().reverse()) await p.mouse.move(l.x + 40, l.y, { steps: 14 });
+    // across a part, its leader and its label in one stroke (the neighbours' gaps in between)
+    // (along the leader, as a hand would: part, the dot, the elbow, the label)
+    const leaders = (await p.evaluate(() =>
+      [...document.querySelectorAll<SVGGElement>(".sheet .lead")].map((g) => {
+        const m = (g.querySelector("path")!.getAttribute("d") ?? "").match(/-?[\d.]+/g)!.map(Number);
+        return {
+          id: g.dataset.id!,
+          pts: [
+            [m[0]!, m[1]!],
+            [m[2]!, m[3]!],
+            [m[4]!, m[5]!],
+          ],
+        };
+      }),
+    )) as { id: string; pts: number[][] }[];
+    for (const l of labs) {
+      const q = parts.find((x) => x.id === l.id)!;
+      const ld = leaders.find((x) => x.id === l.id)!;
+      await p.mouse.move(q.x, q.y, { steps: 6 });
+      for (const pt2 of ld.pts) await p.mouse.move(pt2[0]!, pt2[1]!, { steps: 10 });
+      await p.mouse.move(l.x, l.y, { steps: 4 });
+    }
+    // into the callout and out again
+    const co = (await p.evaluate(() => {
+      const r = document.querySelector(".callout")!.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })) as { x: number; y: number };
+    await p.mouse.move(co.x, co.y, { steps: 20 });
+    await sleep(500);
+    const stay = (await p.evaluate(() => (document.querySelector(".sheet") as Element).getAttribute("data-active"))) as
+      | string
+      | null;
+    await p.mouse.move(600, 150, { steps: 10 });
+    await sleep(700);
+    const r = await read(p);
+    const ids = new Set(labs.map((l) => l.id));
+    const switches = r.seq.filter((x) => x !== null).length;
+    if (r.nulls > 1) log(`hover nulls at (previous id, x, y, ms): ${JSON.stringify(r.at)}`);
+    result(
+      "sweep: no null state between parts and labels",
+      r.nulls <= 1,
+      `${switches} active-state changes, ${r.nulls} null states (only the final close counts), sequence length ${r.seq.length}`,
+    );
+    result(
+      "sweep: the callout never remounts",
+      r.remounts === 0 && r.mounts === 1,
+      `mounted once, ${r.remounts} remounts`,
+    );
+    result(
+      "the callout holds while the pointer is in it, closes after leaving",
+      stay !== null && r.seq[r.seq.length - 1] === null,
+      `active while inside: ${stay}, last state ${r.seq[r.seq.length - 1]}`,
+    );
+    void ids;
+    result("console", errors.length === 0, errors.length ? errors.join(" | ") : "no errors");
+    await ctx.close();
+    const f = readdirSync(dir).find((x) => x.endsWith(".webm"));
+    if (f) renameSync(join(dir, f), join(OUT, `${PREFIX}-hover-sweep.webm`));
+    rmSync(dir, { recursive: true, force: true });
+    log(`hover video ${join(OUT, `${PREFIX}-hover-sweep.webm`)}`);
+  }
+  // ---- 390, touch
+  {
+    const { ctx, p, errors } = await open(390, "light", { url: URL0 });
+    await sleep(4500);
+    await watch(p);
+    const labs = (await p.evaluate(() =>
+      [...document.querySelectorAll<SVGGElement>(".sheet .lab")].map((l) => {
+        const r = l.querySelector("circle")!.getBoundingClientRect();
+        return { id: l.dataset.id!, x: r.left + r.width / 2 + 30, y: r.top + r.height / 2 };
+      }),
+    )) as { id: string; x: number; y: number }[];
+    for (const l of labs) {
+      await p.touchscreen.tap(l.x, l.y);
+      await sleep(260);
+    }
+    for (const l of labs.slice().reverse()) {
+      await p.touchscreen.tap(l.x, l.y);
+      await sleep(260);
+    }
+    const r = await read(p);
+    const last = r.seq[r.seq.length - 1];
+    result(
+      "390 touch: taps switch parts, the callout never remounts",
+      r.remounts === 0 && r.mounts === 1 && last !== null && r.nulls === 0,
+      `${r.seq.filter((x) => x !== null).length} active-state changes, ${r.nulls} nulls, ${r.remounts} remounts, last ${last}`,
+    );
+    await p.screenshot({ path: join(OUT, `${PREFIX}-390-light-hover-touch.png`) });
+    await p.keyboard.press("Escape");
+    await sleep(400);
+    const closed = (await p.evaluate(() => !document.querySelector(".callout"))) as boolean;
+    result("390: Escape closes it", closed, "");
+    result("390 console", errors.length === 0, errors.length ? errors.join(" | ") : "no errors");
+    await ctx.close();
+  }
+}
+
 await b.close();

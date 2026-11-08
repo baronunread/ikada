@@ -311,7 +311,7 @@ html[data-theme="light"] .bp {
 .sheet .part,
 .sheet .lead,
 .sheet .lab {
-  transition: opacity 220ms ease;
+  transition: opacity 120ms ease;
 }
 .sheet[data-active] .part:not([data-on]),
 .sheet[data-active] .lead:not([data-on]),
@@ -348,22 +348,55 @@ html[data-theme="light"] .bp {
 /* callout: the real component, in place */
 .callout {
   position: absolute;
+  left: 0;
+  top: 0;
   z-index: 8;
-  pointer-events: auto;
   background: var(--sb-raised);
   color: var(--sb-fg);
   border-radius: 14px;
   box-shadow: var(--sb-shadow-float);
-  animation: co-in 220ms var(--out) both;
-  transform-origin: 100% 40%;
   overflow: hidden;
+  transform-origin: 100% 40%;
+  /* one callout for the whole sheet: it enters when the first part is hovered, glides between parts (transform, 180 ms,
+     interruptible), and leaves when the last is let go */
+  opacity: 0;
+  scale: 0.97;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease-out,
+    scale 140ms ease-out,
+    transform 180ms var(--out);
 }
-@keyframes co-in {
+.callout[data-on] {
+  opacity: 1;
+  scale: 1;
+  pointer-events: auto;
+}
+.co-stack {
+  display: grid;
+}
+.co-layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.co-layer.in {
+  animation: co-fade-in 120ms ease-out both;
+}
+.co-layer.out {
+  animation: co-fade-out 120ms ease-out both;
+  pointer-events: none;
+}
+@keyframes co-fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.97);
   }
 }
+@keyframes co-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
 .co-head {
   display: flex;
   align-items: center;
@@ -552,4 +585,18 @@ html[data-theme="light"] .bp {
   from {
     opacity: 0;
   }
+}
+
+/* the leader is part of its part's hover zone: a wide invisible stroke along it, so the pointer can travel from a part to
+   its label without leaving the zone */
+.sheet .leadhit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.bp[data-open] .sheet .leadhit {
+  pointer-events: stroke;
 }
