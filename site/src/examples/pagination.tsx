@@ -55,4 +55,8 @@ export const playground: Playground = {
 };
 
 /** The compact render on the overview's component tile. */
-export const preview: Preview = () => <Pagination compact page={3} pageCount={12} onPageChange={() => {}} />;
+function PagesPreview() {
+  const [page, setPage] = useState(3);
+  return <Pagination compact page={page} pageCount={12} onPageChange={setPage} />;
+}
+export const preview: Preview = () => <PagesPreview />;

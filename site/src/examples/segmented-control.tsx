@@ -43,9 +43,14 @@ const [value, setValue] = useState("24h");
   },
 ];
 
-/** The compact render on the overview's component tile. */
-export const preview: Preview = () => (
-  <div className="w-56">
-    <SegmentedControl aria-label="Range" options={ranges} value="24h" onValueChange={() => {}} />
-  </div>
-);
+function RangePreview() {
+  const [value, setValue] = useState<string>("24h");
+  return (
+    <div className="w-56">
+      <SegmentedControl aria-label="Range" options={ranges} value={value} onValueChange={setValue} />
+    </div>
+  );
+}
+
+/** The compact render on the overview's component tile (live: it keeps its own state). */
+export const preview: Preview = () => <RangePreview />;

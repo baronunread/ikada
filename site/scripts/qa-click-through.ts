@@ -154,6 +154,14 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
       stats.interactions++;
       const before = await cls();
       const url0 = p.url();
+      // did the press change anything at all? (the segmented control tile once clicked "successfully" and did nothing)
+      await p.evaluate(() => {
+        const w2 = window as any;
+        w2.__mo?.disconnect();
+        w2.__mut = 0;
+        w2.__mo = new MutationObserver((m) => (w2.__mut += m.length));
+        w2.__mo.observe(document.body, { attributes: true, childList: true, subtree: true, characterData: true });
+      });
       try {
         const el = p.locator(sel).first();
         await el.scrollIntoViewIfNeeded({ timeout: 2000 });
@@ -177,6 +185,27 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
       }
       await sleep(420);
       const d = (await cls()) - before;
+      const muts = (await p.evaluate(() => (window as any).__mut)) as number;
+      const navigated0 = p.url() !== url0;
+      if (
+        muts === 0 &&
+        !navigated0 &&
+        /BUTTON|SPAN|DIV/.test(
+          await p
+            .locator(sel)
+            .first()
+            .evaluate((e) => e.tagName)
+            .catch(() => ""),
+        )
+      )
+        await add(
+          {
+            element: name,
+            kind: "press had no effect",
+            detail: "nothing in the DOM changed within 420 ms of the press",
+          },
+          "noeffect-" + i,
+        );
       stats.maxActionCls = Math.max(stats.maxActionCls, d);
       if (d > 0.01)
         await add({ element: name, kind: "layout shift", detail: "on press", cls: +d.toFixed(4) }, "shift-" + i);

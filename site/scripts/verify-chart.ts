@@ -1006,4 +1006,87 @@ if (on("hover") || what === "hover") {
   }
 }
 
+// ------------------------------------------------------------------------------------------------ segmented
+/** every segmented control on the /ikada site: a click must change the pressed segment AND the pebble must slide under it */
+if (on("segmented") || what === "segmented") {
+  const origin = new URL(URL0).origin;
+  const pages = [
+    "/ikada/",
+    "/ikada/components/segmented-control",
+    "/ikada/motion",
+    "/ikada/blocks",
+    "/ikada/blocks/traffic-chart",
+    "/ikada/blocks/logs-panel",
+    "/ikada/blocks/kv-browser",
+    "/ikada/docs",
+  ];
+  let total = 0;
+  let bad = 0;
+  for (const [w, theme] of [
+    [1440, "dark"],
+    [1440, "light"],
+    [390, "light"],
+    [390, "dark"],
+  ] as const) {
+    const { ctx, p } = await open(w, theme, { url: origin + pages[0] });
+    for (const path of pages) {
+      await p.goto(origin + path);
+      await sleep(1800);
+      // wake the lazy previews: scroll through the page
+      await p.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += 600) {
+          scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 120));
+        }
+        scrollTo(0, 0);
+      });
+      await sleep(1200);
+      const n = await p.locator('[class*="group/seg"]').count();
+      for (let i = 0; i < n; i++) {
+        const group = p.locator('[class*="group/seg"]').nth(i);
+        if (!(await group.isVisible())) continue;
+        await group.scrollIntoViewIfNeeded();
+        const name = (await group.getAttribute("aria-label")) ?? `#${i}`;
+        const buttons = group.locator("button");
+        const m = await buttons.count();
+        for (let k = 0; k < m; k++) {
+          const btn = buttons.nth(k);
+          if ((await btn.getAttribute("aria-pressed")) === "true" || (await btn.isDisabled())) continue;
+          total++;
+          if (w === 390) await btn.tap().catch(() => {});
+          else await btn.click({ timeout: 4000 }).catch(() => {});
+          await sleep(650);
+          const r = (await group.evaluate((g) => {
+            const pressed = g.querySelector<HTMLElement>('button[aria-pressed="true"]');
+            const peb = g.querySelector<HTMLElement>("[data-sb-pebble]");
+            const pr = pressed?.getBoundingClientRect();
+            const br = peb?.getBoundingClientRect();
+            return {
+              n: g.querySelectorAll('button[aria-pressed="true"]').length,
+              label: pressed?.textContent?.trim() ?? null,
+              dx: pr && br ? Math.abs(pr.left + pr.width / 2 - (br.left + br.width / 2)) : null,
+              pebble: !!peb,
+            };
+          })) as { n: number; label: string | null; dx: number | null; pebble: boolean };
+          const want = ((await btn.textContent()) ?? "").trim();
+          const ok = r.n === 1 && r.label === want && (r.dx === null ? !r.pebble : r.dx < 3);
+          if (!ok) {
+            bad++;
+            log(
+              `segmented FAIL · ${w} ${theme} ${path} · "${name}" · clicked "${want}": pressed ${r.n} ("${r.label}"), pebble ${r.pebble ? "off by " + r.dx?.toFixed(1) + " px" : "absent"}`,
+            );
+            await p.screenshot({
+              path: join(OUT, `segmented-fail-${w}-${theme}-${path.replace(/\W+/g, "-")}-${i}.png`),
+            });
+          }
+        }
+      }
+    }
+    await ctx.close();
+  }
+  log(
+    `segmented ${bad === 0 ? "PASS" : "FAIL"} · ${total} clicks on segments across ${pages.length} pages x 4 variants, ${bad} wrong`,
+  );
+}
+
 await b.close();
