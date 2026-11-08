@@ -15,6 +15,6 @@
     "shadcn": "4.23.0"
   },
   "devDependencies": {
-    "sproutboat": "0.51.1"
+    "sproutboat": "0.52.1"
   }
 }

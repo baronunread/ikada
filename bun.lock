@@ -45,7 +45,7 @@
         "shadcn": "4.23.0",
       },
       "devDependencies": {
-        "sproutboat": "0.51.1",
+        "sproutboat": "0.52.1",
       },
     },
   },
@@ -372,19 +372,17 @@
 
     "@sproutboat/assets": ["@sproutboat/assets@0.3.0", "", {}, "sha512-YvKhDPnAaU+Xxnn6QpDizFq/SYwGEgbCWtSz+7edniPBQT5HHOnh9GyKj5Sa1+sjlkNnpKvUk+6evfCUTNRytg=="],
 
-    "@sproutboat/cli-darwin-arm64": ["@sproutboat/cli-darwin-arm64@0.51.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-S5dhYpYXT51zb64qqAkxYWu6EDMLBo731XQ9EbdNm9qMXXnD2u/mZ744T46IVUeODcANVQs3dCS7ClF9LIQOMg=="],
+    "@sproutboat/cli-darwin-arm64": ["@sproutboat/cli-darwin-arm64@0.52.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-GpbyZeuLqTbZN0fJpHnm1xkua/vq9ypYxxVwl46tYsgccpTuZ4ajB1bgFYCiZ/IUtmFj4gVN/tbPhpBgk/9hZg=="],
 
-    "@sproutboat/cli-darwin-x64": ["@sproutboat/cli-darwin-x64@0.51.1", "", { "os": "darwin", "cpu": "x64" }, "sha512-pxrDv5k1eZxlTo5l4BPOTzoURpaQ0lbLApI6TU2PuIlTUlN1izVXPAsj7VgSvzbAgNwjCQjnX2hmUxedVJcvUQ=="],
+    "@sproutboat/cli-linux-arm64": ["@sproutboat/cli-linux-arm64@0.52.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-F7fzJ1h7sl70Mcn0OG9hgGR67reamclC+QgvJajON9JmCYtRSZyBxtNNP64K45v8KxoyYcGgvxxGOIRpSwiUOA=="],
 
-    "@sproutboat/cli-linux-arm64": ["@sproutboat/cli-linux-arm64@0.51.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-IIfKxKJOIEH3Lt/Y+pB1+SO2qgnrhp7FqHvzj4JgZQanNarNyF/Hk0ju0h6dJUf0+SAyB5Cd8fzkgcXBul169A=="],
-
-    "@sproutboat/cli-linux-x64": ["@sproutboat/cli-linux-x64@0.51.1", "", { "os": "linux", "cpu": "x64" }, "sha512-EVWOtfud9Q21TRr+fjlZCdZW9IUwPBC9LK4qOEHy4Xa7wn04iQIfWdPp/8RCukK0WwPChrpzS4Zu3no/m5S0Ew=="],
+    "@sproutboat/cli-linux-x64": ["@sproutboat/cli-linux-x64@0.52.1", "", { "os": "linux", "cpu": "x64" }, "sha512-bbj+M1khCztnM/L3btlA5f3Zqyrz7caAnKsq9h0liZFo5UNGJrApIsz9ZxrcuEM9Gbb26zyjjIpYHwYisDlrZw=="],
 
     "@sproutboat/config": ["@sproutboat/config@0.6.0", "", {}, "sha512-fx7B412Sy4YEDXMSaUx07+GyAOQDOaGSW7kO4hmA1SZBUsRX3evx+zH7tyFv6b0PHxP+htkySl+8wZUdWc0vjA=="],
 
     "@sproutboat/runtime": ["@sproutboat/runtime@0.42.2", "", {}, "sha512-pvMtaDMkfvzZ3rgLkH9Dl5yhrmC3NArtrn4GSqzTtJFhGvuU1AsqDKpfC2a7ZzqI6KiJnGSI5y9C+R9u3ybm9w=="],
 
-    "@sproutboat/toolchain": ["@sproutboat/toolchain@0.23.1", "", {}, "sha512-XBAwaixlb4M12dzIY473mVn8kP4Yep/eaf1XSFNtOELpfM65m5JI9O1VpAydTNxR8TCe1VxCBnqDGQuGaJNaKg=="],
+    "@sproutboat/toolchain": ["@sproutboat/toolchain@0.24.2", "", {}, "sha512-hzbL3/ym/0pykjB2gzH5/MN1SCuZEEwjOHg2ygcot2BCUSGMX8AAT5WpL0X9NiWW3KV6Yvx5r5L5Y9He4H1PZw=="],
 
     "@sproutboat/wire": ["@sproutboat/wire@0.22.2", "", { "dependencies": { "@sproutboat/assets": "^0.3.0", "@sproutboat/runtime": "^0.42.2" } }, "sha512-Pfe/Q6SY4VKWHw3SOoLh3IzR0KSDDUsmMdZCvUIIvLeEbWD/KTUkKiztNuNLk4G9NNNNggLMKDj5ia6kMm0+zw=="],
 
@@ -1084,7 +1082,7 @@
 
     "space-separated-tokens": ["space-separated-tokens@2.0.2", "", {}, "sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q=="],
 
-    "sproutboat": ["sproutboat@0.51.1", "", { "dependencies": { "@sproutboat/artifact": "^0.3.0", "@sproutboat/assets": "^0.3.0", "@sproutboat/config": "^0.6.0", "@sproutboat/runtime": "^0.42.2", "@sproutboat/toolchain": "^0.23.1", "@sproutboat/wire": "^0.22.2" }, "optionalDependencies": { "@sproutboat/cli-darwin-arm64": "0.51.1", "@sproutboat/cli-darwin-x64": "0.51.1", "@sproutboat/cli-linux-arm64": "0.51.1", "@sproutboat/cli-linux-x64": "0.51.1" }, "bin": { "sproutboat": "bin/sproutboat.cjs" } }, "sha512-kjgtFewaJWJfYa5XJ16gWOLynOXRPmUfR7+0dlemFE3qF6+NrX5eRnrey8pVrwuBwRcTScgOnB7CsA+4HRc7og=="],
+    "sproutboat": ["sproutboat@0.52.1", "", { "dependencies": { "@sproutboat/artifact": "^0.3.0", "@sproutboat/assets": "^0.3.0", "@sproutboat/config": "^0.6.0", "@sproutboat/runtime": "^0.42.2", "@sproutboat/toolchain": "^0.24.2", "@sproutboat/wire": "^0.22.2" }, "optionalDependencies": { "@sproutboat/cli-darwin-arm64": "0.52.1", "@sproutboat/cli-darwin-x64": "0.52.1", "@sproutboat/cli-linux-arm64": "0.52.1", "@sproutboat/cli-linux-x64": "0.52.1" }, "bin": { "sproutboat": "bin/sproutboat.cjs" } }, "sha512-Elskd8xhTbOeB5Pa5nCZjoCMdV5S0ry+68PAd7xa3dDF2ztN2iB4lLzN/CLLSf97hUCj6fmelWzm8jTxpNNUuA=="],
 
     "std-env": ["std-env@4.3.0", "", {}, "sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag=="],
 
