@@ -9,12 +9,7 @@ import { IkadaMark } from "./IkadaMark";
  * The live preview of one block: blocks/<slug>/<slug>.tsx, rendered with no props so it shows
  * its sample data. Each block is its own chunk, loaded on its page only.
  */
-// Only the blocks the website shows (SHOWN_BLOCKS in lib/registry.ts); the others get no chunk in the site build.
-const modules = import.meta.glob<Record<string, unknown>>([
-  "../../../blocks/metric-row/*.tsx",
-  "../../../blocks/logs-panel/*.tsx",
-  "../../../blocks/settings-section/*.tsx",
-]);
+const modules = import.meta.glob<Record<string, unknown>>("../../../blocks/*/*.tsx");
 
 const pascal = (slug: string): string =>
   slug
