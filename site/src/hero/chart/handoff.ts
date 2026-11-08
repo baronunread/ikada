@@ -25,7 +25,7 @@ export interface Handoff {
 
 type HandoffWindow = Window & { __chartHandoff?: Handoff | null };
 
-/** sessionStorage holds ~5M characters per origin; past this the snapshot falls back to WebP (lossy, ~10× smaller) */
+/** sessionStorage holds ~5M characters per origin; past this the snapshot falls back to WebP at quality 1 (lossless in Chrome, usually smaller than the PNG) */
 const PNG_MAX_CHARS = 3_000_000;
 
 /** Call on `pageswap` (and on `pagehide` as the fallback). Costs one re-render and a PNG encode: ~40 ms at 1440×900
@@ -36,7 +36,7 @@ export function saveHandoff(handle: Handle, canvas: HTMLCanvasElement, theme: Th
     const r = canvas.getBoundingClientRect();
     const state = handle.getState();
     let snap = handle.snapshot("image/png");
-    if (snap && snap.length > PNG_MAX_CHARS) snap = handle.snapshot("image/webp", 0.92);
+    if (snap && snap.length > PNG_MAX_CHARS) snap = handle.snapshot("image/webp", 1);
     const h: Handoff = {
       v: 1,
       at: Date.now(),
