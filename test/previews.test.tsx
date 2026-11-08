@@ -36,6 +36,25 @@ describe("the overview tiles are live", () => {
     expect(pressed().map((b) => b.textContent)).toEqual(["1h"]);
   });
 
+  test("the dialog tile opens a real dialog", async () => {
+    const { preview } = await import("../site/src/examples/dialog");
+    render(<>{preview()}</>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /Delete project/ }));
+    expect(await screen.findByRole("dialog")).toBeTruthy();
+  });
+
+  test("the button tile deploys when pressed", async () => {
+    const { preview } = await import("../site/src/examples/button");
+    render(<>{preview()}</>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Deploy" }));
+    expect(
+      screen.getByRole("button", { name: /Deploy/ }).hasAttribute("disabled") ||
+        screen.getByRole("button", { name: /Deploy/ }).getAttribute("aria-busy") === "true",
+    ).toBe(true);
+  });
+
   test("the pagination tile moves to the page pressed", async () => {
     const { preview } = await import("../site/src/examples/pagination");
     render(<>{preview()}</>);

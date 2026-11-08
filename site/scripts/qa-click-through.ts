@@ -185,9 +185,22 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
       }
       await sleep(420);
       const d = (await cls()) - before;
+      // pressing the segment that is already selected (or an already-on toggle) changes nothing, by design
+      const wasOn = await p
+        .locator(sel)
+        .first()
+        .evaluate(
+          (e) =>
+            e.getAttribute("aria-pressed") === "true" ||
+            e.getAttribute("aria-selected") === "true" ||
+            e.getAttribute("aria-checked") === "true" ||
+            e.hasAttribute("data-pressed"),
+        )
+        .catch(() => false);
       const muts = (await p.evaluate(() => (window as any).__mut)) as number;
       const navigated0 = p.url() !== url0;
       if (
+        !wasOn &&
         muts === 0 &&
         !navigated0 &&
         /BUTTON|SPAN|DIV/.test(

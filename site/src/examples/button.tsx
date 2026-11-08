@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../../../src/components/button";
 import { PlusIcon } from "../../../src/lib/icons";
 import { forcedFocus, type Example, type Playground, type Preview } from "./types";
@@ -100,9 +101,23 @@ export const playground: Playground = {
 };
 
 /** The compact render on the overview's component tile. */
-export const preview: Preview = () => (
-  <div className="flex gap-2">
-    <Button variant="primary">Deploy</Button>
-    <Button>Cancel</Button>
-  </div>
-);
+function DeployPreview() {
+  const [s, set] = useState<"idle" | "busy" | "done">("idle");
+  return (
+    <div className="flex gap-2">
+      <Button
+        variant="primary"
+        loading={s === "busy"}
+        onClick={() => {
+          set("busy");
+          setTimeout(() => set("done"), 1300);
+          setTimeout(() => set("idle"), 3200);
+        }}
+      >
+        {s === "done" ? "Deployed" : "Deploy"}
+      </Button>
+      <Button onClick={() => set("idle")}>Reset</Button>
+    </div>
+  );
+}
+export const preview: Preview = () => <DeployPreview />;

@@ -115,14 +115,15 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex w-60 flex-col gap-2 rounded-xl bg-raised p-4 shadow-float">
-    <p className="font-semibold">Delete project?</p>
-    <p className="text-sm text-fg-muted">This cannot be undone.</p>
-    <div className="flex justify-end gap-2">
-      <Button size="sm">Cancel</Button>
-      <Button size="sm" variant="danger">
-        Delete
-      </Button>
-    </div>
-  </div>
+  <Dialog>
+    <DialogTrigger render={<Button variant="danger">Delete project…</Button>} />
+    <DialogContent>
+      <DialogTitle>Delete project?</DialogTitle>
+      <DialogDescription>This cannot be undone.</DialogDescription>
+      <DialogFooter>
+        <DialogClose render={<Button>Cancel</Button>} />
+        <DialogClose render={<Button variant="danger">Delete</Button>} />
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 );
