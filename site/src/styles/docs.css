@@ -962,6 +962,19 @@
     width: 100%;
     min-width: 0;
   }
+  /* the live preview is client-only: reserve its measured height (lib/block-heights.ts) so it appears without a shift */
+  .bview > .inner[data-reserve] {
+    min-height: var(--bhm, 12rem);
+  }
+  @media (min-width: 900px) {
+    .bview[data-vp="full"] > .inner[data-reserve],
+    .bframe .bview > .inner[data-reserve] {
+      min-height: var(--bh, 12rem);
+    }
+  }
+  .bview[data-vp]:not([data-vp="full"]) > .inner[data-reserve] {
+    min-height: 0;
+  }
   .bview[data-vp="768"] > .inner {
     width: 768px;
     max-width: 100%;

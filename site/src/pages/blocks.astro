@@ -4,6 +4,7 @@ import PageHead from "../components/docs/PageHead.astro";
 import { Icon } from "../components/icons";
 import Docs from "../layouts/Docs.astro";
 import { blocks } from "../lib/registry";
+import { blockHeightStyle } from "../lib/block-heights";
 import { addCommands, fence, href, pageMarkdown } from "../lib/site";
 
 const toc = blocks.map((b) => ({ id: `block-${b.name}`, label: b.title }));
@@ -38,7 +39,7 @@ const markdown = pageMarkdown({
         </div>
       </div>
       <div class="bview" data-demo>
-        <div class="inner" style="min-height:12rem"><BlockPreview client:visible slug={b.name} /></div>
+        <div class="inner" data-reserve style={blockHeightStyle(b.name)}><BlockPreview client:visible slug={b.name} /></div>
       </div>
     </section>
   ))}

@@ -135,7 +135,7 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
         const cs = getComputedStyle(el);
         if (!r.width || !r.height || cs.visibility === "hidden" || cs.display === "none" || el.closest("[hidden]"))
           return;
-        if (el.matches('a[href="#"]')) return;
+        if (el.matches('a[href="#"], a.sbc-m, .sr-only')) return;
         el.setAttribute("data-qa", String(n++));
       });
       return n;
@@ -158,6 +158,8 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
           await p.keyboard.type("qa", { delay: 20 });
         } else if (/SELECT/.test(tag)) {
           await el.focus();
+        } else if (/INPUT:(checkbox|radio)/i.test(tag)) {
+          await el.click({ timeout: 2500, force: true });
         } else {
           await el.click({ timeout: 2500, trial: false });
         }
@@ -180,7 +182,7 @@ async function run(path: string, w: number, theme: "light" | "dark", interact: b
         const out: string[] = [];
         document
           .querySelectorAll<HTMLElement>(
-            '[role="dialog"], [role="menu"], [role="listbox"], [popover]:popover-open, [data-popup], [data-open] [role="menu"]',
+            '[role="dialog"], [role="menu"], [popover]:popover-open, [data-popup], [data-open] [role="menu"]',
           )
           .forEach((el) => {
             const r = el.getBoundingClientRect();

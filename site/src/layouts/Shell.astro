@@ -9,6 +9,9 @@ import { IkadaMark } from "../components/IkadaMark";
 import { Icon } from "../components/icons";
 import { REPO_URL } from "../lib/registry";
 import { href, sideNav, topNav, VERSION } from "../lib/site";
+// Preloaded so the first paint already has the real fonts: a swap after first paint reflows the headings (layout shift).
+import figtreeUrl from "@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url";
+import monoUrl from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
 
 interface Props {
   title: string;
@@ -30,6 +33,8 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
     <title>{title === "ikada" ? "ikada: the Sproutboat design system" : `${title} · ikada`}</title>
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark light" />
+    <link rel="preload" href={figtreeUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
     <link rel="icon" href={href("/favicon-light-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
     <link rel="icon" href={href("/favicon-dark-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />

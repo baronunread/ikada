@@ -382,7 +382,7 @@ export interface World {
   /** the grid of static depths (3 units), for the screen-grid contours */
   paths: { land: Path2D[]; hachure: Path2D; coast: Path2D };
   /** is this world point sea deep enough for a vessel to be launched on */
-  launchable(x: number, y: number): boolean;
+  launchable(x: number, y: number, manual?: boolean): boolean;
 }
 
 let cached: World | null = null;
@@ -529,11 +529,12 @@ export function world(): World {
     soundings,
     quiet,
     paths: { land, hachure, coast },
-    launchable: (x, y) =>
-      S(x, y) < -0.2 &&
-      !bumpAvoid.some((b) => Math.hypot(x - b.x, y - b.y) < b.r * 0.8) &&
-      Math.hypot(x - harbour.x, y - harbour.y) > 110 &&
-      Math.hypot(x - raft.x, y - raft.y) > 60,
+    // the idle demo launches far from the harbour in deep water; a press may launch anywhere on the sea
+    launchable: (x, y, manual = false) =>
+      S(x, y) < (manual ? -0.1 : -0.2) &&
+      !bumpAvoid.some((b) => Math.hypot(x - b.x, y - b.y) < b.r * (manual ? 0.5 : 0.8)) &&
+      Math.hypot(x - harbour.x, y - harbour.y) > (manual ? 34 : 110) &&
+      Math.hypot(x - raft.x, y - raft.y) > (manual ? 26 : 60),
   };
   return cached;
 }

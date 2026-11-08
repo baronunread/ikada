@@ -9,6 +9,7 @@ import { Icon } from "../../components/icons";
 import Docs from "../../layouts/Docs.astro";
 import { propsTables } from "../../lib/props";
 import { blockFiles, blocks } from "../../lib/registry";
+import { blockHeightStyle } from "../../lib/block-heights";
 import type { Item } from "../../lib/registry";
 import { addCommands, fence, gzipKb, href, pagedDeps, pageMarkdown, registryJson, treeUrl, usesBaseUi } from "../../lib/site";
 import type { TocEntry } from "../../lib/site";
@@ -76,7 +77,7 @@ const markdown = pageMarkdown({
       </div>
     </div>
     <div class="bview" data-vp="full" data-scope data-demo>
-      <div class="inner"><BlockPreview client:only="react" slug={item.name} /></div>
+      <div class="inner" data-reserve style={blockHeightStyle(item.name)}><BlockPreview client:only="react" slug={item.name} /></div>
     </div>
     <div class="stage-code">
       {

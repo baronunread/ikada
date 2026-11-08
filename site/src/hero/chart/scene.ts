@@ -180,6 +180,8 @@ export interface Handle {
   /** wake a vessel as a press would (for the idle tour and tests) */
   wake(i: number): void;
   deploy(x: number, y: number): boolean;
+  /** may a vessel be deployed at this canvas point */
+  canDeploy(x: number, y: number): boolean;
   sweep(): void;
 }
 
@@ -1709,6 +1711,31 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       if (Math.abs(raftHv - (hoverRaft ? 1 : 0)) > 0.01) b = true;
       drawRaft(t, raftAw, raftHv);
     }
+    // a hold charging: a ring grows under the pointer until the sweep starts
+    if (pdown && !pdown.held) {
+      const u = (performance.now() - pdown.t0 - CHARGE_AT) / (HOLD - CHARGE_AT);
+      if (u > 0) {
+        const e2 = easeOut(Math.min(1, u));
+        c.setTransform(dpr, 0, 0, dpr, pdown.x * dpr, pdown.y * dpr);
+        c.lineCap = "round";
+        c.lineWidth = 1;
+        c.strokeStyle = `rgba(${pal.green},${(0.25 + 0.25 * e2).toFixed(3)})`;
+        c.beginPath();
+        c.arc(0, 0, 16 + 14 * e2, 0, TAU);
+        c.stroke();
+        c.lineWidth = 2;
+        c.strokeStyle = `rgba(${pal.greenLine},0.95)`;
+        c.beginPath();
+        c.arc(0, 0, 16 + 14 * e2, -Math.PI / 2, -Math.PI / 2 + TAU * Math.min(1, u));
+        c.stroke();
+        c.fillStyle = `rgba(${pal.green},${(0.08 + 0.12 * e2).toFixed(3)})`;
+        c.beginPath();
+        c.arc(0, 0, 16 + 14 * e2, 0, TAU);
+        c.fill();
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        b = true;
+      }
+    }
     // hover rings
     c.lineWidth = 0.9;
     for (const s of ships) {
@@ -2008,9 +2035,13 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     moved: boolean;
     held: boolean;
     to: number;
+    t0: number;
     ship: Ship | null;
     raft: boolean;
   } | null = null;
+  /** a hold: the ring starts to charge after this long, the sweep starts at HOLD (ms, wall clock) */
+  const CHARGE_AT = 120;
+  const HOLD = 430;
   const rectOf = (): DOMRect => canvas.getBoundingClientRect();
   function onDown(e: PointerEvent): void {
     if (e.button > 0) return;
@@ -2029,8 +2060,17 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
         startSweep(st.t, false);
         kick();
       }
-    }, 430);
-    pdown = { x, y, moved: false, held: false, to, ship: shipOfEl(target), raft: !!marker && marker === raftEl };
+    }, HOLD);
+    pdown = {
+      x,
+      y,
+      moved: false,
+      held: false,
+      to,
+      t0: performance.now(),
+      ship: shipOfEl(target),
+      raft: !!marker && marker === raftEl,
+    };
     kick();
   }
   function onMove(e: PointerEvent): void {
@@ -2064,15 +2104,19 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     void e;
   }
   let suppressClick = 0;
-  function click(x: number, y: number): void {
+  /** may a vessel be deployed on open water at this canvas point (not land, the text, the furniture, the margin)? */
+  function canDeploy(x: number, y: number): boolean {
     const m = maskNow();
     const L = layout(m);
     const M = L.M;
-    if (x < M + 12 || x > W - M - 12 || y < M + 30 || y > H - M - 12 || y < Math.max(74, m.navH + 10)) return;
+    if (x < M + 12 || x > W - M - 12 || y < M + 30 || y > H - M - 12 || y < Math.max(74, m.navH + 10)) return false;
     const cp = m.copy;
-    if (cp && x > cp.x0 - 26 && x < cp.x1 + 26 && y > cp.y0 - 30 && y < cp.y1 + 34) return;
-    if (L.avoid.some((r) => x > r.x0 && x < r.x1 && y > r.y0 && y < r.y1)) return;
-    if (!wd.launchable(wx(x), wy(y))) return;
+    if (cp && x > cp.x0 - 26 && x < cp.x1 + 26 && y > cp.y0 - 30 && y < cp.y1 + 34) return false;
+    if (L.avoid.some((r) => x > r.x0 && x < r.x1 && y > r.y0 && y < r.y1)) return false;
+    return wd.launchable(wx(x), wy(y), true);
+  }
+  function click(x: number, y: number): void {
+    if (!canDeploy(x, y)) return;
     if (st.launches.length >= 3) return;
     launch(wx(x), wy(y), st.t);
     kick();
@@ -2224,6 +2268,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       camMoving ||
       maskMoving() ||
       st.labels.some((l) => l.until < NEVER / 2) ||
+      (pdown !== null && !pdown.held) ||
       hover !== null ||
       focusShip !== null
     );
@@ -2319,18 +2364,29 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   const ac = new AbortController();
   const sig = { signal: ac.signal, passive: true } as const;
   host.addEventListener("pointerdown", onDown, sig);
-  host.addEventListener("pointermove", onMove, sig);
-  host.addEventListener("pointerup", onUp, sig);
-  host.addEventListener(
+  // move, up and cancel on the window: a release outside the hero (or the window) must still end the hold
+  window.addEventListener("pointermove", onMove, sig);
+  window.addEventListener("pointerup", onUp, sig);
+  window.addEventListener(
     "pointercancel",
     () => {
       if (pdown) {
         clearTimeout(pdown.to);
         pdown = null;
         if (st.sweep) st.sweep.held = false;
+        kick();
       }
     },
     sig,
+  );
+  // a long press on touch opens the context menu and selects text: not on the chart
+  host.addEventListener(
+    "contextmenu",
+    (e) => {
+      const t = e.target as Element | null;
+      if (pdown || !t?.closest?.(ignore)) e.preventDefault();
+    },
+    { signal: ac.signal },
   );
   if (layer) {
     layer.addEventListener("pointerover", onOver, sig);
@@ -2431,6 +2487,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
         kick();
       }
     },
+    canDeploy,
     deploy(x, y) {
       noteInput();
       const n = st.launches.length;
@@ -2466,6 +2523,7 @@ function staticHandle(opts: MountOptions): Handle {
     raftPoint: () => ({ x: 0, y: 0 }),
     wake: none,
     deploy: () => false,
+    canDeploy: () => false,
     sweep: none,
   };
 }

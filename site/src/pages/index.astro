@@ -13,6 +13,8 @@ import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/chart/handoff";
 const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat’s own dashboards are built from the same files.`;
 const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
 const tile = (slug: string, span: Tile["span"]): Tile => ({ slug, title: title(slug), href: href(`/components/${slug}`), span });
+// The home page leads with three blocks; the catalogue (/blocks) shows all of them.
+const highlights = ["metric-row", "logs-panel", "settings-section"].flatMap((n) => blocks.filter((b) => b.name === n));
 const tiles: Tile[] = [
   tile("button", 4),
   tile("segmented-control", 4),
@@ -66,19 +68,25 @@ const tiles: Tile[] = [
       <div class="sec-head">
         <div>
           <h2 id="blocks">Whole screens, <em>one command each.</em></h2>
-          <p>{blocks.length} dashboard blocks assembled from the components, with sample data. The CLI writes the files into your app.</p>
+          <p>Dashboard blocks assembled from the components, with sample data. The CLI writes the files into your app. Three to start with; there are {blocks.length} in all.</p>
         </div>
-        <a class="more" href={href("/blocks")}>All blocks, live <Icon name="arrow" /></a>
+        <a class="more" href={href("/blocks")}>All {blocks.length} blocks <Icon name="arrow" /></a>
       </div>
       <ul class="cindex">
-        {blocks.map((b) => (
+        {highlights.map((b) => (
           <li>
-            <a href={href(`/blocks/${b.name}`)}>
+            <a href={href(`/blocks/`)}>
               <span>{b.title}</span>
               <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
             </a>
           </li>
         ))}
+        <li>
+          <a href={href("/blocks")}>
+            <span>All {blocks.length} blocks</span>
+            <small><span>the full catalogue</span><span><Icon name="arrow" /></span></small>
+          </a>
+        </li>
       </ul>
     </section>
 

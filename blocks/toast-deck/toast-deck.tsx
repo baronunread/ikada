@@ -49,7 +49,13 @@ interface Seen {
 }
 
 const clock = (t: number) =>
-  new Date(t).toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  new Date(t).toLocaleTimeString("en", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  });
 
 /** The last few toasts, from `toast.subscribe`: the hook an Activity feed or a bell would use. */
 function useToastHistory(limit = 4): Seen[] {

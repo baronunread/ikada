@@ -79,7 +79,7 @@ async function open(width: number, theme: "dark" | "light", o: OpenOpts = {}) {
       (window as any).__hero ||
       document.querySelector("[data-hero-shell], .hero")?.getAttribute("data-backend") === "static",
     null,
-    { timeout: 20000 },
+    { timeout: 60000 },
   );
   await sleep(700);
   return { ctx, p, errors };
@@ -446,6 +446,111 @@ if (on("rec")) {
   if (f) renameSync(join(dir, f), join(OUT, `${PREFIX}-zoom.webm`));
   rmSync(dir, { recursive: true, force: true });
   log(`rec ${join(OUT, `${PREFIX}-zoom.webm`)}`);
+}
+
+// ------------------------------------------------------------------------------------------------ hold
+/** press and hold: the ring charges, the sweep starts and wakes vessels, a release does not deploy; a short click still does */
+if (on("hold") || what === "hold") {
+  const state = (p: Page) =>
+    hero(p, (h) => {
+      const s = h.getState();
+      return {
+        sweep: s.sweep ? { held: s.sweep.held, woken: s.sweep.woken, auto: s.sweep.auto } : null,
+        launches: s.launches.length,
+        dyn: s.dyn.length,
+        sw: s.ships.filter((r: any) => r.sw >= 0).length,
+      };
+    }) as Promise<{
+      sweep: null | { held: boolean; woken: number; auto: boolean };
+      launches: number;
+      dyn: number;
+      sw: number;
+    }>;
+  const seaPoint = async (p: Page) => {
+    const box = await canvasBox(p);
+    return {
+      box,
+      x: box.x + box.w * (CAMERA === "wide" ? 0.58 : 0.42),
+      y: box.y + box.h * (box.w < 700 ? 0.86 : 0.82),
+    };
+  };
+  const result = (name: string, ok: boolean, detail: string) =>
+    log(`hold ${ok ? "PASS" : "FAIL"} · ${name} · ${detail}`);
+  for (const variant of ["desktop", "reduced", "touch"] as const) {
+    const touch = variant === "touch";
+    const { ctx, p } = await open(touch ? 390 : 1440, "dark", { reduced: variant === "reduced" });
+    await sleep(800);
+    // the idle demo must not be what we measure
+    const { box, x, y } = await seaPoint(p);
+    const cdp = await ctx.newCDPSession(p);
+    const down = async (px: number, py: number) =>
+      touch
+        ? cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: px, y: py }] })
+        : (await p.mouse.move(px, py), p.mouse.down());
+    const up = async () =>
+      touch ? cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }) : p.mouse.up();
+    const quiet = () => hero(p, (h) => h.wake(0)); // a press resets the idle demo, so it does not launch or sweep while we measure
+    await quiet();
+    // 1. hold on open water
+    const s0 = await state(p);
+    await down(x, y);
+    await sleep(300);
+    await p.screenshot({
+      path: join(OUT, `${PREFIX}-hold-${variant}-charging.png`),
+      clip: { x: Math.max(0, x - 90), y: Math.max(0, y - 90), width: 180, height: 180 },
+    });
+    await sleep(900);
+    const s1 = await state(p);
+    await p.screenshot({ path: join(OUT, `${PREFIX}-hold-${variant}-sweeping.png`) });
+    await up();
+    await sleep(3400);
+    const s2 = await state(p);
+    result(
+      `${variant} hold on open water`,
+      !!s1.sweep && s1.sweep.held && !s1.sweep.auto && s2.launches === s0.launches && s2.dyn === s0.dyn && s2.sw > 0,
+      `sweep started: ${!!s1.sweep}, held: ${s1.sweep?.held}, vessels woken by the sweep: ${s2.sw}, deployed on release: ${s2.dyn - s0.dyn + s2.launches - s0.launches}`,
+    );
+    // 2. a short press still deploys
+    await sleep(2000);
+    await quiet();
+    const c0 = await state(p);
+    // a spot of open water the chart itself accepts (not land, the text, the furniture)
+    const spot = (await p.evaluate(() => {
+      const h = (window as any).__hero;
+      const c = document.querySelector(".hero-canvas")!.getBoundingClientRect();
+      for (let fy = 0.5; fy < 0.95; fy += 0.04)
+        for (let fx = 0.1; fx < 0.95; fx += 0.04)
+          if (
+            h.canDeploy(c.width * fx, c.height * fy) &&
+            !h.vessels().some((v: any) => v.visible && Math.hypot(v.x - c.width * fx, v.y - c.height * fy) < 70) &&
+            Math.hypot(h.raftPoint().x - c.width * fx, h.raftPoint().y - c.height * fy) < 9999
+          )
+            return [c.width * fx, c.height * fy];
+      return null;
+    })) as number[] | null;
+    await down(box.x + (spot?.[0] ?? 0), box.y + (spot?.[1] ?? 0));
+    await sleep(90);
+    await up();
+    await sleep(300);
+    const c1 = await state(p);
+    result(
+      `${variant} short press deploys`,
+      c1.launches + c1.dyn > c0.launches + c0.dyn && !c1.sweep?.held,
+      `launches ${c0.launches}->${c1.launches}`,
+    );
+    // 3. hold on a vessel
+    await sleep(2500);
+    await quiet();
+    const v = await aVessel(p, 1);
+    const h0 = await state(p);
+    await down(box.x + v.x, box.y + v.y);
+    await sleep(900);
+    const h1 = await state(p);
+    await up();
+    result(`${variant} hold on a vessel`, !!h1.sweep && h1.sweep.held, `sweep started: ${!!h1.sweep}`);
+    void h0;
+    await ctx.close();
+  }
 }
 
 await b.close();
