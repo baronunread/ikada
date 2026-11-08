@@ -15,6 +15,8 @@ export interface Handoff {
   h: number;
   cw: number;
   ch: number;
+  /** the path of the page that stored it: a reload stores one too, and is not an arrival from elsewhere */
+  from: string;
   theme: Theme;
   camera: Camera;
   state: ChartState;
@@ -44,6 +46,7 @@ export function saveHandoff(handle: Handle, canvas: HTMLCanvasElement, theme: Th
       h: innerHeight,
       cw: r.width,
       ch: r.height,
+      from: location.pathname,
       theme,
       camera: state.cam.to,
       state,

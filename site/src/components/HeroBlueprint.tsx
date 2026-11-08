@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import { Sheet } from "../hero/blueprint/Sheet";
+import { introSeen, markIntroSeen } from "../hero/intro";
 import "../hero/blueprint/blueprint.css";
 
 /**
@@ -19,8 +20,10 @@ declare global {
 export default function HeroBlueprint() {
   const root = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number; copyBottom: number } | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [open, setOpen] = useState(false);
+  // seen this session (head script): the settled sheet from the first render, no reveal
+  const [settled] = useState(() => introSeen());
+  const [mounted, setMounted] = useState(settled);
+  const [open, setOpen] = useState(settled);
   const [reduced, setReduced] = useState(false);
 
   useLayoutEffect(() => {
@@ -55,6 +58,7 @@ export default function HeroBlueprint() {
 
   // open once the chart is up (or after a beat, if there is no chart: the poster is the picture)
   useEffect(() => {
+    if (settled) return undefined;
     let done = false;
     const go = (): void => {
       if (done) return;
@@ -71,6 +75,21 @@ export default function HeroBlueprint() {
       clearTimeout(t);
     };
   }, []);
+
+  // the intro is done once the ink has drawn (about 3.6 s after the sheet opens), or when the page is left sooner
+  useEffect(() => {
+    if (settled) {
+      markIntroSeen();
+      return undefined;
+    }
+    if (!open) return undefined;
+    const t = window.setTimeout(markIntroSeen, 3800);
+    addEventListener("pagehide", markIntroSeen);
+    return () => {
+      clearTimeout(t);
+      removeEventListener("pagehide", markIntroSeen);
+    };
+  }, [open, settled]);
 
   // the chart's markers are out of reach while the sheet covers them; home.ts pauses the chart
   useEffect(() => {
@@ -98,7 +117,14 @@ export default function HeroBlueprint() {
   }, [open]);
 
   return (
-    <div ref={root} className="bp" data-open={open || undefined} data-reduced={reduced || undefined} data-chart-ignore>
+    <div
+      ref={root}
+      className="bp"
+      data-open={open || undefined}
+      data-settled={settled || undefined}
+      data-reduced={reduced || undefined}
+      data-chart-ignore
+    >
       <ToastProvider>
         <TooltipProvider>
           {size && mounted && <Sheet w={size.w} h={size.h} armed={open} copyBottom={size.copyBottom} />}

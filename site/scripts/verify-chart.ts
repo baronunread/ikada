@@ -708,4 +708,105 @@ if (what === "reveal") {
   }
 }
 
+// ------------------------------------------------------------------------------------------------ intro
+/** the /ikada intro plays once per session: first visit and the hand-off play it, a reload settles at once */
+if (on("intro") || what === "intro") {
+  const result = (name: string, ok: boolean, detail: string) =>
+    log(`intro ${ok ? "PASS" : "FAIL"} · ${name} · ${detail}`);
+  const origin = new URL(URL0).origin;
+  const probe = (p: Page) =>
+    p.evaluate(() => {
+      const shell = document.querySelector("[data-hero-shell]");
+      const bp = document.querySelector(".bp");
+      const paths = [...document.querySelectorAll<SVGPathElement>(".sheet .draw")];
+      const inked = paths.length ? paths.filter((x) => getComputedStyle(x).opacity === "1").length / paths.length : 0;
+      return {
+        seen: document.documentElement.dataset.intro ?? null,
+        flag: sessionStorage.getItem("ikada:intro"),
+        state: shell?.getAttribute("data-blueprint") ?? null,
+        settled: bp?.hasAttribute("data-settled") ?? false,
+        inked,
+        paper: (document.querySelector(".paper")
+          ? getComputedStyle(document.querySelector(".paper")!).clipPath
+          : ""
+        ).slice(0, 40),
+      };
+    });
+  for (const [w, theme] of [
+    [1440, "dark"],
+    [390, "light"],
+  ] as const) {
+    const ctx = await b.newContext({
+      viewport: { width: w, height: w === 390 ? 844 : 900 },
+      deviceScaleFactor: w === 390 ? 3 : 2,
+      isMobile: w === 390,
+      hasTouch: w === 390,
+      colorScheme: theme,
+    });
+    await ctx.addInitScript((t) => localStorage.setItem("ikada-theme", t), theme);
+    const p = await ctx.newPage();
+    const errs: string[] = [];
+    p.on("pageerror", (e) => errs.push(e.message));
+    // 1. the first direct visit of the session plays in full
+    await p.goto(URL0);
+    await sleep(500);
+    const a = await probe(p);
+    await sleep(4800);
+    const a2 = await probe(p);
+    result(
+      `${w} first visit plays`,
+      a.seen === null && a.inked < 0.5 && a2.state === "open" && a2.flag === "1" && a2.inked > 0.95,
+      `at 0.5 s: ink ${(a.inked * 100).toFixed(0)}%, at 5.3 s: ${a2.state}, ink ${(a2.inked * 100).toFixed(0)}%, flag ${a2.flag}`,
+    );
+    // 2. a reload settles at once
+    await p.reload();
+    await sleep(120);
+    const r1 = await probe(p);
+    const first = await p.screenshot({ path: join(OUT, `${PREFIX}-${w}-${theme}-reload-120ms.png`) });
+    void first;
+    await sleep(600);
+    const r2 = await probe(p);
+    await p.screenshot({ path: join(OUT, `${PREFIX}-${w}-${theme}-reload.png`) });
+    const shot = (await p.evaluate(() => (window as any).__hero?.getState().cam)) as
+      | { vz: number; lz: number }
+      | undefined;
+    result(
+      `${w} reload settles`,
+      r1.seen === "seen" && r2.state === "open" && r2.settled && r2.inked > 0.95 && (!shot || Math.abs(shot.vz) < 0.01),
+      `head script: ${r1.seen}, sheet ${r2.state}, settled ${r2.settled}, ink ${(r2.inked * 100).toFixed(0)}% by 0.7 s, chart camera still ${shot ? "(vz " + shot.vz.toFixed(3) + ")" : "n/a"}`,
+    );
+    // 3. a later direct visit in the same session settles too
+    await p.goto(URL0 + "?again=1");
+    await sleep(700);
+    const d = await probe(p);
+    result(
+      `${w} later direct visit settles`,
+      d.seen === "seen" && d.state === "open" && d.inked > 0.95,
+      `${d.seen}, ${d.state}, ink ${(d.inked * 100).toFixed(0)}%`,
+    );
+    // 4. arriving from sproutboat.com plays in full, flag or not
+    await p.goto(origin + "/");
+    await p.waitForFunction(() => (window as any).__hero, null, { timeout: 60000 });
+    await sleep(1200);
+    await p
+      .locator('.nav-links a[href="/ikada"]')
+      .first()
+      .click()
+      .catch(async () => p.goto(URL0));
+    await p.waitForURL(/\/ikada/);
+    await sleep(350);
+    const h1 = await probe(p);
+    const exact = (await p.evaluate(() => document.documentElement.classList.contains("chart-exact"))) as boolean;
+    await sleep(5200);
+    const h2 = await probe(p);
+    result(
+      `${w} hand-off plays`,
+      h1.seen === null && h1.inked < 0.5 && h2.state === "open" && h2.inked > 0.95,
+      `at 0.35 s: seen ${h1.seen}, ink ${(h1.inked * 100).toFixed(0)}%, exact first frame ${exact}; at 5.5 s: ${h2.state}, ink ${(h2.inked * 100).toFixed(0)}%`,
+    );
+    result(`${w} console`, errs.length === 0, errs.length ? errs.join(" | ") : "no errors");
+    await ctx.close();
+  }
+}
+
 await b.close();

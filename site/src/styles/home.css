@@ -31,6 +31,17 @@
     view-transition-name: chart-hero;
     background: var(--sb-canvas);
   }
+  /* the intro was seen this session (head script, hero/intro.ts): the first paint is the sheet's paper, not the chart */
+  html[data-intro="seen"] .hero-bg {
+    background: oklch(0.255 0.07 252);
+  }
+  html[data-intro="seen"][data-theme="light"] .hero-bg {
+    background: oklch(0.972 0.012 92);
+  }
+  html[data-intro="seen"] .hero-poster,
+  html[data-intro="seen"] .hero-canvas {
+    visibility: hidden;
+  }
   .hero-poster,
   .hero-canvas {
     position: absolute;
@@ -171,7 +182,7 @@
 
   /* hero entrance: the statement leads, the rest follows on shrinking beats; opacity only under reduce */
   @media (prefers-reduced-motion: no-preference) {
-    :root:not([data-motion="reduce"]) .hero > * {
+    :root:not([data-motion="reduce"]):not([data-intro="seen"]) .hero > * {
       animation: hero-in 600ms var(--ease-out) backwards;
       animation-delay: calc(var(--beat, 0) * 1ms);
     }

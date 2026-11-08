@@ -10,6 +10,7 @@ import { blocks, components } from "../lib/registry";
 import { addCommands, gzipKb, href, VERSION } from "../lib/site";
 import HeroBlueprint from "../components/HeroBlueprint";
 import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/chart/handoff";
+import { INTRO_SCRIPT } from "../hero/intro";
 
 const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat’s own dashboards are built from the same files.`;
 const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
@@ -32,6 +33,7 @@ const tiles: Tile[] = [
 
 <Shell title="ikada" description={lede} home>
   <script is:inline slot="head" set:html={HEAD_SCRIPT} />
+  <script is:inline slot="head" set:html={INTRO_SCRIPT} />
   <main id="main">
     <section class="hero-shell" data-hero-shell aria-labelledby="hero-title">
       <div class="hero-bg" data-hero-media aria-hidden="true">
