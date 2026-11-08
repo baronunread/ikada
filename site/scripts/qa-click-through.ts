@@ -32,7 +32,7 @@ const ikadaPages = ["/ikada/"]
   )
   .concat(readdirSync(join(dist, "components")).map((f) => "/ikada/components/" + f.replace(/\.html$/, "")))
   .concat(readdirSync(join(dist, "blocks")).map((f) => "/ikada/blocks/" + f.replace(/\.html$/, "")));
-const PAGES = ["/", "/how-it-works", "/no-such-page"]
+const PAGES = ["/", "/how-it-works", "/cli", "/no-such-page"]
   .concat(ikadaPages)
   .filter((_, i) => i % SHARDS === SHARD)
   .filter((p) => !ONLY || ONLY.split(",").includes(p));
