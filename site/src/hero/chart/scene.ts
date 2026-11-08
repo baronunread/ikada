@@ -2268,6 +2268,13 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     kick();
   }
 
+  // the eased visuals that are not in the state (hover rings, the raft's glow) start from where a restored page starts: at rest
+  function settleLocals(): void {
+    for (const s of ships) s.hv = 0;
+    raftHv = 0;
+    raftAw = st.labels.some((l) => l.o === "raft" && l.until > st.t) ? 1 : 0;
+  }
+
   // ----- start -----
   resize();
   build(opts.state);
@@ -2275,6 +2282,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   if (st.cam.to !== opts.camera) st.cam.to = opts.camera;
   if (opts.state && opts.state.theme !== opts.theme) st.theme = opts.theme;
   pal = palette(st.theme);
+  settleLocals();
   buildMarkers();
   renderFrame(0);
   firstDone = true;
@@ -2381,6 +2389,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
         hover = null;
         focusShip = null;
         hoverRaft = false;
+        settleLocals();
         renderFrame(0);
         const url = canvas.toDataURL(type, quality);
         hover = keep[0];

@@ -97,7 +97,6 @@ export function bootHero(): void {
         markers: markers!,
         state: handoff?.state,
         mask: mask(),
-        words: { caption: "ikada · the raft, moored at Sprout Harbour · simulated values illustrative" },
         // the canvas replaces the poster once it has drawn; after an exact hand-off it is the same picture
         onFirstFrame: () => {
           if (q.get("chart") === "debug")

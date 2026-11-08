@@ -11,9 +11,9 @@ const entries: { title: string; pr?: number; text: string }[] = [
   { title: "The ikada mark", pr: 6, text: "E4, Buoyed: two lashed logs riding low on one wave line, with a press, a first-paint drop and a loading loop." },
   { title: "Blocks", pr: 5, text: "Eleven dashboard patterns as shadcn registry:block items, each with a live preview and sample data." },
   { title: "Docs site and shadcn registry", pr: 3, text: "Every component and helper as a registry item, generated from the source, with a docs page per component." },
-  { title: "Afloat", pr: 4, text: "ikada's motion character: springs, press and release, the focus wake and sprouting success." },
+  { title: "Afloat", pr: 4, text: "ikada’s motion character: springs, press and release, the focus wake and sprouting success." },
   { title: "Menus above modals", pr: 2, text: "Menus stack above dialogs and the mobile drawer, so they open from inside them." },
-  { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard's vendored copy." },
+  { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard’s vendored copy." },
 ];
 const lede = "What changed in each release of ikada. The package is not on npm yet; everything below is in the first release.";
 const markdown = pageMarkdown({ title: "Changelog", description: lede, url: href("/changelog"), body: [`## ${VERSION} (unreleased)`, ...entries.map((e) => `- ${e.title}${e.pr ? ` (#${e.pr})` : ""}: ${e.text}`)] });

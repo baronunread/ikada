@@ -10,7 +10,7 @@ import { blocks, components } from "../lib/registry";
 import { addCommands, gzipKb, href, VERSION } from "../lib/site";
 import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/chart/handoff";
 
-const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat's own dashboards are built from the same files.`;
+const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat’s own dashboards are built from the same files.`;
 const title = (slug: string): string => components.find((c) => c.name === slug)?.title ?? slug;
 const tile = (slug: string, span: Tile["span"]): Tile => ({ slug, title: title(slug), href: href(`/components/${slug}`), span });
 const tiles: Tile[] = [
@@ -41,7 +41,7 @@ const tiles: Tile[] = [
           <span class="ver">ikada {VERSION}</span><span class="sep" aria-hidden="true"></span><span>MIT</span><span class="sep" aria-hidden="true"></span>
           <span class="go">Changelog <Icon name="arrow" /></span>
         </a>
-        <h1 id="hero-title" data-hero-mask="h1">The components behind <em>Sproutboat's dashboards.</em></h1>
+        <h1 id="hero-title" data-hero-mask="h1">The components behind <em>Sproutboat’s dashboards.</em></h1>
         <p class="lede" data-hero-mask="lede">{lede}</p>
         <div class="ctas" data-hero-mask="ctl">
           <a class={buttonStyles({ variant: "primary", size: "lg" })} href={href("/docs")}>Get started</a>

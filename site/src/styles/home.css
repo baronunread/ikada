@@ -369,7 +369,10 @@
   }
   @media (max-width: 860px) {
     .hero {
-      padding: 84px var(--hero-pad) 72px;
+      padding: 96px var(--hero-pad) 72px;
+    }
+    .hero .pill {
+      margin-bottom: 24px;
     }
     .hero h1 {
       font-size: 40px;
@@ -385,9 +388,14 @@
       font-size: 12px;
       gap: 8px;
     }
+    .hero .ctas {
+      gap: 12px;
+      margin-top: 28px;
+    }
     .hero .ctas a {
       flex: 1 1 0;
       min-width: 0;
+      min-height: 48px;
     }
     .sec {
       padding: 16px 16px 0;

@@ -6,7 +6,7 @@ import Docs from "../layouts/Docs.astro";
 import { motion } from "../../../src/tokens.generated";
 import { href, pageMarkdown } from "../lib/site";
 
-const lede = "Afloat is ikada's motion: the raft takes your weight. A press settles, the release springs back once, and nothing else bounces.";
+const lede = "Afloat is ikada’s motion: the raft takes your weight. A press settles, the release springs back once, and nothing else bounces.";
 const rules = [
   ["Press and release", `A press settles the control 1px down and to scale 0.97 in ${motion.duration.press}ms ease-out and presses the shadow in; letting go returns it on the bob spring.`],
   ["Nothing else bounces", `Hover is colour plus a lift in the cast shadow (${motion.duration.hover}ms). Menus and table rows do not animate their highlight. Exits are short and plain: popups and toasts ${motion.duration["popup-out"]}ms, dialogs ${motion.duration["dialog-out"]}ms, all ease-out.`],
