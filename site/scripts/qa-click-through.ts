@@ -19,6 +19,7 @@ const ORIGIN = opt("--origin", "http://127.0.0.1:4420");
 const OUT = resolve(opt("--out", "/tmp/qa-click-through"));
 const [SHARD, SHARDS] = opt("--shard", "0/1").split("/").map(Number) as [number, number];
 const QUICK = argv.includes("--quick");
+const ONLY = opt("--only", "");
 mkdirSync(OUT, { recursive: true });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -31,7 +32,10 @@ const ikadaPages = ["/ikada/"]
   )
   .concat(readdirSync(join(dist, "components")).map((f) => "/ikada/components/" + f.replace(/\.html$/, "")))
   .concat(readdirSync(join(dist, "blocks")).map((f) => "/ikada/blocks/" + f.replace(/\.html$/, "")));
-const PAGES = ["/", "/how-it-works", "/no-such-page"].concat(ikadaPages).filter((_, i) => i % SHARDS === SHARD);
+const PAGES = ["/", "/how-it-works", "/no-such-page"]
+  .concat(ikadaPages)
+  .filter((_, i) => i % SHARDS === SHARD)
+  .filter((p) => !ONLY || ONLY.split(",").includes(p));
 
 interface Issue {
   page: string;

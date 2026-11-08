@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
@@ -49,14 +49,30 @@ function load(slug: string): ComponentType {
 /** The block's chunk is loading: the mark's loading loop, shown only if it takes over 400ms. */
 function Loading() {
   return (
-    <div className="grid min-h-48 place-items-center rounded-xl bg-surface text-fg-muted" aria-busy="true">
+    <div className="grid h-full min-h-12 place-items-center rounded-xl bg-surface text-fg-muted" aria-busy="true">
       <IkadaMark size={48} motion="none" loading className="ikm-spinner" title="Loading the preview" />
     </div>
   );
 }
 
-export default function BlockPreview({ slug }: { slug: string }) {
+/**
+ * `defer`: mount the block only when its box nears the viewport (the blocks index has eleven). Client-only either way,
+ * so there is nothing to mismatch on hydration; the box keeps its reserved height meanwhile.
+ */
+export default function BlockPreview({ slug, defer = false }: { slug: string; defer?: boolean }) {
   const Block = load(slug);
+  const box = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(!defer);
+  useEffect(() => {
+    if (on || !box.current) return;
+    if (!("IntersectionObserver" in window)) return setOn(true);
+    const io = new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && (setOn(true), io.disconnect()), {
+      rootMargin: "600px 0px",
+    });
+    io.observe(box.current);
+    return () => io.disconnect();
+  }, [on]);
+  if (!on) return <div ref={box} aria-hidden="true" />;
   return (
     <ToastProvider>
       <TooltipProvider>

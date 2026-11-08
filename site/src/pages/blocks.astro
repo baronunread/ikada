@@ -39,7 +39,7 @@ const markdown = pageMarkdown({
         </div>
       </div>
       <div class="bview" data-demo>
-        <div class="inner" data-reserve style={blockHeightStyle(b.name)}><BlockPreview client:visible slug={b.name} /></div>
+        <div class="inner" data-reserve style={blockHeightStyle(b.name)}><BlockPreview client:only="react" slug={b.name} defer /></div>
       </div>
     </section>
   ))}
