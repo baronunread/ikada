@@ -14,6 +14,7 @@ const FILES = [
   "scene.ts",
   "world.ts",
   "palette.ts",
+  "cameras.ts",
   "handoff.ts",
   "instrument-serif-italic.woff2",
   "README.md",

@@ -61,6 +61,7 @@ interface Handle {
   setMask(m, { animate }?): void; // eases the veil and the contours (~420 ms)
   snapshot(type?, quality?): string | null;   // re-renders the current state (no hover label), returns a data URL
   stats(): Stats;                 // frames, cpu ms (mean, p95, max) per frame, fps, dpr
+  tune({ density, wake, names, furniture, veil }): void;   // the blueprint view and design studies tune the chart under it
   pause(); resume(); running(): boolean; destroy(): void;
   vessels(), raftPoint(), wake(i), deploy(x, y), sweep()   // tests and tours
 }
@@ -152,3 +153,12 @@ by a guard after a slow stretch. No frames while the page is hidden or the hero 
 
 `site/scripts/verify-chart.ts` (headless Chrome against `bun run preview`): `posters`, `shots`, `handoff`, `perf`,
 `reduced`, `rec`.
+
+## The blueprint (ikada's hero)
+
+On /ikada the chart zooms to the raft and `site/src/hero/blueprint/` opens over it: a drafting sheet whose seven parts are
+real ikada components (Button, Tooltip, Toast, Tabs, Select, Dialog, Switch). The sheet is a page-level React island
+(`site/src/components/HeroBlueprint.tsx`), not part of this module: it waits for the chart (`hero:ready`), opens the paper
+from the raft marker (`raftScreenPx` from `cameras.ts`), and tells the page to park the chart's frames (`hero:sheet`).
+sproutboat.com to /ikada is the chart's zoom with the paper opening as the camera settles; Back is the chart zooming out
+(the sheet is page content, so it leaves with the page, and the chart underneath carries over through the hand-off).

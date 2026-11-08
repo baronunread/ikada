@@ -4,6 +4,7 @@
 export const CHART_VERSION = "1.0.0";
 
 export { freshState, mount, T0, WORDS } from "./scene";
-export type { Backend, Camera, ChartState, Handle, Mask, MountOptions, Rect, Stats, Theme, Words } from "./scene";
+export type { Backend, Camera, ChartState, Handle, Mask, MountOptions, Rect, Stats, Theme, Tune, Words } from "./scene";
 export { HANDOFF_KEY, HANDOFF_MAX_AGE_MS, HEAD_SCRIPT, POSTER_SCRIPT, saveHandoff, takeHandoff } from "./handoff";
 export type { Handoff } from "./handoff";
+export { portraitWeight, raftMarkerScale, raftScreenPx, RAFT_UV, RAFT_Z } from "./cameras";

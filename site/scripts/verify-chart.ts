@@ -450,7 +450,24 @@ if (on("rec")) {
 
 // ------------------------------------------------------------------------------------------------ hold
 /** press and hold: the ring charges, the sweep starts and wakes vessels, a release does not deploy; a short click still does */
-if (on("hold") || what === "hold") {
+if ((on("hold") || what === "hold") && CAMERA === "raft") {
+  // /ikada: the blueprint sheet covers the chart, so a press or a hold on it must do nothing to the chart
+  const { ctx, p } = await open(1440, "dark", { url: URL0 });
+  await sleep(4500);
+  const box0 = await canvasBox(p);
+  await p.mouse.move(box0.x + box0.w * 0.55, box0.y + box0.h * 0.55);
+  await p.mouse.down();
+  await sleep(1200);
+  const s = (await hero(p, (h) => {
+    const t = h.getState();
+    return { sweep: !!t.sweep, launches: t.launches.length };
+  })) as { sweep: boolean; launches: number };
+  await p.mouse.up();
+  log(
+    `hold ${!s.sweep && s.launches === 0 ? "PASS" : "FAIL"} · /ikada: a hold on the blueprint sheet starts no sweep and deploys nothing (sweep ${s.sweep}, launches ${s.launches}); the hold test proper runs on sproutboat.com`,
+  );
+  await ctx.close();
+} else if (on("hold") || what === "hold") {
   const state = (p: Page) =>
     hero(p, (h) => {
       const s = h.getState();
@@ -549,6 +566,134 @@ if (on("hold") || what === "hold") {
     await up();
     result(`${variant} hold on a vessel`, !!h1.sweep && h1.sweep.held, `sweep started: ${!!h1.sweep}`);
     void h0;
+    await ctx.close();
+  }
+}
+
+// ------------------------------------------------------------------------------------------------ blueprint
+/** the /ikada blueprint sheet: it opens, the parts are keyboard-reachable buttons that show the real components, Escape closes */
+if (on("blueprint") || what === "blueprint") {
+  const result = (name: string, ok: boolean, detail: string) =>
+    log(`blueprint ${ok ? "PASS" : "FAIL"} · ${name} · ${detail}`);
+  for (const [w, theme] of [
+    [1440, "dark"],
+    [1440, "light"],
+    [390, "light"],
+    [390, "dark"],
+  ] as const) {
+    const mobile = w === 390;
+    const { ctx, p, errors } = await open(w, theme, { url: URL0 });
+    await sleep(4500); // the ink has drawn
+    const opened = (await p.evaluate(() =>
+      document.querySelector("[data-hero-shell]")?.getAttribute("data-blueprint"),
+    )) as string;
+    await p.screenshot({ path: join(OUT, `${PREFIX}-${w}-${theme}-sheet-rest.png`) });
+    const labels = (await p.evaluate(() =>
+      [...document.querySelectorAll<SVGElement>(".sheet .lab")].map((l) => l.getAttribute("aria-label")),
+    )) as string[];
+    result(
+      `${w} ${theme} sheet opens`,
+      opened === "open" && labels.length === 7,
+      `state ${opened}, ${labels.length} labelled parts: ${labels.join(", ")}`,
+    );
+    // pointer or tap: the Tabs part (label 04)
+    const tabs = p.locator('.sheet .lab[aria-label*="Tabs"]');
+    if (mobile) await tabs.tap();
+    else await tabs.click();
+    await sleep(600);
+    const co = (await p.evaluate(() => ({
+      callout: !!document.querySelector(".callout"),
+      tabs: document.querySelectorAll(".callout [role=tab]").length,
+      label: document.querySelector(".callout")?.getAttribute("aria-label"),
+    }))) as { callout: boolean; tabs: number; label: string | null };
+    await p.screenshot({ path: join(OUT, `${PREFIX}-${w}-${theme}-sheet-tabs.png`) });
+    result(
+      `${w} ${theme} a part shows the real component`,
+      co.callout && co.tabs === 3,
+      `${co.label}, ${co.tabs} tabs`,
+    );
+    await p.keyboard.press("Escape");
+    await sleep(300);
+    const closed = (await p.evaluate(() => !document.querySelector(".callout"))) as boolean;
+    result(`${w} ${theme} Escape closes the callout`, closed, "");
+    if (!mobile && theme === "dark") {
+      // keyboard: Tab to a numbered label, Enter pins it and moves focus into the callout; Escape returns to the label
+      await p.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      await p.locator('.sheet .lab[aria-label*="Dialog"]').focus();
+      await p.keyboard.press("Enter");
+      await sleep(500);
+      const inCallout = (await p.evaluate(
+        () => !!document.activeElement?.closest(".callout") || document.activeElement?.classList.contains("callout"),
+      )) as boolean;
+      for (let k = 0; k < 4; k++) {
+        await p.keyboard.press("Tab");
+        if (((await p.evaluate(() => document.activeElement?.textContent)) ?? "").includes("Delete")) break;
+      }
+      await p.keyboard.press("Enter"); // the Delete app… trigger
+      await sleep(600);
+      const dlg = (await p.evaluate(() => !!document.querySelector('[role="dialog"]:not(.callout)'))) as boolean;
+      await p.screenshot({ path: join(OUT, `${PREFIX}-${w}-${theme}-sheet-dialog.png`) });
+      await p.keyboard.press("Escape");
+      await sleep(900);
+      const dlgGone = (await p.evaluate(() => !document.querySelector('[role="dialog"]:not(.callout)'))) as boolean;
+      const stillCallout = (await p.evaluate(() => !!document.querySelector(".callout"))) as boolean;
+      await p.keyboard.press("Escape");
+      await sleep(500);
+      const back = (await p.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? "")) as string;
+      result(
+        `${w} ${theme} keyboard: Enter pins and focuses the callout, a Dialog opens and Escape closes only it, a second Escape returns to the label`,
+        inCallout && dlg && dlgGone && stillCallout && /Dialog/.test(back),
+        `focus in callout ${inCallout}, dialog ${dlg}->${dlgGone}, callout kept ${stillCallout}, focus back on "${back}"`,
+      );
+    }
+    result(`${w} ${theme} console`, errors.length === 0, errors.length ? errors.join(" | ") : "no errors");
+    await ctx.close();
+  }
+}
+
+// ------------------------------------------------------------------------------------------------ reveal
+/** frame times from document start to 5 s on a fresh load (the chart's glide, the paper opening, the ink drawing on) */
+if (what === "reveal") {
+  for (const [name, w, thr] of [
+    ["desktop 1440x900 @2x", 1440, 0],
+    ["phone 390x844 @3x, CPU x4", 390, 4],
+  ] as const) {
+    const mobile = w === 390;
+    const ctx = await b.newContext({
+      viewport: { width: w, height: mobile ? 844 : 900 },
+      deviceScaleFactor: mobile ? 3 : 2,
+      isMobile: mobile,
+      hasTouch: mobile,
+      colorScheme: "dark",
+    });
+    await ctx.addInitScript(() => {
+      const w2 = window as any;
+      w2.__f = [];
+      let last = performance.now();
+      const tick = (t: number) => {
+        w2.__f.push([t, t - last]);
+        last = t;
+        if (t < 6000) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    const p = await ctx.newPage();
+    if (thr) await (await ctx.newCDPSession(p)).send("Emulation.setCPUThrottlingRate", { rate: thr });
+    await p.goto(URL0);
+    await sleep(6500);
+    const f = (await p.evaluate(() => (window as any).__f)) as [number, number][];
+    const seg = (a: number, z: number) => f.filter(([t]) => t >= a && t < z).map(([, d]) => d);
+    for (const [label, a, z] of [
+      ["0-2 s (load, chart, paper opens)", 0, 2000],
+      ["2-5 s (ink draws on)", 2000, 5000],
+    ] as const) {
+      const d = seg(a, z).slice(1);
+      const total = d.reduce((x, y) => x + y, 0);
+      const sorted = d.slice().sort((x, y) => x - y);
+      log(
+        `reveal ${name} · ${label}: ${((d.length / total) * 1000).toFixed(1)} fps · worst frame ${Math.max(...d).toFixed(1)} ms · p95 ${sorted[Math.floor(sorted.length * 0.95)]!.toFixed(1)} ms · >25 ms ${d.filter((x) => x > 25).length}/${d.length}`,
+      );
+    }
     await ctx.close();
   }
 }

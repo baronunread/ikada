@@ -82,9 +82,30 @@ export function bootHero(): void {
   const posterFor = (t: Theme): string =>
     (poster.dataset.chartPoster ?? "").replace("{theme}", t).replace("{size}", innerWidth <= 600 ? "390" : "1440");
 
+  /** the chart is up (or will not be): the blueprint sheet may open */
+  const ready = (): void => {
+    (window as Window & { __heroReady?: boolean }).__heroReady = true;
+    window.dispatchEvent(new Event("hero:ready"));
+  };
+  /** the sheet covers the chart: stop its frames a beat after it has opened, and wake it for a theme change */
+  let sheetOpen = false;
+  let pauseT = 0;
+  const parkChart = (ms: number): void => {
+    clearTimeout(pauseT);
+    pauseT = window.setTimeout(() => {
+      if (sheetOpen && q.get("chart") !== "debug") handle?.pause();
+    }, ms);
+  };
+  addEventListener("hero:sheet", (e) => {
+    sheetOpen = !!(e as CustomEvent<boolean>).detail;
+    if (sheetOpen) parkChart(2800);
+    else handle?.resume();
+  });
+
   async function boot(): Promise<void> {
     if (q.get("backend") === "static") {
       shell!.dataset.backend = "static";
+      ready();
       return;
     }
     try {
@@ -107,21 +128,28 @@ export function bootHero(): void {
     } catch (e) {
       console.warn("[hero]", e);
       shell!.dataset.backend = "static";
+      ready();
       return;
     }
     shell!.dataset.backend = handle.backend;
     (window as Window & { __hero?: Handle }).__hero = handle;
-    if (handle.backend !== "canvas") return;
+    if (handle.backend !== "canvas") {
+      ready();
+      return;
+    }
     if (q.get("chart") === "freeze") handle.pause();
     document.fonts?.ready.then(() => remeasure(q.get("chart") !== "freeze"));
+    ready();
   }
 
   addEventListener("resize", () => remeasure(), { passive: true });
   new MutationObserver(() => {
     if (shell.dataset.backend === "static" || !handle || handle.backend !== "canvas") poster.src = posterFor(theme());
+    handle?.resume();
     handle?.setTheme(theme());
     handle?.setReduced(reduced());
     remeasure(true);
+    if (sheetOpen) parkChart(900);
   }).observe(html, { attributes: true, attributeFilter: ["data-theme", "data-motion"] });
   matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => handle?.setReduced(reduced()));
 

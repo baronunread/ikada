@@ -6,6 +6,7 @@
 // the effects in flight, the mask), the canvas size and the theme. A restored state renders its first frame with
 // dt = 0, so it is pixel-identical to the last frame the previous page drew (same canvas size and pixel ratio).
 import { palette, type Palette } from "./palette";
+import { RAFT_UV, RAFT_Z } from "./cameras";
 import {
   ACCT,
   anim,
@@ -29,7 +30,7 @@ import {
 } from "./world";
 
 export type Theme = "light" | "dark";
-export type Camera = "wide" | "raft" | "corner";
+export type Camera = "wide" | "raft" | "corner" | "harbour";
 export type Backend = "canvas" | "static";
 /** CSS px in the canvas's own box */
 export interface Rect {
@@ -160,9 +161,22 @@ export const WORDS: Words = {
   raftHost: "ikada",
   raftLabel: "ikada|design system|MIT",
 };
+export interface Tune {
+  /** how many of the vessels are drawn (spread evenly over the sheet) */
+  density?: number;
+  /** wake every vessel (true) or put them all to sleep (false) */
+  wake?: boolean;
+  names?: "serif" | "mono" | "off";
+  /** 0..1: opacity of the compass, scale bar, legend, hint and caption drawn on the canvas */
+  furniture?: number;
+  /** 0..1: extra veil over the sea under the copy on the base layer (land, coast, islets), for non-wide cameras */
+  veil?: number;
+}
 export interface Handle {
   backend: Backend;
   setCamera(name: Camera, o?: { animate?: boolean }): void;
+  /** live controls for the ikada hero (the blueprint view tunes the chart under it) */
+  tune(o: Tune): void;
   getState(): ChartState;
   setTheme(t: Theme): void;
   setReduced(b: boolean): void;
@@ -201,8 +215,12 @@ function camDefs(w: World): Record<Camera, { land: CamDef; port: CamDef }> {
       port: { wx: 1030, wy: 560, u: 0.56, v: 0.62, z: 1.28 },
     },
     raft: {
-      land: { wx: w.raft.x, wy: w.raft.y, u: 0.63, v: 0.58, z: 2.9 },
-      port: { wx: w.raft.x, wy: w.raft.y, u: 0.46, v: 0.7, z: 1.7 },
+      land: { wx: w.raft.x, wy: w.raft.y, u: RAFT_UV.land[0], v: RAFT_UV.land[1], z: RAFT_Z.land },
+      port: { wx: w.raft.x, wy: w.raft.y, u: RAFT_UV.port[0], v: RAFT_UV.port[1], z: RAFT_Z.port },
+    },
+    harbour: {
+      land: { wx: w.harbour.x - 6, wy: w.harbour.y - 22, u: 0.68, v: 0.58, z: 1.6 },
+      port: { wx: w.harbour.x - 6, wy: w.harbour.y - 22, u: 0.8, v: 0.66, z: 1.9 },
     },
     corner: { land: { wx: 330, wy: 700, u: 0.5, v: 0.5, z: 1.8 }, port: { wx: 330, wy: 700, u: 0.5, v: 0.5, z: 2.2 } },
   };
@@ -396,6 +414,11 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   let focusShip: Ship | null = null;
   let kick = (): void => {};
   let busy = true;
+  let nameStyle: "serif" | "mono" | "off" = "serif";
+  let furn = 1;
+  let veil = 0;
+  const ORDER = wd.ships.map((_, k) => k).sort((a, b) => ((a * 7919) % 103) - ((b * 7919) % 103));
+  let keepSet = new Set(wd.ships.map((_, k) => k));
 
   // ----- state -----
   function build(state: ChartState | undefined): void {
@@ -408,19 +431,21 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     rebuildShips();
   }
   function rebuildShips(): void {
-    ships = wd.ships.map((s: ShipDef, k) => ({
-      i: s.i,
-      x: s.x,
-      y: s.y,
-      hd: s.hd,
-      n: s.n,
-      host: s.host,
-      route: wd.routes[k]!,
-      run: st.ships[k]!,
-      dyn: false,
-      ph: s.i * 1.9,
-      hv: 0,
-    }));
+    ships = wd.ships
+      .map((s: ShipDef, k) => ({
+        i: s.i,
+        x: s.x,
+        y: s.y,
+        hd: s.hd,
+        n: s.n,
+        host: s.host,
+        route: wd.routes[k]!,
+        run: st.ships[k]!,
+        dyn: false,
+        ph: s.i * 1.9,
+        hv: 0,
+      }))
+      .filter((_, k) => keepSet.has(k));
     for (const d of st.dyn) {
       const nm = appName(d.i);
       ships.push({
@@ -696,6 +721,10 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     c.lineWidth = lw(1.05 + Math.min(0.5, (sc - 1) * 0.15));
     c.stroke(wd.paths.coast);
     harbourArt(c, lw);
+    if (veil > 0.01) {
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      scrimGrad(c, maskNow(), "scrim", 1 + veil * 0.8);
+    }
     // screen-space finish: glow, vignette, grain
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (P.dark && !cheap) {
@@ -718,8 +747,13 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     }
     graticule(c, L);
     soundings(c);
-    scaleBar(c, L);
-    compassArt(c, L.compass.x, L.compass.y, L.compass.r);
+    if (furn > 0.01) {
+      c.save();
+      c.globalAlpha = furn;
+      scaleBar(c, L);
+      compassArt(c, L.compass.x, L.compass.y, L.compass.r);
+      c.restore();
+    }
     names(c);
   }
   function harbourArt(c: CanvasRenderingContext2D, lw: (w: number) => number): void {
@@ -926,11 +960,13 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       for (let x = Math.ceil(wxMin / step) * step; x < wxMax; x += step) {
         const sx = px(x);
         if (sx < M + 30 || sx > W - M - 30) continue;
+        if (k > k0 && Math.abs(x / (step * 2) - Math.round(x / (step * 2))) < 0.01) continue;
         if (lab || sx > W * 0.3) c.fillText(lon(x, dec), sx, H - o - bar - (lab ? 5 : 3.5));
       }
       for (let y = Math.ceil(wyMin / step) * step; y < wyMax; y += step) {
         const sy = py(y);
         if (sy < M + 30 || sy > H - M - 30) continue;
+        if (k > k0 && Math.abs(y / (step * 2) - Math.round(y / (step * 2))) < 0.01) continue;
         if (!lab && L.compass && sy < (maskNow().copy?.y1 ?? 0) + 10) continue;
         c.save();
         c.translate(lab ? o + bar + 11 : W - o - bar - 3.5, sy);
@@ -962,7 +998,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const y1 = wy(H - MARGIN - 10);
     for (const s of wd.soundings) {
       if (s.x < x0 || s.x > x1 || s.y < y0 || s.y > y1) continue;
-      const a = s.tier === 1 ? 1 : t2;
+      const a = (s.tier === 1 ? 1 : t2) * maskFade(px(s.x), py(s.y));
       if (a <= 0.02) continue;
       const sh = s.d < 12;
       c.fillStyle = `rgba(${pal.ink},${((sh ? 0.7 : 0.5) * a * (pal.dark ? 1 : 1.2)).toFixed(3)})`;
@@ -989,12 +1025,17 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     c.restore();
   }
   function names(c: CanvasRenderingContext2D): void {
+    if (nameStyle === "off") return;
     const fz = clamp(sc, 0.85, 1.45) * (mob ? 0.74 : 1);
     for (const n of wd.names) {
       const x = px(n.x);
       const y = py(n.y);
       if (x < -120 || x > W + 120 || y < -40 || y > H + 40) continue;
+      if (x < MARGIN + 26 || x > W - MARGIN - 26 || y > H - MARGIN - 30) continue;
+      const fa = maskFade(x, y);
+      if (fa < 0.04) continue;
       c.save();
+      c.globalAlpha = fa;
       c.textAlign = "center";
       c.translate(x, y);
       if (n.rot) c.rotate(n.rot);
@@ -1016,7 +1057,11 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
         c.font = `italic ${Math.round(14 * fz)}px ${SERIF}`;
         c.fillStyle = `rgba(${pal.ink},.58)`;
       }
-      c.fillText(n.t, 0, 0);
+      if (nameStyle === "mono" && n.kind !== "deeps") {
+        c.font = `500 ${mob ? 8.5 : 10}px ${MONO}`;
+        c.letterSpacing = "2.2px";
+      }
+      c.fillText(nameStyle === "mono" ? n.t.toUpperCase() : n.t, 0, 0);
       c.restore();
     }
   }
@@ -1139,7 +1184,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
 
   // ----- the contours (animated depth lines) and the routes, on their own layer -----
   const LV = [-0.04, -0.09, -0.15, -0.22, -0.3, -0.4, -0.51, -0.63, -0.77, -0.92, -1.08, -1.26, -1.46];
-  function scrimGrad(c: CanvasRenderingContext2D, m: Mask, kind: "scrim" | "cut"): void {
+  function scrimGrad(c: CanvasRenderingContext2D, m: Mask, kind: "scrim" | "cut", k = 1): void {
     const cp = m.copy;
     if (cp) {
       const cx = (cp.x0 + cp.x1) / 2;
@@ -1151,9 +1196,9 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       c.scale(rx, ry);
       const gr = c.createRadialGradient(0, 0, 0, 0, 0, 1);
       if (kind === "scrim") {
-        const a = pal.scrimA;
+        const a = Math.min(0.97, pal.scrimA * k);
         gr.addColorStop(0, `rgba(${pal.veil},${a})`);
-        gr.addColorStop(0.45, `rgba(${pal.veil},${(a * 0.65).toFixed(3)})`);
+        gr.addColorStop(0.45, `rgba(${pal.veil},${(a * (k > 1 ? 0.9 : 0.65)).toFixed(3)})`);
         gr.addColorStop(1, `rgba(${pal.veil},0)`);
       } else {
         gr.addColorStop(0, "rgba(0,0,0,.8)");
@@ -1257,6 +1302,14 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const n = Math.sin(a) * dpr * s;
     g!.setTransform(c, n, -n, c, x * dpr, y * dpr);
   }
+  /** 0..1, how clear a screen point is of the text (soundings and vessels fade out under the copy) */
+  function maskFade(x: number, y: number): number {
+    const cp = maskNow().copy;
+    if (!cp) return 1;
+    const dx = Math.max(cp.x0 - 6 - x, 0, x - (cp.x1 + 6));
+    const dy = Math.max(cp.y0 - 6 - y, 0, y - (cp.y1 + 6));
+    return sstep(0, 34, Math.hypot(dx, dy));
+  }
   function drawShip(s: Ship, t: number): void {
     const run = s.run;
     const hd = s.hd + Math.sin(t * 0.00035 + s.ph) * 0.07;
@@ -1265,12 +1318,14 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const y = py(s.y) + bob;
     const aw = run.aw;
     if (x < -30 || x > W + 30 || y < -30 || y > H + 30) return;
+    const fa = maskFade(x, y);
+    if (fa < 0.02) return;
     if (aw > 0.02) {
       g!.setTransform(dpr, 0, 0, dpr, x * dpr, y * dpr);
-      g!.globalAlpha = aw;
+      g!.globalAlpha = aw * fa;
       g!.drawImage(glowTinted(), -26, -26, 52, 52);
-      g!.globalAlpha = 1;
     }
+    g!.globalAlpha = fa;
     setT(x, y, hd, shipScale());
     g!.lineJoin = "round";
     g!.lineCap = "round";
@@ -1288,6 +1343,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     g!.stroke(CL);
     g!.strokeStyle = aw > 0.3 ? `rgba(${pal.greenLine},.75)` : `rgba(${pal.ink},.5)`;
     g!.stroke(TICK);
+    g!.globalAlpha = 1;
   }
   // the raft: two lashed logs and the sprout, in one monoline; a mooring ring marks it from the other vessels
   const LOG1 = new Path2D();
@@ -1765,9 +1821,11 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
   let raftAw = 0;
   let raftHv = 0;
   function drawFurniture(t: number, L: Layout): void {
+    if (furn <= 0.01) return;
     const c = g!;
     const mono = (px2: number): string => `500 ${px2}px ${MONO}`;
     c.save();
+    c.globalAlpha = furn;
     c.textBaseline = "middle";
     const fs = mob ? 9.5 : 10.5;
     c.font = mono(fs);
@@ -1793,7 +1851,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     }
     const hintA = st.used === null ? 1 : 1 - clamp((t - st.used) / 600, 0, 1);
     if (hintA > 0.01) {
-      c.globalAlpha = hintA;
+      c.globalAlpha = furn * hintA;
       c.letterSpacing = ".5px";
       c.font = mono(mob ? 11 : 12);
       const pulse = (t / 2000) % 1;
@@ -1809,7 +1867,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       c.stroke();
       c.fillStyle = `rgba(${pal.name},${pal.dark ? 0.78 : 0.9})`;
       c.fillText(mob ? words.hintMobile : words.hintDesktop, L.legend.x + 16, L.hintY + 1.5);
-      c.globalAlpha = 1;
+      c.globalAlpha = furn;
     }
     if (!mob) {
       c.letterSpacing = "1.3px";
@@ -2228,7 +2286,7 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
     const m = maskNow();
     const L = layout(m);
     frameLogic(st.t, L, m);
-    const key = `${camNow}|${W}|${H}|${dpr}|${st.theme}|${L.compass.y.toFixed(1)}|${m.copy ? m.copy.y1.toFixed(0) : 0}|${camMoving ? "c" : "f"}`;
+    const key = `${camNow}|${W}|${H}|${dpr}|${st.theme}|${L.compass.y.toFixed(1)}|${m.copy ? m.copy.y1.toFixed(0) : 0}|${camMoving ? "c" : "f"}|${nameStyle}|${furn.toFixed(2)}|${veil}`;
     if (key !== baseKey) {
       drawBase(L, camMoving);
       baseKey = key;
@@ -2417,6 +2475,42 @@ export async function mount(canvas: HTMLCanvasElement, opts: MountOptions): Prom
       }
       kick();
     },
+    tune(o) {
+      if (o.density !== undefined) {
+        const n = clamp(Math.round(o.density), 0, wd.ships.length);
+        keepSet = new Set(ORDER.slice(0, n));
+        rebuildShips();
+        buildMarkers();
+        baseKey = "";
+        lastC = -1e9;
+      }
+      if (o.names) {
+        nameStyle = o.names;
+        baseKey = "";
+      }
+      if (o.veil !== undefined) {
+        veil = o.veil;
+        baseKey = "";
+      }
+      if (o.furniture !== undefined) {
+        furn = o.furniture;
+        baseKey = "";
+      }
+      if (o.wake === true) {
+        for (const s of ships) {
+          s.run.awUntil = NEVER;
+          s.run.ms = 5 + (s.i % 4);
+        }
+      } else if (o.wake === false) {
+        for (const s of ships) {
+          s.run.awUntil = 0;
+          s.run.rt = null;
+          s.run.pings = [];
+        }
+        st.labels = [];
+      }
+      kick();
+    },
     getState() {
       return structuredClone(st);
     },
@@ -2513,6 +2607,7 @@ function staticHandle(opts: MountOptions): Handle {
     setTheme: none,
     setReduced: none,
     setMask: none,
+    tune: none,
     snapshot: () => null,
     stats: () => ({ backend: "static", frames: 0, cpuMs: 0, p95Ms: 0, maxMs: 0, fps: 0, dpr: 1, w: 0, h: 0 }),
     pause: none,

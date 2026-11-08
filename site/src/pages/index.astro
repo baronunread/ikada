@@ -8,6 +8,7 @@ import { Icon } from "../components/icons";
 import Shell from "../layouts/Shell.astro";
 import { blocks, components } from "../lib/registry";
 import { addCommands, gzipKb, href, VERSION } from "../lib/site";
+import HeroBlueprint from "../components/HeroBlueprint";
 import { HEAD_SCRIPT, POSTER_SCRIPT } from "../hero/chart/handoff";
 
 const lede = `${components.length} React components and blocks on Base UI and Tailwind CSS v4, with typed OKLCH tokens. Sproutboat’s own dashboards are built from the same files.`;
@@ -51,6 +52,7 @@ const tiles: Tile[] = [
         </div>
       </div>
       <div class="hero-markers" data-hero-markers></div>
+      <HeroBlueprint client:only="react" />
     </section>
 
     <section class="sec" aria-labelledby="live">
