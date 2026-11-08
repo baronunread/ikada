@@ -51,8 +51,14 @@ export const components = items
 export const REGISTRY_URL = "https://sproutboat.com/ikada/r";
 export const REPO_URL = "https://github.com/baronunread/ikada";
 
-/** The dashboard blocks (registry:block), one page each under /blocks. */
-export const blocks = items.filter((i) => i.type === "registry:block").sort((a, b) => a.title.localeCompare(b.title));
+/** The blocks the website shows: a dashboard overview, a live log view and a settings form. The other blocks stay in the
+ *  repo and the registry but have no page, link or search entry here. */
+export const SHOWN_BLOCKS = ["metric-row", "logs-panel", "settings-section"];
+
+/** The shown dashboard blocks (registry:block), one page each under /blocks. */
+export const blocks = items
+  .filter((i) => i.type === "registry:block" && SHOWN_BLOCKS.includes(i.name))
+  .sort((a, b) => a.title.localeCompare(b.title));
 
 /** The installed source of a block's files, as `shadcn add` writes them (aliases rewritten). */
 export function blockFiles(item: Item): { name: string; source: string }[] {

@@ -13,11 +13,11 @@ export const demo = {
   home: demoHref("/"),
   docs: demoHref("/docs"),
   installation: demoHref("/installation"),
-  projects: demoHref("/blocks/project-tray"),
+  projects: demoHref("/components/table"),
   logs: demoHref("/blocks/logs-panel"),
   settings: demoHref("/blocks/settings-section"),
   metrics: demoHref("/blocks/metric-row"),
-  traffic: demoHref("/blocks/traffic-chart"),
+  traffic: demoHref("/components/timeseries-chart"),
   usage: demoHref("/components/meter"),
   deployments: demoHref("/components/table"),
 } as const;
