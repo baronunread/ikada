@@ -26,7 +26,7 @@ export interface SparklineBase {
   area?: boolean;
   /** [min, max]. Defaults to the data's own range with a little air above and below, so a quiet series still shows its shape; pass [0, max] to compare several on one honest scale. */
   domain?: readonly [number, number];
-  /** What the number is, shown next to it in the hover tooltip. Defaults to the first words of `ariaLabel` ("Requests" from "Requests, last 24 hours"). */
+  /** What the number is, shown once next to the value in the hover tooltip ("Requests  10,303"), so `formatValue` should not repeat it. Defaults to the first words of `ariaLabel` ("Requests" from "Requests, last 24 hours"). */
   label?: string;
   /** Formats the hover value. */
   formatValue?: (value: number) => string;
@@ -114,7 +114,8 @@ export function Sparkline({
         use: tooltip,
         // A floating card in the top layer: never clipped by the tile, flips above or below the point.
         portal,
-        placement: ["top", "bottom"],
+        // below first: above the point is where a tile keeps its figure and its change badge
+        placement: ["bottom", "top"],
         offset: 12,
         content: (points: readonly { datum: unknown }[]) => {
           const d = points[0]!.datum as Row;
