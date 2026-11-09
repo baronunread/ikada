@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn, tv } from "../lib/cn";
 
 const avatarStyles = tv({
-  base: "inline-grid shrink-0 select-none place-items-center overflow-hidden bg-hover font-semibold text-fg shadow-pill",
+  base: "relative inline-grid shrink-0 select-none place-items-center overflow-hidden bg-hover font-semibold leading-none text-fg shadow-pill",
   variants: {
     size: {
       sm: "size-6 rounded-md text-sb-xs",
@@ -37,7 +37,13 @@ function initialOf(name: string): string {
 export function Avatar({ src, name, size, className, ref, ...props }: AvatarProps) {
   return (
     <BaseAvatar.Root data-slot="avatar" ref={ref} className={cn(avatarStyles({ size }), className)} {...props}>
-      {src ? <BaseAvatar.Image src={src} alt={`${name} avatar`} className="size-full object-cover" /> : null}
+      {src ? (
+        <BaseAvatar.Image
+          src={src}
+          alt={`${name} avatar`}
+          className="size-full object-cover outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
+        />
+      ) : null}
       <BaseAvatar.Fallback aria-hidden="true" delay={src ? 400 : 0}>
         {initialOf(name)}
       </BaseAvatar.Fallback>

@@ -55,7 +55,10 @@ export function NoResults({ rows = SAMPLE_ROWS, initialQuery = "reed" }: { rows?
       {shown.length ? (
         <ul className="divide-y divide-hairline">
           {shown.map((r) => (
-            <li key={r} className="px-4 py-2.5 font-mono text-sb-sm">
+            <li
+              key={r}
+              className="m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit] px-4 py-2.5 font-mono text-sb-sm"
+            >
               {r}
             </li>
           ))}
@@ -157,7 +160,7 @@ export function EmptyStates({ className, onCreate }: EmptyStatesProps) {
       <div className="grid grid-cols-1 gap-5 @2xl:grid-cols-2">
         {items.map((item) => (
           <section key={item.id} aria-labelledby={`empty-${item.id}`} className="flex min-w-0 flex-col gap-2">
-            <h2 id={`empty-${item.id}`} className="px-1 text-sb-sm font-semibold text-fg-muted">
+            <h2 id={`empty-${item.id}`} className="m-0 px-1 text-sb-sm font-semibold text-fg-muted">
               {item.title}
             </h2>
             <div className="flex flex-1 flex-col *:flex-1">{item.body}</div>

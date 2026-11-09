@@ -68,7 +68,7 @@ export function Pagination({
         onClick={() => go(page - 1)}
         className={cell}
       >
-        <ChevronLeftIcon />
+        <ChevronLeftIcon className="rtl:-scale-x-100" />
       </button>
       {compact ? (
         <span className="min-w-0 px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
@@ -80,7 +80,7 @@ export function Pagination({
             <li key={entry}>
               {entry === "gap-start" || entry === "gap-end" ? (
                 <span aria-hidden="true" className="inline-grid h-8 min-w-6 place-items-center text-fg-muted">
-                  ...
+                  …
                 </span>
               ) : (
                 <button
@@ -107,7 +107,7 @@ export function Pagination({
         onClick={() => go(page + 1)}
         className={cell}
       >
-        <ChevronRightIcon />
+        <ChevronRightIcon className="rtl:-scale-x-100" />
       </button>
     </nav>
   );

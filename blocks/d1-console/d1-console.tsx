@@ -282,7 +282,7 @@ function TablesTree({
       {tables.map((t) => {
         const expanded = open.has(t.name);
         return (
-          <li key={t.name}>
+          <li key={t.name} className="m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit]">
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
@@ -291,7 +291,7 @@ function TablesTree({
                 aria-label={`${expanded ? "Hide" : "Show"} columns of ${t.name}`}
                 onClick={() => toggle(t.name)}
                 className={cn(
-                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:size-11",
                   focusRing,
                 )}
               >
@@ -352,7 +352,7 @@ function TablesTree({
 function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean }) {
   if (!outcome) {
     return (
-      <p className="border-t border-hairline px-4 py-8 text-center text-sb-sm text-fg-muted">
+      <p className="m-0 border-t border-hairline px-4 py-8 text-center text-sb-sm text-fg-muted">
         Run a query to see its rows here.
       </p>
     );
@@ -425,7 +425,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
           </TableBody>
         </Table>
       ) : (
-        <p className="px-4 pb-4 text-sb-sm text-fg-muted">The query ran and matched no rows.</p>
+        <p className="m-0 px-4 pb-4 text-sb-sm text-fg-muted">The query ran and matched no rows.</p>
       )}
     </div>
   );
@@ -485,7 +485,7 @@ export function D1Console({
               aria-expanded={showTables}
               onClick={() => setShowTables((v) => !v)}
               className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg @3xl:hidden",
+                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:h-11 @3xl:hidden",
                 focusRing,
               )}
             >
@@ -499,7 +499,7 @@ export function D1Console({
             </button>
           </div>
           <div className={cn(!showTables && "@max-3xl:hidden")}>
-            <p className="px-3 pt-2 text-sb-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
+            <p className="m-0 px-3 pt-2 text-sb-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
             <TablesTree tables={tables} current={current} onQuery={queryTable} />
           </div>
         </aside>

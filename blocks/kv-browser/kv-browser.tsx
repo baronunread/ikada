@@ -13,7 +13,7 @@ import { InlineConfirm } from "../../src/components/inline-confirm";
 import { Input } from "../../src/components/input";
 import { SegmentedControl } from "../../src/components/segmented-control";
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from "../../src/components/table";
-import { cn, focusRing } from "../../src/lib/cn";
+import { cn, focusRing, pressMotion } from "../../src/lib/cn";
 import { formatBytes } from "../../src/lib/format";
 import { CheckIcon, KeyIcon, SearchIcon, TrashIcon, UndoIcon } from "../../src/lib/icons";
 
@@ -157,9 +157,9 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-sb-xs shadow-[inset_0_0_0_1px_var(--sb-hairline)]",
-        "transition-colors duration-(--sb-duration-hover) ease-hover",
-        active ? "bg-hover font-semibold text-fg" : "text-fg-muted hover:bg-hover hover:text-fg",
+        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-sb-xs shadow-[inset_0_0_0_1px_var(--sb-hairline-strong)] pointer-coarse:h-11",
+        pressMotion,
+        active ? "bg-neutral-soft font-semibold text-fg" : "text-fg-muted hover:bg-hover hover:text-fg",
         focusRing,
       )}
     >
@@ -315,7 +315,7 @@ export function KvBrowser({
             <TableBody ref={listRef}>
               {rows.length === 0 ? (
                 <TableEmpty colSpan={3}>
-                  <p className="text-sb-sm text-fg-muted">
+                  <p className="m-0 text-sb-sm text-fg-muted">
                     {filtered ? "No keys match this filter." : "This namespace is empty."}
                   </p>
                 </TableEmpty>

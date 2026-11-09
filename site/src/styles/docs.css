@@ -323,7 +323,7 @@
   .docs.wide .prose {
     max-width: none;
   }
-  .prose h1 {
+  .prose h1:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 40px;
     font-weight: 600;
     letter-spacing: -0.03em;
@@ -331,7 +331,7 @@
     margin: 10px 0 10px;
     text-wrap: balance;
   }
-  .prose h2 {
+  .prose h2:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.015em;
@@ -339,20 +339,21 @@
     margin: 48px 0 12px;
     text-wrap: balance;
   }
-  .prose h3 {
+  .prose h3:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 16px;
     font-weight: 600;
     margin: 28px 0 8px;
   }
-  .prose p,
-  .prose li {
+  .prose > p,
+  .prose > ul > li,
+  .prose > ol > li {
     color: var(--sb-fg-muted);
     font-size: 15.5px;
     line-height: 1.65;
     max-width: 65ch;
     text-wrap: pretty;
   }
-  .prose p {
+  .prose > p {
     margin: 0 0 14px;
   }
   .prose ul.list {
@@ -360,7 +361,8 @@
     list-style: disc;
     margin: 0 0 14px;
   }
-  .prose li {
+  .prose > ul > li,
+  .prose > ol > li {
     margin: 4px 0;
   }
   .prose a.ilink {

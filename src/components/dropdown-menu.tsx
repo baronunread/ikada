@@ -54,7 +54,7 @@ export function DropdownMenuContent({
           className={cn(
             floatingSurface,
             popupMotion,
-            "min-w-48 p-1 text-sb-base [--sb-gutter:0rem] has-[[role=menuitemcheckbox]]:[--sb-gutter:1.5rem] has-[[role=menuitemradio]]:[--sb-gutter:1.5rem]",
+            "min-w-48 max-w-(--available-width) overflow-y-auto overscroll-contain p-1 text-sb-base [--sb-gutter:0rem] has-[[role=menuitemcheckbox]]:[--sb-gutter:1.5rem] has-[[role=menuitemradio]]:[--sb-gutter:1.5rem]",
             className,
           )}
           {...instantAttr(instant)}
@@ -68,7 +68,7 @@ export function DropdownMenuContent({
 }
 
 const itemStyles = [
-  "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-1.5 pe-2.5 ps-[calc(0.625rem+var(--sb-gutter))] text-sb-base outline-hidden select-none",
+  "relative flex min-h-9 min-w-0 cursor-default wrap-anywhere items-center gap-2 rounded-md py-1.5 pe-2.5 ps-[calc(0.625rem+var(--sb-gutter))] text-sb-base outline-hidden select-none",
   "transition-colors duration-(--sb-duration-hover) ease-hover",
   "data-disabled:opacity-50 data-highlighted:bg-hover pointer-coarse:min-h-11",
 ].join(" ");

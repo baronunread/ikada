@@ -92,7 +92,7 @@ export function RadioGroup({
             <span className="flex min-w-0 flex-col [overflow-wrap:anywhere]">
               <span id={`${legendId}-label-${index}`}>{option.label}</span>
               {option.description ? (
-                <span id={`${legendId}-description-${index}`} className="text-sb-sm text-fg-muted">
+                <span id={`${legendId}-description-${index}`} className="text-pretty text-sb-sm text-fg-muted">
                   {option.description}
                 </span>
               ) : null}
