@@ -307,7 +307,7 @@ export function LogsPanel({
     >
       <div className="flex flex-col gap-3 px-4 pt-4 pb-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 id="logs-panel-title" className="me-auto text-sb-md font-semibold">
+          <h2 id="logs-panel-title" className="me-auto min-w-0 truncate text-sb-md font-semibold">
             {title}
           </h2>
           <div className="relative order-last w-full @2xl:order-none @2xl:w-64">
@@ -324,7 +324,7 @@ export function LogsPanel({
           <SegmentedControl
             aria-label="Stream"
             size="sm"
-            className="w-auto"
+            className="w-40 shrink-0"
             value={mode}
             options={[
               { value: "live", label: "Live" },

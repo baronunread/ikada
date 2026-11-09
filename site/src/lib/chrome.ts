@@ -104,7 +104,7 @@ function drawer(): void {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && panel.hasAttribute("data-open")) set(false, true);
   });
-  matchMedia("(min-width: 861px)").addEventListener("change", (m) => m.matches && set(false));
+  matchMedia("(min-width: 901px)").addEventListener("change", (m) => m.matches && set(false));
 }
 
 /** The text a copy button copies: `data-copy` itself, or the text of the element `data-copy-from` names. */

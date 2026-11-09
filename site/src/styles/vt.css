@@ -3,7 +3,7 @@
      Lead     <main>, named "page" for the moment     the old lifts and fades, the new rises on the bob spring
      Support  brand-mark                             the sprout sinks below its waterline, the raft surfaces (and back)
      Support  brand-word, nav-links, nav-action       a crossfade at natural size (no text stretching)
-     Static   site-nav (the header bar)               no animation
+     Static   site-nav (the header bar), nav-ctl      no animation (the icon buttons sit at the same place on every page)
      Carry    chart-hero (the chart's box)             the new page's first paint is the old page's last frame, so the
                                                       swap is invisible; without an exact hand-off, a short crossfade
    Only navigations that cross /ikada get the "sb" type (the head script in Shell.astro); inside /ikada every
@@ -23,8 +23,11 @@
   .nav .links {
     view-transition-name: nav-links;
   }
-  .nav .ctl {
+  .nav .search {
     view-transition-name: nav-action;
+  }
+  .nav .ctl {
+    view-transition-name: nav-ctl;
   }
 }
 
@@ -80,6 +83,16 @@ html:active-view-transition-type(sb)::view-transition-new(site-nav) {
   animation: none;
 }
 html:active-view-transition-type(sb)::view-transition-old(site-nav) {
+  animation: none;
+  opacity: 0;
+}
+
+/* static: the icon cluster (GitHub, theme, menu) is the same box on all three sites */
+html:active-view-transition-type(sb)::view-transition-group(nav-ctl),
+html:active-view-transition-type(sb)::view-transition-new(nav-ctl) {
+  animation: none;
+}
+html:active-view-transition-type(sb)::view-transition-old(nav-ctl) {
   animation: none;
   opacity: 0;
 }

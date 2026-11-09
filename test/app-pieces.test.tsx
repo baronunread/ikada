@@ -222,11 +222,33 @@ describe("DescriptionList", () => {
 });
 
 describe("Pagination", () => {
-  test("pageRange shows first, last, siblings and gaps", () => {
+  test("pageRange keeps a constant slot count and never hides a single page", () => {
     expect(pageRange(1, 1)).toEqual([1]);
-    expect(pageRange(1, 5)).toEqual([1, 2, "gap-end", 5]);
+    expect(pageRange(3, 7)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(pageRange(1, 12)).toEqual([1, 2, 3, 4, 5, "gap-end", 12]);
+    expect(pageRange(4, 12)).toEqual([1, 2, 3, 4, 5, "gap-end", 12]);
+    expect(pageRange(5, 12)).toEqual([1, "gap-start", 4, 5, 6, "gap-end", 12]);
     expect(pageRange(6, 12)).toEqual([1, "gap-start", 5, 6, 7, "gap-end", 12]);
-    expect(pageRange(2, 4)).toEqual([1, 2, 3, 4]);
+    expect(pageRange(9, 12)).toEqual([1, "gap-start", 8, 9, 10, 11, 12]);
+    expect(pageRange(12, 12)).toEqual([1, "gap-start", 8, 9, 10, 11, 12]);
+    for (const count of [8, 12, 40])
+      for (const siblings of [1, 2]) {
+        const widths = new Set<number>();
+        for (let p = 1; p <= count; p += 1) {
+          const r = pageRange(p, count, siblings);
+          widths.add(r.length);
+          const nums = r.filter((e): e is number => typeof e === "number");
+          expect(nums.includes(p)).toBe(true);
+          // a gap stands for at least two pages
+          r.forEach((e, i) => {
+            if (typeof e === "number") return;
+            const before = e === "gap-start" ? 1 : (r[i - 1] as number);
+            const after = e === "gap-start" ? (r[i + 1] as number) : (r[i + 1] as number);
+            expect(after - before - 1).toBeGreaterThanOrEqual(2);
+          });
+        }
+        expect(widths.size).toBe(1);
+      }
   });
   test("buttons move the page, ends are disabled, the current page is marked", async () => {
     let page = 1;

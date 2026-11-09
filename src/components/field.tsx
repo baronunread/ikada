@@ -49,13 +49,13 @@ export function Field({
       </BaseField.Label>
       {children}
       {description ? (
-        <BaseField.Description className="text-sb-sm text-fg-muted [overflow-wrap:anywhere]">
+        <BaseField.Description className="text-pretty text-sb-sm text-fg-muted [overflow-wrap:anywhere]">
           {description}
         </BaseField.Description>
       ) : null}
       <BaseField.Error
         match={Boolean(error)}
-        className="flex items-start gap-1.5 text-sb-sm text-danger-fg [overflow-wrap:anywhere]"
+        className="flex items-start gap-1.5 text-pretty text-sb-sm text-danger-fg [overflow-wrap:anywhere]"
       >
         {error}
       </BaseField.Error>

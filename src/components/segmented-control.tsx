@@ -187,6 +187,8 @@ export function SegmentedControl<T extends string = string>({
             size === "sm" ? "h-6 px-2 text-sb-xs" : "h-7 px-3 text-sb-sm",
             coarseTarget,
             focusRing,
+            // Hug the segment: the ring then lands on the tray edge instead of spilling past it.
+            "focus-visible:outline-offset-0",
           )}
         >
           {typeof option.label === "string" ? (

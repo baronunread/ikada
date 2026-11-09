@@ -5,15 +5,15 @@
  */
 export const BLOCK_HEIGHTS: Record<string, [number, number]> = {
   "d1-console": [583, 583],
-  "empty-states": [861, 1689],
-  "kv-browser": [1325, 1441],
-  "logs-panel": [628, 754],
+  "empty-states": [638, 1246],
+  "kv-browser": [1296, 1412],
+  "logs-panel": [568, 686],
   "metric-row": [312, 352],
-  "project-tray": [833, 1214],
-  "settings-section": [1275, 1449],
-  "sign-in-card": [530, 530],
-  "toast-deck": [602, 716],
-  "traffic-chart": [436, 476],
+  "project-tray": [671, 1052],
+  "settings-section": [953, 1127],
+  "sign-in-card": [442, 442],
+  "toast-deck": [420, 512],
+  "traffic-chart": [348, 388],
   "usage-line": [104, 134],
 };
 export const blockHeightStyle = (slug: string): string => {

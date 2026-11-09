@@ -119,7 +119,7 @@ export function Breadcrumbs({ items, maxItems = 4, className, ref, ...props }: B
               </li>
               {last ? null : (
                 <li aria-hidden="true" className="flex shrink-0 text-fg-muted">
-                  <ChevronRightIcon className="size-3.5" />
+                  <ChevronRightIcon className="size-3.5 rtl:-scale-x-100" />
                 </li>
               )}
             </Fragment>

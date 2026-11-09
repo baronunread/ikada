@@ -6,9 +6,9 @@ import { Tooltip } from "./tooltip";
 const iconSize = tv({
   variants: {
     size: {
-      sm: "size-(--sb-control-h-sm) px-0",
-      md: "size-(--sb-control-h) px-0",
-      lg: "size-10 px-0",
+      sm: "size-(--sb-control-h-sm) px-0 pointer-coarse:min-w-11",
+      md: "size-(--sb-control-h) px-0 pointer-coarse:min-w-11",
+      lg: "size-10 px-0 pointer-coarse:min-w-11",
     },
   },
   defaultVariants: { size: "md" },

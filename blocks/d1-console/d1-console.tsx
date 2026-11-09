@@ -282,7 +282,7 @@ function TablesTree({
       {tables.map((t) => {
         const expanded = open.has(t.name);
         return (
-          <li key={t.name}>
+          <li key={t.name} className="">
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
@@ -291,7 +291,7 @@ function TablesTree({
                 aria-label={`${expanded ? "Hide" : "Show"} columns of ${t.name}`}
                 onClick={() => toggle(t.name)}
                 className={cn(
-                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:size-11",
                   focusRing,
                 )}
               >
@@ -485,7 +485,7 @@ export function D1Console({
               aria-expanded={showTables}
               onClick={() => setShowTables((v) => !v)}
               className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg @3xl:hidden",
+                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:h-11 @3xl:hidden",
                 focusRing,
               )}
             >

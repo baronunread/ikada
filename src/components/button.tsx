@@ -8,7 +8,7 @@ import { SpinnerIcon } from "../lib/icons";
 
 export const buttonStyles = tv({
   base: [
-    "relative inline-flex max-w-full shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
+    "relative inline-flex min-w-0 max-w-full shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
     pressMotion,
     // Optical alignment: the icon side gets 2px less padding than the text side.
     "has-[>svg:first-child:not(:only-child)]:ps-3 has-[>svg:last-child:not(:only-child)]:pe-3",
@@ -69,6 +69,8 @@ export function Button({
   ref,
   ...props
 }: ButtonProps) {
+  // A plain-text label truncates with an ellipsis instead of breaking the layout.
+  const label = typeof children === "string" ? <span className="min-w-0 truncate">{children}</span> : children;
   return (
     <BaseButton
       data-slot="button"
@@ -83,13 +85,11 @@ export function Button({
     >
       {loading ? (
         <>
-          <span className="inline-flex min-w-0 items-center gap-2 opacity-0">
-            <Label>{children}</Label>
-          </span>
+          <span className="inline-flex min-w-0 items-center gap-2 opacity-0">{label}</span>
           <SpinnerIcon className="absolute" />
         </>
       ) : (
-        <Label>{children}</Label>
+        label
       )}
     </BaseButton>
   );

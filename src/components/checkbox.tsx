@@ -90,7 +90,7 @@ export function Checkbox({
       <span className="flex min-w-0 flex-col [overflow-wrap:anywhere]">
         <span id={`${controlId}-label`}>{label}</span>
         {description ? (
-          <span id={`${controlId}-description`} className="text-sb-sm text-fg-muted">
+          <span id={`${controlId}-description`} className="text-pretty text-sb-sm text-fg-muted">
             {description}
           </span>
         ) : null}
