@@ -107,11 +107,16 @@ export function MetricTile({
                 </span>
               ) : null}
             </div>
-            <span className="min-h-5 text-sb-sm text-fg-muted">{noData ? emptyText : hint}</span>
+            {noData || hint ? <span className="text-sb-sm text-fg-muted">{noData ? emptyText : hint}</span> : null}
           </>
         )}
       </div>
-      <div className="mt-2 flex h-11 flex-col justify-end">{loading || noData ? null : sparkline}</div>
+      {/* The slot exists only for tiles that have a sparkline, and keeps its height while loading or empty so the tile doesn't jump. */}
+      {sparkline ? (
+        <div className="mt-2 flex h-11 flex-col justify-end">{loading || noData ? null : sparkline}</div>
+      ) : (
+        <div className="pb-3.5" />
+      )}
     </div>
   );
 }
