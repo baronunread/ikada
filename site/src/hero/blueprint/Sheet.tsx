@@ -264,6 +264,14 @@ function TitleBlock({
   if (mobile)
     return (
       <g className="tb">
+        <rect
+          x={T.x}
+          y={T.y}
+          width={T.w}
+          height={T.h}
+          className="tb-bg"
+          style={sv({ "--dl": `${Math.round((B0 + 700) * 0.82)}ms` })}
+        />
         <Ln d={`M${T.x} ${T.y}H${T.x + T.w}V${T.y + T.h}H${T.x}Z`} k="main" dl={B0 + 700} />
         <Tx x={T.x + P} y={T.y + 19} cls="tb-main" dl={B0 + 1500}>
           {rev}
@@ -280,6 +288,14 @@ function TitleBlock({
   const { x, y, w: tw, h } = T;
   return (
     <g className="tb">
+      <rect
+        x={x}
+        y={y}
+        width={tw}
+        height={h}
+        className="tb-bg"
+        style={sv({ "--dl": `${Math.round((B0 + 700) * 0.82)}ms` })}
+      />
       <Ln d={`M${x} ${y}H${x + tw}V${y + h}H${x}Z`} k="main" dl={B0 + 700} />
       <Ln
         d={`M${x} ${y + r1}H${x + tw}M${x} ${y + r2}H${x + tw}M${x1} ${y + r1}V${y + h}M${x2} ${y + r2}V${y + h}M${x3} ${y + r2}V${y + h}`}
