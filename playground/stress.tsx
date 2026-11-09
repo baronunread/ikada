@@ -394,6 +394,18 @@ function Forms() {
       <Case name="SegmentedControl" width="100%">
         <div className="flex flex-col gap-3">
           <SegmentedControl
+            aria-label="selected last"
+            value="e"
+            onValueChange={() => {}}
+            options={[
+              { value: "a", label: "Last 1 hour" },
+              { value: "b", label: "Last 24 hours" },
+              { value: "c", label: "Last 7 days" },
+              { value: "d", label: "Last 30 days" },
+              { value: "e", label: "Custom range" },
+            ]}
+          />
+          <SegmentedControl
             aria-label="s"
             value={seg}
             onValueChange={setSeg}
