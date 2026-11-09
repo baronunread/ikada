@@ -383,6 +383,7 @@
     list-style: none;
   }
   .bcard {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -398,11 +399,26 @@
     overflow: hidden;
     background: var(--sb-canvas);
     box-shadow: inset 0 -1px 0 var(--sb-hairline);
-    outline: 2px solid transparent;
-    outline-offset: -2px;
   }
-  .bwin:focus-visible {
-    outline-color: var(--sb-focus);
+  /* the title is the link; its box stretches over the whole card (the copy button sits above it) */
+  .bstretch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .bstretch {
+    outline: none;
+  }
+  .bcard:has(.bstretch:focus-visible) {
+    outline: 2px solid var(--sb-focus);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) {
+    .bcard:has(.bstretch:hover) .bname h3 {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
   /* the block renders at 160% of the card and is shown at 62%: a thumbnail that is the real component */
   .bwin-in {
@@ -456,6 +472,8 @@
     overflow: hidden;
   }
   .bcmd {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 8px;
