@@ -57,9 +57,14 @@ export function Switch({ label, className, id, ref, ...props }: SwitchProps) {
   );
   if (!label) return control;
   return (
-    <label htmlFor={controlId} className={cn("inline-flex items-center gap-2.5 text-sb-base text-fg", className)}>
+    <label
+      htmlFor={controlId}
+      className={cn("inline-flex max-w-full items-center gap-2.5 text-sb-base text-fg", className)}
+    >
       {control}
-      <span id={`${controlId}-label`}>{label}</span>
+      <span id={`${controlId}-label`} className="min-w-0 [overflow-wrap:anywhere]">
+        {label}
+      </span>
     </label>
   );
 }

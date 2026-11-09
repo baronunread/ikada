@@ -56,7 +56,7 @@ export function SensitiveInput({
       <Input
         {...props}
         type={revealed ? "text" : "password"}
-        className={cn(copyable ? "pe-[4.5rem]" : "pe-10", className)}
+        className={cn(copyable ? "pe-[4.5rem] pointer-coarse:pe-24" : "pe-10 pointer-coarse:pe-14", className)}
       />
       <span className="absolute inset-y-0 end-1 flex items-center gap-0.5">
         <IconButton

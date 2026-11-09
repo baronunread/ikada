@@ -34,7 +34,8 @@ const linkStyles = cn(
 
 function Crumb({ item, current }: { item: BreadcrumbItem; current: boolean }) {
   // An undefined href would override the one on a router link, so only set it when there is one.
-  const shared = { onClick: item.onClick, className: cn(linkStyles, "block truncate"), children: item.label };
+  const title = typeof item.label === "string" ? item.label : item.text;
+  const shared = { onClick: item.onClick, title, className: cn(linkStyles, "block truncate"), children: item.label };
   const linkProps = item.href === undefined ? shared : { ...shared, href: item.href };
   const link = useRender({
     defaultTagName: "a",
@@ -44,14 +45,14 @@ function Crumb({ item, current }: { item: BreadcrumbItem; current: boolean }) {
   });
   if (current) {
     return (
-      <span aria-current="page" className="block truncate font-medium text-fg">
+      <span aria-current="page" title={title} className="block truncate font-medium text-fg">
         {item.label}
       </span>
     );
   }
   return (
     link ?? (
-      <button type="button" onClick={item.onClick} className={cn(linkStyles, "block truncate")}>
+      <button type="button" onClick={item.onClick} title={title} className={cn(linkStyles, "block truncate")}>
         {item.label}
       </button>
     )
@@ -118,7 +119,7 @@ export function Breadcrumbs({ items, maxItems = 4, className, ref, ...props }: B
               </li>
               {last ? null : (
                 <li aria-hidden="true" className="flex shrink-0 text-fg-muted">
-                  <ChevronRightIcon className="size-3.5" />
+                  <ChevronRightIcon className="size-3.5 rtl:-scale-x-100" />
                 </li>
               )}
             </Fragment>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ikada worst-case stress page</title>
+    <script>
+      (function () {
+        var p = new URLSearchParams(location.search);
+        var t = p.get("theme") === "dark" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+        document.documentElement.classList.toggle("dark", t === "dark");
+        if (p.get("dir") === "rtl") document.documentElement.setAttribute("dir", "rtl");
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./stress-main.tsx"></script>
+  </body>
+</html>

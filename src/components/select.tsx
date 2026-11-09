@@ -53,6 +53,7 @@ export function Select({
           id={id}
           aria-label={ariaLabel}
           aria-invalid={invalid || undefined}
+          title={options.find((o) => o.value === props.value)?.label}
           className={cn(
             "inline-flex h-(--sb-control-h) w-full min-w-0 items-center justify-between gap-2 ps-3 pe-2.5 text-start text-sb-base",
             fieldSurface,
@@ -79,7 +80,7 @@ export function Select({
               className={cn(
                 floatingSurface,
                 popupMotion,
-                "max-h-(--available-height) min-w-(--anchor-width) overflow-y-auto p-1",
+                "max-h-(--available-height) max-w-(--available-width) min-w-(--anchor-width) overflow-y-auto p-1",
               )}
               {...instantAttr(instant)}
             >

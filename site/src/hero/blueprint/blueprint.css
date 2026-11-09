@@ -216,6 +216,16 @@ html[data-theme="light"] .bp {
   transition: opacity 300ms ease var(--dl, 0ms);
 }
 
+/* the title block is an opaque box: the sheet's own paper colour, so no grid shows inside it */
+.sheet .tb-bg {
+  fill: var(--paper);
+  opacity: 0;
+  transition: opacity 300ms ease var(--dl, 0ms);
+}
+.bp[data-open] .sheet .tb-bg {
+  opacity: 1;
+}
+
 /* text */
 .sheet .tx {
   font-family: var(--mono);

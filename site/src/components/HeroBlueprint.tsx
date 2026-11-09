@@ -17,9 +17,9 @@ declare global {
   }
 }
 
-export default function HeroBlueprint() {
+export default function HeroBlueprint({ version }: { version: string }) {
   const root = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<{ w: number; h: number; copyBottom: number } | null>(null);
+  const [size, setSize] = useState<{ w: number; h: number; copyBottom: number; navH: number } | null>(null);
   // seen this session (head script): the settled sheet from the first render, no reveal
   const [settled] = useState(() => introSeen());
   const [mounted, setMounted] = useState(settled);
@@ -33,7 +33,9 @@ export default function HeroBlueprint() {
     const measure = (): void => {
       const ctl = shell.querySelector<HTMLElement>("[data-hero-mask=ctl]");
       const copyBottom = ctl ? ctl.getBoundingClientRect().bottom - shell.getBoundingClientRect().top : 0;
-      setSize({ w: shell.clientWidth, h: shell.clientHeight, copyBottom: Math.round(copyBottom) });
+      // the header overlaps the top of the shell (its padding-top): the sheet's frame starts below it
+      const navH = Math.round(parseFloat(getComputedStyle(shell).paddingTop) || 0);
+      setSize({ w: shell.clientWidth, h: shell.clientHeight, copyBottom: Math.round(copyBottom), navH });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -127,7 +129,16 @@ export default function HeroBlueprint() {
     >
       <ToastProvider>
         <TooltipProvider>
-          {size && mounted && <Sheet w={size.w} h={size.h} armed={open} copyBottom={size.copyBottom} />}
+          {size && mounted && (
+            <Sheet
+              w={size.w}
+              h={size.h}
+              armed={open}
+              copyBottom={size.copyBottom}
+              navH={size.navH || undefined}
+              version={version}
+            />
+          )}
         </TooltipProvider>
       </ToastProvider>
     </div>

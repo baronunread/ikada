@@ -80,10 +80,15 @@ function Section({
     >
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-0 flex-1 basis-60">
-          <h2 id={`${id}-title`} className={cn("text-sb-md font-semibold", tone === "danger" && "text-danger-fg")}>
+          <h2
+            id={`${id}-title`}
+            className={cn("text-sb-md font-semibold [overflow-wrap:anywhere]", tone === "danger" && "text-danger-fg")}
+          >
             {title}
           </h2>
-          {description ? <p className="mt-0.5 text-sb-base text-fg-muted">{description}</p> : null}
+          {description ? (
+            <p className="mt-0.5 text-sb-base text-fg-muted [overflow-wrap:anywhere]">{description}</p>
+          ) : null}
         </div>
         {action ? <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div> : null}
       </div>
@@ -107,8 +112,8 @@ function SwitchRow({
   return (
     <label className="flex cursor-pointer items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
       <span className="min-w-0">
-        <span className="block font-medium">{label}</span>
-        <span className="block text-sb-sm text-fg-muted">{description}</span>
+        <span className="block font-medium [overflow-wrap:anywhere]">{label}</span>
+        <span className="block text-sb-sm text-fg-muted [overflow-wrap:anywhere]">{description}</span>
       </span>
       <Switch checked={checked} onCheckedChange={onCheckedChange} className="mt-0.5" />
     </label>
@@ -214,7 +219,7 @@ export function SettingsSection({
   return (
     <div className={cn("@container flex flex-col gap-4 text-fg", className)}>
       <Section id="settings-general" title="General" description="The name is shown in the dashboard and in emails.">
-        <div className="grid gap-4 @xl:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 @xl:grid-cols-[repeat(2,minmax(0,1fr))]">
           <Field label="Name" error={nameError}>
             <Input value={values.name} onChange={(event) => set("name", event.target.value)} autoComplete="off" />
           </Field>

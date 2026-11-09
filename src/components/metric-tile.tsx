@@ -80,7 +80,7 @@ export function MetricTile({
       {...props}
     >
       <div className="flex flex-col gap-1 px-4 pt-3.5">
-        <span className="text-sb-sm font-medium text-fg-muted">{label}</span>
+        <span className="text-sb-sm font-medium text-fg-muted [overflow-wrap:anywhere]">{label}</span>
         {loading ? (
           <div className="flex flex-col gap-2 py-1.5">
             <Skeleton className="h-6 w-24" />
@@ -90,7 +90,12 @@ export function MetricTile({
         ) : (
           <>
             <div className="flex flex-wrap items-baseline gap-x-1.5">
-              <span className={cn("text-sb-metric proportional-nums", noData && "text-fg-muted")}>
+              <span
+                className={cn(
+                  "min-w-0 text-sb-metric proportional-nums [overflow-wrap:anywhere]",
+                  noData && "text-fg-muted",
+                )}
+              >
                 {noData ? "—" : shown}
               </span>
               {unit && !noData ? <span className="text-sb-base font-medium text-fg-muted">{unit}</span> : null}
@@ -107,7 +112,9 @@ export function MetricTile({
                 </span>
               ) : null}
             </div>
-            {noData || hint ? <span className="text-sb-sm text-fg-muted">{noData ? emptyText : hint}</span> : null}
+            {noData || hint ? (
+              <span className="text-sb-sm text-fg-muted [overflow-wrap:anywhere]">{noData ? emptyText : hint}</span>
+            ) : null}
           </>
         )}
       </div>

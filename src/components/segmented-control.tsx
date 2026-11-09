@@ -3,7 +3,7 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import { cn, coarseTarget, focusRing, pebble, traySurface } from "../lib/cn";
 
 export interface SegmentedOption<T extends string = string> {
@@ -76,6 +76,55 @@ function usePebble(value: string) {
   return { ref, box, ready };
 }
 
+const FADE = 20;
+
+/**
+ * When the tray scrolls (more options than room), fades the edge that has more content behind it, so a
+ * clipped label reads as "scrolls" rather than "cut off". Keeps the chosen option in view on mount and change.
+ */
+function useScrollEdges(ref: RefObject<HTMLDivElement | null>, value: string): CSSProperties | undefined {
+  const [edges, setEdges] = useState({ start: false, end: false });
+  useIsomorphicLayoutEffect(() => {
+    const group = ref.current;
+    if (!group) return undefined;
+    const update = () => {
+      const max = group.scrollWidth - group.clientWidth;
+      // scrollLeft is 0 at the start edge in both directions; it runs negative in RTL.
+      const at = Math.abs(group.scrollLeft);
+      const next = { start: max > 1 && at > 1, end: max > 1 && at < max - 1 };
+      setEdges((prev) => (prev.start === next.start && prev.end === next.end ? prev : next));
+    };
+    update();
+    group.addEventListener("scroll", update, { passive: true });
+    if (typeof ResizeObserver === "undefined") return () => group.removeEventListener("scroll", update);
+    const observer = new ResizeObserver(update);
+    observer.observe(group);
+    return () => {
+      group.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, [ref]);
+  useIsomorphicLayoutEffect(() => {
+    const group = ref.current;
+    const el = group?.querySelector<HTMLElement>("[data-pressed]");
+    if (!group || !el) return;
+    // Scroll the tray only (scrollIntoView could move the page), the least that shows the whole option.
+    const g = group.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    if (r.left < g.left) group.scrollLeft -= g.left - r.left + 4;
+    else if (r.right > g.right) group.scrollLeft += r.right - g.right + 4;
+  }, [ref, value]);
+  if (!edges.start && !edges.end) return undefined;
+  const physicalLeft = getComputedStyleDirection(ref.current) === "rtl" ? edges.end : edges.start;
+  const physicalRight = getComputedStyleDirection(ref.current) === "rtl" ? edges.start : edges.end;
+  const mask = `linear-gradient(to right, ${physicalLeft ? "transparent" : "#000"} 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), ${physicalRight ? "transparent" : "#000"} 100%)`;
+  return { maskImage: mask, WebkitMaskImage: mask };
+}
+
+function getComputedStyleDirection(el: HTMLElement | null): "ltr" | "rtl" {
+  return el && typeof getComputedStyle !== "undefined" && getComputedStyle(el).direction === "rtl" ? "rtl" : "ltr";
+}
+
 /**
  * One choice out of a few, always one selected (a click on the selected segment does nothing).
  * Arrow keys move between segments; Space or Enter selects. A raised pebble on a recessed tray
@@ -90,6 +139,7 @@ export function SegmentedControl<T extends string = string>({
   "aria-label": ariaLabel,
 }: SegmentedControlProps<T>) {
   const { ref, box, ready } = usePebble(value);
+  const fade = useScrollEdges(ref, value);
   return (
     <ToggleGroup
       data-slot="segmented-control"
@@ -101,7 +151,12 @@ export function SegmentedControl<T extends string = string>({
         if (chosen) onValueChange(chosen.value);
       }}
       data-pebble={box ? "" : undefined}
-      className={cn("group/seg relative inline-flex w-full gap-0.5 p-0.5", traySurface, className)}
+      style={fade}
+      className={cn(
+        "group/seg relative inline-flex w-full max-w-full gap-0.5 overflow-x-auto p-0.5 [scrollbar-width:none]",
+        traySurface,
+        className,
+      )}
     >
       {box ? (
         <span
@@ -124,7 +179,7 @@ export function SegmentedControl<T extends string = string>({
           disabled={option.disabled}
           aria-label={option["aria-label"] ?? option.ariaLabel}
           className={cn(
-            "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-semibold text-fg-muted",
+            "relative z-10 inline-flex min-w-max flex-1 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md font-semibold text-fg-muted",
             "transition-[background-color,color,box-shadow] duration-(--sb-duration-hover) ease-hover hover:text-fg",
             "data-pressed:bg-raised data-pressed:text-fg data-pressed:shadow-pill",
             "group-data-pebble/seg:data-pressed:bg-transparent group-data-pebble/seg:data-pressed:shadow-none",
@@ -132,9 +187,17 @@ export function SegmentedControl<T extends string = string>({
             size === "sm" ? "h-6 px-2 text-sb-xs" : "h-7 px-3 text-sb-sm",
             coarseTarget,
             focusRing,
+            // Hug the segment: the ring then lands on the tray edge instead of spilling past it.
+            "focus-visible:outline-offset-0",
           )}
         >
-          {option.label}
+          {typeof option.label === "string" ? (
+            <span className="max-w-64 min-w-0 truncate" title={option.label}>
+              {option.label}
+            </span>
+          ) : (
+            option.label
+          )}
         </Toggle>
       ))}
     </ToggleGroup>

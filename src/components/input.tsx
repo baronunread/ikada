@@ -6,7 +6,7 @@ export const inputStyles = cn(
   "h-(--sb-control-h) w-full min-w-0 px-3 text-sb-base",
   fieldSurface,
   "placeholder:text-fg-muted pointer-coarse:text-[16px]",
-  "read-only:bg-hover",
+  "read-only:bg-hover [&[type=number]]:tabular-nums",
   focusRing,
   coarseTarget,
 );

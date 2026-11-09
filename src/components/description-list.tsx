@@ -34,8 +34,10 @@ export function DescriptionList({ items, layout = "inline", className, ref, ...p
             layout === "inline" && "@md:grid-cols-[10rem_minmax(0,1fr)]",
           )}
         >
-          <dt className="text-sb-sm font-medium text-fg-muted">{item.term}</dt>
-          <dd className={cn("m-0 min-w-0 break-words", item.mono && "font-mono text-sb-sm")}>{item.details}</dd>
+          <dt className="min-w-0 break-words text-sb-sm font-medium text-fg-muted">{item.term}</dt>
+          <dd className={cn("m-0 min-w-0 break-words text-pretty", item.mono && "font-mono text-sb-sm")}>
+            {item.details}
+          </dd>
         </div>
       ))}
     </dl>

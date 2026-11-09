@@ -24,7 +24,7 @@ export function Link({ external = false, className, children, ref, render, ...pr
       target: external ? "_blank" : undefined,
       rel: external ? "noopener noreferrer" : undefined,
       className: cn(
-        "inline-flex items-center gap-1 rounded-xs font-medium text-fg underline decoration-hairline-strong decoration-1 underline-offset-4 transition-colors duration-(--sb-duration-hover) ease-hover",
+        "rounded-xs font-medium text-fg underline decoration-hairline-strong decoration-1 underline-offset-4 transition-colors duration-(--sb-duration-hover) ease-hover",
         "hover:decoration-fg aria-disabled:pointer-events-none aria-disabled:opacity-55",
         focusRing,
         className,
@@ -35,7 +35,7 @@ export function Link({ external = false, className, children, ref, render, ...pr
           {children}
           {external ? (
             <>
-              <ArrowUpRightIcon className="size-3.5" />
+              <ArrowUpRightIcon className="ms-1 inline-block size-3.5 align-[-0.2em]" />
               <span className="sr-only">(opens in a new tab)</span>
             </>
           ) : null}

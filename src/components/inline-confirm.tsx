@@ -63,7 +63,7 @@ export function InlineConfirm({
           aria-hidden="true"
           data-open={active ? "" : undefined}
           className={cn(
-            "pointer-events-none absolute bottom-full start-1/2 z-(--sb-z-popover) mb-1.5 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-lg bg-raised px-2 py-1 text-sb-xs font-medium text-fg shadow-float",
+            "pointer-events-none absolute bottom-full start-1/2 z-(--sb-z-popover) mb-1.5 inline-flex -translate-x-1/2 items-center rtl:translate-x-1/2 gap-1 whitespace-nowrap rounded-lg bg-raised px-2 py-1 text-sb-xs font-medium text-fg shadow-float",
             "group/confirm origin-bottom [transition:opacity_var(--sb-duration-popup-out)_var(--ease-out),translate_var(--sb-duration-popup-out)_var(--ease-out),scale_var(--sb-duration-popup-out)_var(--ease-out)]",
             "translate-y-[calc(4px*var(--sb-move))] scale-(--sb-scale-popup) opacity-0",
             "data-open:translate-y-0 data-open:scale-100 data-open:opacity-100",
