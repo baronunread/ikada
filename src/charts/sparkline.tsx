@@ -12,6 +12,7 @@ import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import { accessibleName } from "../lib/accessible-name";
 import type { AccessibleName } from "../lib/accessible-name";
+import { tooltipCard } from "./tooltip-card";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
@@ -123,10 +124,9 @@ export function Sparkline({
         offset: 8,
         content: (points: readonly { datum: unknown }[]) => {
           const d = points[0]!.datum as Row;
-          return {
-            ...(formatPoint ? { title: formatPoint(d.i) } : {}),
-            rows: [{ label: name, value: formatValue(d.v), color: stroke, active: true }],
-          };
+          return tooltipCard(formatPoint?.(d.i), [
+            { label: name, value: formatValue(d.v), color: stroke, active: true },
+          ]);
         },
       },
     });

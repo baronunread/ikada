@@ -58,6 +58,7 @@ export const CATEGORIES: Record<string, string[]> = {
   sparkline: ["charts"],
   "timeseries-chart": ["charts"],
   "chart-theme": ["charts", "utilities"],
+  "tooltip-card": ["charts", "utilities"],
   // Libraries
   cn: ["utilities"],
   "accessible-name": ["utilities"],
@@ -155,6 +156,10 @@ export const TEXT: Record<string, { title?: string; description?: string }> = {
   "chart-theme": {
     title: "Chart theme",
     description: "Chart colour tokens as CSS variable references, so TanStack Charts follow light and dark.",
+  },
+  "tooltip-card": {
+    title: "Chart tooltip card",
+    description: "Builds the hover card (a title over swatch rows) that Sparkline and TimeseriesChart share.",
   },
 };
 

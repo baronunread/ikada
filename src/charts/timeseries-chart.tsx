@@ -1,10 +1,12 @@
 "use client";
 
+import { crosshair } from "@tanstack/charts/crosshair";
 import { areaY, defineChart, lineY, ruleX, text } from "@tanstack/charts";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { decorative } from "@tanstack/charts/mark/decorative";
 import { tooltip } from "@tanstack/charts/tooltip";
+import type { ChartTooltipPlacement } from "@tanstack/charts/tooltip";
 import { portal } from "@tanstack/charts/tooltip/portal";
 import { useMemo } from "react";
 import { cn } from "../lib/cn";
@@ -12,6 +14,7 @@ import { formatCompact, formatNumber } from "../lib/format";
 import { useLocale } from "../lib/locale";
 import { accessibleName } from "../lib/accessible-name";
 import type { AccessibleName } from "../lib/accessible-name";
+import { tooltipCard } from "./tooltip-card";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
@@ -180,6 +183,11 @@ export function TimeseriesChart({
           }),
         ];
       }),
+      // A vertical guide that the card sits beside. Not a mark in the tooltip, so deploy markers stay out of it.
+      crosshair({
+        x: { stroke: "currentColor", strokeOpacity: 0.35, strokeWidth: 1, strokeDasharray: "2 3" },
+        y: false,
+      }),
       ...markers(deploy).flatMap((m, i) => [
         decorative(
           ruleX([{ time: m.time }], {
@@ -206,6 +214,8 @@ export function TimeseriesChart({
         ),
       ]),
     ];
+    // Which side of the crosshair the card is on, set by `anchor` just before the library reads `placement`.
+    let side: "left" | "right" = "right";
     return defineChart({
       marks,
       scales: {
@@ -228,7 +238,34 @@ export function TimeseriesChart({
         use: tooltip,
         // In the top layer, so a tile or card with overflow hidden never clips it.
         portal,
-        format: (p: { datum: Row }) => `${time(p.datum.time)}\n${p.datum.label}: ${formatValue(p.datum.value)}`,
+        // Beside the crosshair at the top of the plot: right of the line, flipping to its left in the right half of
+        // the plot (not only at the viewport edge), so it never covers the hovered point or hangs outside the tile.
+        anchor: (points: readonly { x: number }[], context: { plot: { x: number; y: number; width: number } }) => {
+          const x = points[0]!.x;
+          side = x > context.plot.x + context.plot.width / 2 ? "left" : "right";
+          return { x, y: context.plot.y };
+        },
+        get placement(): ChartTooltipPlacement[] {
+          return side === "left" ? ["bottom-left", "bottom-right"] : ["bottom-right", "bottom-left"];
+        },
+        offset: 12,
+        content: (points: readonly { datum: unknown }[]) => {
+          const hovered = (points[0]!.datum as Row).time;
+          const rows = series.flatMap((s) => {
+            const p = s.data.find((d) => d.time === hovered);
+            return p
+              ? [
+                  {
+                    label: s.label,
+                    value: formatValue(p.value),
+                    color: chartColors[s.color ?? "requests"],
+                    active: true,
+                  },
+                ]
+              : [];
+          });
+          return tooltipCard(time(hovered), rows);
+        },
       },
     });
   }, [empty, series, deploy, yDomain, xDomain, formatTime, formatValue, formatTick, xTicks, yTicks, resolvedLocale]);
