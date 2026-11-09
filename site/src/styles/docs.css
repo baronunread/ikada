@@ -201,6 +201,9 @@
       scale var(--sb-duration-spring-bob) var(--sb-spring-bob),
       outline-color 120ms ease;
   }
+  .nav .ibtn .i {
+    stroke-width: 1.6; /* the site's header icons: same outline weight on all three sites */
+  }
   .ibtn:active {
     scale: var(--sb-scale-press);
     transition: scale var(--sb-duration-press) var(--ease-out);

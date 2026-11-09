@@ -25,7 +25,7 @@ const paths = {
   check: <path d="m3 8.5 3 3 7-7" />,
   arrow: <path d="M3 8h10M9 4l4 4-4 4" />,
   chev: <path d="m6 4 4 4-4 4" />,
-  menu: <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" />,
+  menu: <path d="M2.5 5h11M2.5 11h11" />,
   x: <path d="m4 4 8 8M12 4l-8 8" />,
   ext: <path d="M9 2.5h4.5V7M13.5 2.5 7 9M11 9.5V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V5.5A.5.5 0 0 1 3 5h3.5" />,
   file: (
