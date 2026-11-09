@@ -3,6 +3,8 @@ import { MetricTile } from "../../../src/components/metric-tile";
 import type { Example, Playground, Preview } from "./types";
 
 const requests = [8, 11, 9, 14, 13, 17, 16, 21, 19, 24];
+/** The ten points are the last ten hours, 14:00 to 23:00. */
+const hour = (i: number): string => `${String(14 + i).padStart(2, "0")}:00`;
 
 export const examples: Example[] = [
   {
@@ -14,7 +16,7 @@ export const examples: Example[] = [
         value="1.28M"
         delta={{ value: "12%", direction: "up" }}
         hint="14.8 req/s average"
-        sparkline={<Sparkline aria-label="Requests, last 24 hours" height={28} data={requests} />}
+        sparkline={<Sparkline aria-label="Requests, last 10 hours" height={28} data={requests} formatPoint={hour} />}
         className="w-64"
       />
     ),
@@ -23,7 +25,7 @@ export const examples: Example[] = [
   value="1.28M"
   delta={{ value: "12%", direction: "up" }}
   hint="14.8 req/s average"
-  sparkline={<Sparkline aria-label="Requests, last 24 hours" height={28} data={[8, 11, 9, 14, 13, 17, 16, 21, 19, 24]} />}
+  sparkline={<Sparkline aria-label="Requests, last 10 hours" height={28} data={[8, 11, 9, 14, 13, 17, 16, 21, 19, 24]} formatPoint={(i) => \`\${14 + i}:00\`} />}
 />`,
   },
   {
@@ -115,7 +117,7 @@ export const playground: Playground = {
       }
       loading={Boolean(v.loading)}
       noData={Boolean(v.noData)}
-      sparkline={<Sparkline aria-label="Requests, last 24 hours" height={28} data={requests} />}
+      sparkline={<Sparkline aria-label="Requests, last 10 hours" height={28} data={requests} formatPoint={hour} />}
       className="w-64"
     />
   ),
@@ -125,17 +127,17 @@ export const playground: Playground = {
         ? ""
         : `\n  delta={{ value: "12%", direction: "${v.delta}"${v.sentiment !== "neutral" ? `, sentiment: "${v.sentiment}"` : ""} }}`;
     const flags = `${v.loading ? "\n  loading" : ""}${v.noData ? "\n  noData" : ""}`;
-    return `<MetricTile\n  label="${v.label}"\n  value="${v.value}"${delta}${flags}\n  sparkline={<Sparkline aria-label="Requests, last 24 hours" data={requests} />}\n/>`;
+    return `<MetricTile\n  label="${v.label}"\n  value="${v.value}"${delta}${flags}\n  sparkline={<Sparkline aria-label="Requests, last 10 hours" data={requests} formatPoint={hour} />}\n/>`;
   },
 };
 
-/** The compact render on the overview's component tile. */
+/** The compact render on the overview's component tile. Not scaled with CSS zoom: the tooltip card is fixed-positioned and would land off the point. */
 export const preview: Preview = () => (
   <MetricTile
     label="Requests"
     value="1.28M"
     delta={{ value: "12%", direction: "up" }}
-    sparkline={<Sparkline aria-label="Requests, last 24 hours" height={28} data={requests} />}
-    className="w-52 [zoom:0.8]"
+    sparkline={<Sparkline aria-label="Requests, last 10 hours" height={28} data={requests} formatPoint={hour} />}
+    className="w-44"
   />
 );

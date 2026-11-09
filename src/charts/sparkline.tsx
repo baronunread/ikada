@@ -30,7 +30,7 @@ export interface SparklineBase {
   label?: string;
   /** Formats the hover value. */
   formatValue?: (value: number) => string;
-  /** Label for a hovered point; defaults to its position. */
+  /** Title for a hovered point, usually its time ("14:00"). Without it the card shows just the row ("Requests  11"): a position like "Point 3" says nothing. */
   formatPoint?: (index: number) => string;
   /** A dot on the newest value, so the eye lands on "now". Defaults to true. */
   current?: boolean;
@@ -38,7 +38,6 @@ export interface SparklineBase {
 }
 
 const defaultValue = (value: number): string => formatNumber(value);
-const defaultPoint = (index: number): string => `Point ${index + 1}`;
 
 interface Row {
   i: number;
@@ -59,7 +58,7 @@ export function Sparkline({
   domain,
   label,
   formatValue = defaultValue,
-  formatPoint = defaultPoint,
+  formatPoint,
   current = true,
   className,
 }: SparklineProps) {
@@ -114,13 +113,18 @@ export function Sparkline({
         use: tooltip,
         // A floating card in the top layer: never clipped by the tile, flips above or below the point.
         portal,
-        // below first: above the point is where a tile keeps its figure and its change badge
+        // Anchored to the hovered point's x and the chart's bottom edge: the card hangs just below the sparkline
+        // (below a MetricTile, never over its label, figure or badge) and only flips above when there is no room.
+        anchor: (points: readonly { x: number }[], context: { surface: { height: number } }) => ({
+          x: points[0]!.x,
+          y: context.surface.height,
+        }),
         placement: ["bottom", "top"],
-        offset: 12,
+        offset: 8,
         content: (points: readonly { datum: unknown }[]) => {
           const d = points[0]!.datum as Row;
           return {
-            title: formatPoint(d.i),
+            ...(formatPoint ? { title: formatPoint(d.i) } : {}),
             rows: [{ label: name, value: formatValue(d.v), color: stroke, active: true }],
           };
         },
