@@ -3,6 +3,7 @@
  * first time someone presses the search button or ⌘K, so no page pays for it up front.
  */
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { CommandPalette, useCommandPaletteShortcut } from "../../../src/components/command-palette";
 import type { PaletteGroup } from "../../../src/components/command-palette";
@@ -12,6 +13,42 @@ interface Page {
   label: string;
   href: string;
 }
+
+const svg = (children: ReactNode) => (
+  <svg
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {children}
+  </svg>
+);
+/** One glyph per kind of page, so the type reads at a glance instead of as a mono tag. */
+const icons: Record<string, ReactNode> = {
+  "Get started": svg(
+    <>
+      <path d="M4 2.5h5.5L12.5 5.5v8h-8.5z" />
+      <path d="M9 2.5v3.5h3.5M6 9h4M6 11.2h4" />
+    </>,
+  ),
+  Components: svg(
+    <>
+      <path d="M8 2 13.5 5v6L8 14 2.5 11V5z" />
+      <path d="M2.7 5.1 8 8l5.3-2.9M8 8v6" />
+    </>,
+  ),
+  Blocks: svg(
+    <>
+      <rect x="2.5" y="2.5" width="11" height="11" rx="2" />
+      <path d="M2.5 6.5h11M6.5 6.5v7" />
+    </>,
+  ),
+};
+const fallback = svg(<path d="M3 8h10M8 3v10" />);
 
 function Search({ groups, register }: { groups: PaletteGroup[]; register: (open: () => void) => void }) {
   const [open, setOpen] = useState(false);
@@ -41,7 +78,7 @@ export function mountSearch(_opener?: HTMLElement): () => void {
     items: list.map((p) => ({
       id: p.href,
       label: p.label,
-      hint: label === "Get started" ? "Guide" : label.replace(/s$/, ""),
+      icon: icons[label] ?? fallback,
       keywords: p.href,
     })),
   }));

@@ -111,7 +111,7 @@ export function MetricTile({
           </>
         )}
       </div>
-      <div className="mt-2 h-10">{loading || noData ? null : sparkline}</div>
+      <div className="mt-2 h-11">{loading || noData ? null : sparkline}</div>
     </div>
   );
 }

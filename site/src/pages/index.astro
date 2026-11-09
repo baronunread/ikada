@@ -1,6 +1,7 @@
 ---
 import "../styles/home.css";
 import { buttonStyles } from "../../../src/components/button";
+import BlockPreview from "../components/BlockPreview";
 import HomeShowcase from "../components/HomeShowcase";
 import type { Tile } from "../components/HomeShowcase";
 import Install from "../components/docs/Install.astro";
@@ -76,21 +77,24 @@ const tiles: Tile[] = [
         </div>
         <a class="more" href={href("/blocks")}>All {blocks.length} blocks <Icon name="arrow" /></a>
       </div>
-      <ul class="cindex">
+      <ul class="bcards">
         {highlights.map((b) => (
-          <li>
-            <a href={href(`/blocks/`)}>
-              <span>{b.title}</span>
-              <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
+          <li class="bcard">
+            <a class="bwin" href={href(`/blocks/${b.name}`)} aria-label={`${b.title}: see the block`}>
+              <div class="bwin-in" aria-hidden="true" inert><BlockPreview client:only="react" slug={b.name} /></div>
             </a>
+            <div class="bmeta">
+              <div class="bname"><h3>{b.title}</h3><span class="bsize">{gzipKb(b)}</span></div>
+              <p>{b.description}</p>
+              <div class="bcmd">
+                <code>{addCommands(b.name).npm}</code>
+                <button class="copy" type="button" data-copy={addCommands(b.name).npm} aria-label={`Copy the install command for ${b.title}`}>
+                  <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" />
+                </button>
+              </div>
+            </div>
           </li>
         ))}
-        <li>
-          <a href={href("/blocks")}>
-            <span>All {blocks.length} blocks</span>
-            <small><span>the full catalogue</span><span><Icon name="arrow" /></span></small>
-          </a>
-        </li>
       </ul>
     </section>
 

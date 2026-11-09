@@ -5,6 +5,7 @@ import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { decorative } from "@tanstack/charts/mark/decorative";
 import { tooltip } from "@tanstack/charts/tooltip";
+import { portal } from "@tanstack/charts/tooltip/portal";
 import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatCompact, formatNumber } from "../lib/format";
@@ -225,6 +226,8 @@ export function TimeseriesChart({
       maxFocusDistance: Number.POSITIVE_INFINITY,
       tooltip: {
         use: tooltip,
+        // In the top layer, so a tile or card with overflow hidden never clips it.
+        portal,
         format: (p: { datum: Row }) => `${time(p.datum.time)}\n${p.datum.label}: ${formatValue(p.datum.value)}`,
       },
     });

@@ -2,7 +2,7 @@
 
 `@sproutboat/ikada` is the open component package behind the Community dashboard and, later, the Cloud dashboard. This file is the contract: the principles, every token, and the rules for using them. Tokens live in `tokens/tokens.ts`; the tables below are generated from that file by `bun run tokens`, so they cannot drift from the code.
 
-**Name.** 筏 ikada means raft. The components are lashed together like the logs of a raft, and the sprout rides on it, in the spirit of Cloudflare's Kumo (雲, cloud). Pronounced ee-KAH-dah.
+**Name.** ikada means raft. The components are lashed together like the logs of a raft, and the sprout rides on it, in the spirit of Cloudflare's Kumo (雲, cloud). Pronounced ee-KAH-dah.
 
 ## Principles
 

@@ -1045,6 +1045,8 @@ if (on("segmented") || what === "segmented") {
       for (let i = 0; i < n; i++) {
         const group = p.locator('[class*="group/seg"]').nth(i);
         if (!(await group.isVisible())) continue;
+        // the home page's block thumbnails are inert pictures of live blocks: nothing there is meant to be pressed
+        if (await group.evaluate((g) => !!g.closest("[inert]"))) continue;
         await group.scrollIntoViewIfNeeded();
         const name = (await group.getAttribute("aria-label")) ?? `#${i}`;
         const buttons = group.locator("button");

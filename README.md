@@ -1,6 +1,6 @@
 # @sproutboat/ikada
 
-筏 ikada (raft) is the Sproutboat design system: design tokens and React components built on [Base UI](https://base-ui.com) and Tailwind CSS v4. It is what the Sproutboat dashboards are made of.
+ikada (raft) is the Sproutboat design system: design tokens and React components built on [Base UI](https://base-ui.com) and Tailwind CSS v4. It is what the Sproutboat dashboards are made of.
 
 ```sh
 bun add @sproutboat/ikada @base-ui/react
