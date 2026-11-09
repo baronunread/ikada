@@ -52,6 +52,8 @@ for (const width of widths) {
 
 test("keyboard focus shows a visible ring", async ({ page }) => {
   await page.goto("/?view=light");
+  // Styles arrive with the dev server bundle; do not press Tab before they are applied.
+  await page.waitForLoadState("networkidle");
   await page.keyboard.press("Tab");
   const outline = await page.evaluate(() => {
     const el = document.activeElement;
