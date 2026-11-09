@@ -241,7 +241,7 @@ describe("Badge, StatusDot, Skeleton", () => {
         Degraded
       </Badge>,
     );
-    const cls = screen.getByText("Degraded").className;
+    const cls = screen.getByText("Degraded").closest("[data-slot=badge]")?.className ?? "";
     expect(cls).toContain("warn");
     expect(cls).not.toContain("danger");
   });

@@ -64,6 +64,21 @@ function box(
     sil: poly([P(x0, y0, z1), P(x1, y0, z1), P(x1, y0, z0), P(x1, y1, z0), P(x0, y1, z0), P(x0, y1, z1)], true),
   };
 }
+/** convex hull of screen points (monotone chain): the silhouette of a convex solid from its two end circles */
+const hull = (pts: V[]): V[] => {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o: V, a: V, b: V): number => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const build = (list: V[]): V[] => {
+    const out: V[] = [];
+    for (const q of list) {
+      while (out.length >= 2 && cross(out[out.length - 2]!, out[out.length - 1]!, q) <= 0) out.pop();
+      out.push(q);
+    }
+    out.pop();
+    return out;
+  };
+  return [...build(p), ...build(p.slice().reverse())];
+};
 /** a circle in the YZ plane at x */
 const yz = (I: Iso, x: number, cy: number, cz: number, r: number, t0 = 0, t1 = Math.PI * 2, n = 40): V[] =>
   Array.from({ length: n + 1 }, (_, i) => {
@@ -105,8 +120,8 @@ function log(I: Iso, y: number): PartGeo {
   const at = (x: number, t: number): V => P(x, y + r * Math.cos(t), z + r * Math.sin(t));
   const cap1 = yz(I, x1, y, z, r);
   const far = yz(I, x0, y, z, r, t1, t2, 24);
-  const nearArc = yz(I, x1, y, z, r, t2, t1 + Math.PI * 2, 24);
-  const sil = poly([at(x0, t1), at(x1, t1), ...nearArc, at(x0, t2), ...far.slice().reverse()], true);
+  // the whole body: the hull of both end circles (a cylinder is convex), so the fill leaves no hole
+  const sil = poly(hull([...yz(I, x0, y, z, r), ...cap1]), true);
   const segs: Seg[] = [
     { d: poly([at(x0, t1), at(x1, t1)]), k: "main" },
     { d: poly([at(x0, t2), at(x1, t2)]), k: "main" },
@@ -263,7 +278,7 @@ export function buildIso(I: Iso): {
   const collar = xy(I, 0, 0, R.zSprout, 11);
   const collarTop = xy(I, 0, 0, R.zSprout + 7, 11);
   const sprout: PartGeo = {
-    fills: [cub(L1), cub(L2)],
+    fills: [poly(hull([...collar, ...collarTop]), true), cub(L1), cub(L2)],
     segs: [
       { d: poly(collar, true), k: "main" },
       { d: poly([P(11, 0, R.zSprout), P(11, 0, R.zSprout + 7)]), k: "main" },

@@ -131,7 +131,15 @@ export function TableRow({ selected = false, className, ...props }: TableRowProp
 
 const cellBase = "px-4 text-start align-middle";
 
-export interface TableHeadProps extends Omit<ComponentProps<"th">, "onClick" | "aria-sort">, HideBelowProps {
+export interface NumericProps {
+  /** Right-aligns the column (start edge in RTL reads end) and sets tabular figures. Set it on the `TableHead` and every `TableCell` of a number column. */
+  numeric?: boolean;
+}
+
+const numericClass = "text-end tabular-nums";
+
+export interface TableHeadProps
+  extends Omit<ComponentProps<"th">, "onClick" | "aria-sort">, HideBelowProps, NumericProps {
   /** Makes the header a button. `undefined` means sortable but not sorted. */
   sortable?: boolean;
   /** Current sort of this column; shows the arrow and sets aria-sort. */
@@ -146,6 +154,7 @@ export function TableHead({
   sort,
   onSort,
   hideBelow,
+  numeric,
   className,
   children,
   ...props
@@ -159,6 +168,7 @@ export function TableHead({
       className={cn(
         cellBase,
         "h-10 whitespace-nowrap bg-surface text-sb-sm font-semibold text-fg-muted shadow-[inset_0_-1px_0_var(--sb-hairline)]",
+        numeric && numericClass,
         hideBelow && hideBelowClass[hideBelow],
         className,
       )}
@@ -190,13 +200,19 @@ export function TableHead({
   );
 }
 
-export function TableCell({ hideBelow, className, ...props }: ComponentProps<"td"> & HideBelowProps) {
+export function TableCell({
+  hideBelow,
+  numeric,
+  className,
+  ...props
+}: ComponentProps<"td"> & HideBelowProps & NumericProps) {
   return (
     <td
       data-slot="table-cell"
       className={cn(
         cellBase,
         "h-(--sb-row-h) shadow-[inset_0_-1px_0_var(--sb-hairline)] group-last/row:shadow-none",
+        numeric && numericClass,
         hideBelow && hideBelowClass[hideBelow],
         className,
       )}

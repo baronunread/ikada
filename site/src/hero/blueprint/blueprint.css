@@ -17,7 +17,9 @@
   --inkf: oklch(0.78 0.07 240 / 0.7);
   --accc: oklch(0.86 0.17 152);
   --accf: oklch(0.86 0.17 152 / 0.9);
-  --pf: var(--paper);
+  --pf: oklch(0.31 0.075 252);
+  --pfd: oklch(0.275 0.07 252);
+  --pfh: oklch(0.36 0.1 190);
   --ring: oklch(0.85 0.09 225 / 0.6);
 }
 html[data-theme="light"] .bp {
@@ -30,6 +32,9 @@ html[data-theme="light"] .bp {
   --inkf: oklch(0.45 0.08 250 / 0.75);
   --accc: oklch(0.5 0.15 152);
   --accf: oklch(0.5 0.15 152 / 0.9);
+  --pf: oklch(0.995 0.006 92);
+  --pfd: oklch(0.982 0.009 92);
+  --pfh: oklch(0.94 0.045 150);
   --ring: oklch(0.4 0.08 240 / 0.5);
 }
 
@@ -169,17 +174,19 @@ html[data-theme="light"] .bp {
 }
 
 .sheet .pf {
-  fill: var(--paper);
+  fill: var(--pf);
   stroke: none;
   opacity: 0;
   transition: opacity 120ms linear;
 }
 .bp[data-open] .sheet .pf {
   opacity: 1;
-  transition: opacity 360ms ease var(--dl, 0ms);
+  transition:
+    opacity 360ms ease var(--dl, 0ms),
+    fill 140ms ease;
 }
 .sheet .part[data-on] .pf {
-  fill: color-mix(in oklch, var(--paper), var(--accc) 9%);
+  fill: var(--pfh);
 }
 .sheet .arr {
   fill: var(--inkc);
@@ -207,6 +214,16 @@ html[data-theme="light"] .bp {
 .bp[data-open] .sheet .bal {
   opacity: 1;
   transition: opacity 300ms ease var(--dl, 0ms);
+}
+
+/* the title block is an opaque box: the sheet's own paper colour, so no grid shows inside it */
+.sheet .tb-bg {
+  fill: var(--paper);
+  opacity: 0;
+  transition: opacity 300ms ease var(--dl, 0ms);
+}
+.bp[data-open] .sheet .tb-bg {
+  opacity: 1;
 }
 
 /* text */
@@ -313,7 +330,13 @@ html[data-theme="light"] .bp {
 .sheet .lab {
   transition: opacity 120ms ease;
 }
-.sheet[data-active] .part:not([data-on]),
+/* a part that is not the one in play recedes by colour, never by opacity: it stays solid, so nothing shows through it */
+.sheet[data-active] .part:not([data-on]) .ln {
+  stroke-opacity: 0.4;
+}
+.sheet[data-active] .part:not([data-on]) .pf {
+  fill: var(--pfd);
+}
 .sheet[data-active] .lead:not([data-on]),
 .sheet[data-active] .lab:not([data-on]) {
   opacity: 0.32;

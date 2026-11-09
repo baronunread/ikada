@@ -21,7 +21,7 @@ export interface Metric {
   /** Hourly values, oldest first; draws a sparkline under the tile. */
   trend?: readonly number[];
   trendColor?: ChartColorName;
-  /** How a hovered sparkline value reads. */
+  /** How a hovered sparkline value reads: the number (and a unit if it has one), not the series name, which the tooltip shows once. */
   formatTrend?: (value: number) => string;
 }
 
@@ -65,7 +65,7 @@ export const sampleMetrics: Metric[] = [
     delta: { value: "12%", direction: "up" },
     hint: "Last 24 hours",
     trend: requests,
-    formatTrend: (v) => `${v.toLocaleString("en")} requests`,
+    formatTrend: (v) => v.toLocaleString("en"),
   },
   {
     id: "errors",
@@ -76,7 +76,7 @@ export const sampleMetrics: Metric[] = [
     hint: "5xx responses",
     trend: errors,
     trendColor: "errors",
-    formatTrend: (v) => `${v} errors`,
+    formatTrend: (v) => String(v),
   },
   {
     id: "latency",
@@ -87,7 +87,7 @@ export const sampleMetrics: Metric[] = [
     hint: "p99 212 ms",
     trend: latency,
     trendColor: "series",
-    formatTrend: (v) => `${v} ms p50`,
+    formatTrend: (v) => `${v} ms`,
   },
   {
     id: "serving",

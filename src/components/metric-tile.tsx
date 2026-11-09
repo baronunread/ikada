@@ -30,7 +30,7 @@ export interface MetricTileProps extends Omit<ComponentProps<"div">, "children">
   delta?: MetricDelta;
   /** A line under the value: "14.8 req/s average". */
   hint?: ReactNode;
-  /** A `<Sparkline />` from `@sproutboat/ikada/charts`, flush to the tile's bottom edge. */
+  /** A `<Sparkline />` from `@sproutboat/ikada/charts`, flush to the tile's bottom edge, its line ending in line with the tile's text. */
   sparkline?: ReactNode;
   /** Draws a skeleton in place of the value. */
   loading?: boolean;
@@ -80,7 +80,7 @@ export function MetricTile({
       {...props}
     >
       <div className="flex flex-col gap-1 px-4 pt-3.5">
-        <span className="text-sb-sm font-medium text-fg-muted">{label}</span>
+        <span className="text-sb-sm font-medium text-fg-muted [overflow-wrap:anywhere]">{label}</span>
         {loading ? (
           <div className="flex flex-col gap-2 py-1.5">
             <Skeleton className="h-6 w-24" />
@@ -90,7 +90,12 @@ export function MetricTile({
         ) : (
           <>
             <div className="flex flex-wrap items-baseline gap-x-1.5">
-              <span className={cn("text-sb-metric proportional-nums", noData && "text-fg-muted")}>
+              <span
+                className={cn(
+                  "min-w-0 text-sb-metric proportional-nums [overflow-wrap:anywhere]",
+                  noData && "text-fg-muted",
+                )}
+              >
                 {noData ? "—" : shown}
               </span>
               {unit && !noData ? <span className="text-sb-base font-medium text-fg-muted">{unit}</span> : null}
@@ -107,11 +112,18 @@ export function MetricTile({
                 </span>
               ) : null}
             </div>
-            <span className="min-h-5 text-sb-sm text-fg-muted">{noData ? emptyText : hint}</span>
+            {noData || hint ? (
+              <span className="text-sb-sm text-fg-muted [overflow-wrap:anywhere]">{noData ? emptyText : hint}</span>
+            ) : null}
           </>
         )}
       </div>
-      <div className="mt-2 h-10">{loading || noData ? null : sparkline}</div>
+      {/* The slot exists only for tiles that have a sparkline, and keeps its height while loading or empty so the tile doesn't jump. */}
+      {sparkline ? (
+        <div className="mt-2 flex h-11 flex-col justify-end px-2.5">{loading || noData ? null : sparkline}</div>
+      ) : (
+        <div className="pb-3.5" />
+      )}
     </div>
   );
 }

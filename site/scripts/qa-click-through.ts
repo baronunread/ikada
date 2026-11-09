@@ -30,8 +30,16 @@ const ikadaPages = ["/ikada/"]
       .filter((f) => f.endsWith(".html") && !["index.html", "404.html"].includes(f))
       .map((f) => "/ikada/" + f.replace(/\.html$/, "")),
   )
-  .concat(readdirSync(join(dist, "components")).map((f) => "/ikada/components/" + f.replace(/\.html$/, "")))
-  .concat(readdirSync(join(dist, "blocks")).map((f) => "/ikada/blocks/" + f.replace(/\.html$/, "")));
+  .concat(
+    readdirSync(join(dist, "components"))
+      .filter((f) => f.endsWith(".html")) // the .md twins are plain markdown, not pages
+      .map((f) => "/ikada/components/" + f.replace(/\.html$/, "")),
+  )
+  .concat(
+    readdirSync(join(dist, "blocks"))
+      .filter((f) => f.endsWith(".html"))
+      .map((f) => "/ikada/blocks/" + f.replace(/\.html$/, "")),
+  );
 const PAGES = ["/", "/how-it-works", "/cli", "/no-such-page"]
   .concat(ikadaPages)
   .filter((_, i) => i % SHARDS === SHARD)

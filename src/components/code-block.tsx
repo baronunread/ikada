@@ -40,7 +40,7 @@ export function CodeBlock({ code, label, wrap = false, copyable = true, classNam
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll region must be keyboard-focusable
         tabIndex={0}
         className={cn(
-          "m-0 max-w-full overflow-auto rounded-lg py-3 ps-4 pe-12 font-mono text-sb-sm leading-6 text-fg",
+          "m-0 max-w-full overflow-auto rounded-lg py-3 ps-4 pe-12 font-mono text-sb-sm leading-relaxed text-fg [tab-size:2]",
           wrap ? "whitespace-pre-wrap break-words" : "whitespace-pre",
           focusRingInset,
         )}
@@ -48,22 +48,29 @@ export function CodeBlock({ code, label, wrap = false, copyable = true, classNam
         <code>{code}</code>
       </pre>
       {copyable ? (
-        <InlineConfirm
-          message="Copied"
-          announce="Copied to clipboard"
-          className="absolute end-1.5 top-1.5 rounded-md bg-code-bg"
-        >
-          {({ confirm, active }) => (
-            <IconButton
-              label={active ? "Copied" : `Copy ${label.toLowerCase()}`}
-              size="sm"
-              onClick={() => copy(confirm)}
-              className="text-fg-muted hover:text-fg"
-            >
-              {active ? <CheckIcon className="text-brand-fg" /> : <CopyIcon />}
-            </IconButton>
-          )}
-        </InlineConfirm>
+        <>
+          {/* Text that runs long fades out under the button instead of showing on both sides of it. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 end-0 w-14 rounded-e-lg bg-linear-to-r from-transparent via-code-bg/90 to-code-bg"
+          />
+          <InlineConfirm
+            message="Copied"
+            announce="Copied to clipboard"
+            className="absolute end-1.5 top-1.5 rounded-md bg-code-bg"
+          >
+            {({ confirm, active }) => (
+              <IconButton
+                label={active ? "Copied" : `Copy ${label.toLowerCase()}`}
+                size="sm"
+                onClick={() => copy(confirm)}
+                className="text-fg-muted hover:text-fg"
+              >
+                {active ? <CheckIcon className="text-brand-fg" /> : <CopyIcon />}
+              </IconButton>
+            )}
+          </InlineConfirm>
+        </>
       ) : null}
     </div>
   );

@@ -136,6 +136,43 @@ export const examples: Example[] = [
 </Table>`,
   },
   {
+    title: "Numbers and long names",
+    description:
+      "Number columns take `numeric`: right-aligned tabular figures, so digits line up. Long names scroll inside the table.",
+    render: () => (
+      <Table label="Usage">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Sprout</TableHead>
+            <TableHead numeric>Requests</TableHead>
+            <TableHead numeric>p50 (ms)</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>robin</TableCell>
+            <TableCell numeric>1,284,031</TableCell>
+            <TableCell numeric>11.4</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>wren</TableCell>
+            <TableCell numeric>860</TableCell>
+            <TableCell numeric>108.9</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="max-w-48 truncate">
+              very-long-sprout-name-that-keeps-going-and-going-without-a-break
+            </TableCell>
+            <TableCell numeric>12,000,000,000</TableCell>
+            <TableCell numeric>0.2</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    ),
+    code: `<TableHead numeric>Requests</TableHead>
+<TableCell numeric>1,284,031</TableCell>`,
+  },
+  {
     title: "Sortable",
     description:
       "A sortable header holds a button and sets aria-sort. nextSort cycles none, ascending, descending. Updated hides below the container's md width.",

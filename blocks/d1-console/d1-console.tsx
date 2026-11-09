@@ -282,7 +282,7 @@ function TablesTree({
       {tables.map((t) => {
         const expanded = open.has(t.name);
         return (
-          <li key={t.name}>
+          <li key={t.name} className="">
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
@@ -291,7 +291,7 @@ function TablesTree({
                 aria-label={`${expanded ? "Hide" : "Show"} columns of ${t.name}`}
                 onClick={() => toggle(t.name)}
                 className={cn(
-                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+                  "grid size-7 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:size-11",
                   focusRing,
                 )}
               >
@@ -317,6 +317,7 @@ function TablesTree({
               >
                 <TableIcon className="text-fg-muted" />
                 <span
+                  title={t.name}
                   className={cn("min-w-0 flex-1 truncate font-mono text-sb-sm", current === t.name && "font-semibold")}
                 >
                   {t.name}
@@ -330,7 +331,9 @@ function TablesTree({
               <ul className="flex flex-col gap-1 pt-1 pb-2 ps-11 pe-2" aria-label={`Columns of ${t.name}`}>
                 {t.columns.map((c) => (
                   <li key={c.name} className="flex min-w-0 items-baseline justify-between gap-2 font-mono text-sb-xs">
-                    <span className="truncate">{c.name}</span>
+                    <span className="truncate" title={c.name}>
+                      {c.name}
+                    </span>
                     <span className="shrink-0 text-fg-muted">
                       {c.type}
                       {c.primaryKey ? " · PK" : ""}
@@ -411,7 +414,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
                     {value === null ? (
                       <span className="text-fg-muted">NULL</span>
                     ) : typeof value === "number" && result.columns[c]?.type === "REAL" ? (
-                      value.toFixed(2)
+                      value.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                     ) : (
                       String(value)
                     )}
@@ -474,13 +477,15 @@ export function D1Console({
         <aside className="min-w-0 border-hairline @max-3xl:border-b @3xl:border-e" aria-label="Schema">
           <div className="flex items-center gap-2 px-3 pt-3 pb-1">
             <DatabaseIcon className="text-fg-muted" />
-            <span className="min-w-0 flex-1 truncate font-mono text-sb-sm font-semibold">{database}</span>
+            <span className="min-w-0 flex-1 truncate font-mono text-sb-sm font-semibold" title={database}>
+              {database}
+            </span>
             <button
               type="button"
               aria-expanded={showTables}
               onClick={() => setShowTables((v) => !v)}
               className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg @3xl:hidden",
+                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg pointer-coarse:h-11 @3xl:hidden",
                 focusRing,
               )}
             >

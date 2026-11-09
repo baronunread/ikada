@@ -1,16 +1,20 @@
 "use client";
 
-import { areaY, defineChart, lineY, ruleX, text } from "@tanstack/charts";
+import { crosshair } from "@tanstack/charts/crosshair";
+import { areaY, defineChart, dot, lineY, ruleX, text } from "@tanstack/charts";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { decorative } from "@tanstack/charts/mark/decorative";
 import { tooltip } from "@tanstack/charts/tooltip";
+import type { ChartTooltipPlacement } from "@tanstack/charts/tooltip";
+import { portal } from "@tanstack/charts/tooltip/portal";
 import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatCompact, formatNumber } from "../lib/format";
 import { useLocale } from "../lib/locale";
 import { accessibleName } from "../lib/accessible-name";
 import type { AccessibleName } from "../lib/accessible-name";
+import { tooltipCard } from "./tooltip-card";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
@@ -83,6 +87,13 @@ const defaultValue = (value: number): string => formatNumber(value);
 const EPOCH_MS_FLOOR = 978_307_200_000;
 const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
 
+/** A deploy label is one line of SVG text with no wrapping; past this it would run off the plot. */
+const MAX_LABEL = 28;
+function truncateLabel(label: string): string {
+  const chars = Array.from(label);
+  return chars.length > MAX_LABEL ? `${chars.slice(0, MAX_LABEL - 1).join("")}…` : label;
+}
+
 /** The default x formatter for a domain: clock time, date, or a plain number. */
 export function timeFormatter(domain: readonly [number, number], locale = "en"): (time: number) => string {
   const [x0, x1] = domain;
@@ -128,7 +139,7 @@ export type TimeseriesChartProps = TimeseriesChartBase & AccessibleName;
  * or dates; with no points at all it keeps its height and says so instead of plotting.
  */
 export function TimeseriesChart({
-  series,
+  series: rawSeries,
   deploy,
   "aria-label": ariaLabelStd,
   ariaLabel: ariaLabelLegacy,
@@ -146,6 +157,15 @@ export function TimeseriesChart({
 }: TimeseriesChartProps) {
   const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
   const resolvedLocale = useLocale(locale);
+  // A NaN or Infinity point would make a scale throw and take the page with it: drop it.
+  const series = useMemo(
+    () =>
+      rawSeries.map((s) => ({
+        ...s,
+        data: s.data.filter((p) => Number.isFinite(p.time) && Number.isFinite(p.value)),
+      })),
+    [rawSeries],
+  );
   const empty = !series.some((s) => s.data.length > 0);
   const definition = useMemo(() => {
     if (empty) return null;
@@ -177,7 +197,14 @@ export function TimeseriesChart({
             strokeDasharray: s.dashed ? "6 4" : undefined,
             id: s.id,
           }),
+          // One point draws no line: show it as a dot so a brand-new series is not mistaken for no data.
+          ...(rows.length === 1 ? [dot(rows, { x: "time", y: "value", r: 3, fill: color, id: `${s.id}-dot` })] : []),
         ];
+      }),
+      // A vertical guide that the card sits beside. Not a mark in the tooltip, so deploy markers stay out of it.
+      crosshair({
+        x: { stroke: "currentColor", strokeOpacity: 0.35, strokeWidth: 1, strokeDasharray: "2 3" },
+        y: false,
       }),
       ...markers(deploy).flatMap((m, i) => [
         decorative(
@@ -191,12 +218,14 @@ export function TimeseriesChart({
           }),
         ),
         decorative(
-          text([{ time: m.time, y: yMax * 0.96, t: m.label }], {
+          text([{ time: m.time, y: yMax * 0.96, t: truncateLabel(m.label) }], {
             x: "time",
             y: "y",
             text: "t",
             anchor: "start",
             dx: 8,
+            // Markers close together would print their labels over each other: step every other one down.
+            dy: i % 2 === 0 ? 0 : 14,
             fill: chartColors.deploy,
             fontSize: 11,
             fontWeight: 600,
@@ -205,6 +234,8 @@ export function TimeseriesChart({
         ),
       ]),
     ];
+    // Which side of the crosshair the card is on, set by `anchor` just before the library reads `placement`.
+    let side: "left" | "right" = "right";
     return defineChart({
       marks,
       scales: {
@@ -225,7 +256,36 @@ export function TimeseriesChart({
       maxFocusDistance: Number.POSITIVE_INFINITY,
       tooltip: {
         use: tooltip,
-        format: (p: { datum: Row }) => `${time(p.datum.time)}\n${p.datum.label}: ${formatValue(p.datum.value)}`,
+        // In the top layer, so a tile or card with overflow hidden never clips it.
+        portal,
+        // Beside the crosshair at the top of the plot: right of the line, flipping to its left in the right half of
+        // the plot (not only at the viewport edge), so it never covers the hovered point or hangs outside the tile.
+        anchor: (points: readonly { x: number }[], context: { plot: { x: number; y: number; width: number } }) => {
+          const x = points[0]!.x;
+          side = x > context.plot.x + context.plot.width / 2 ? "left" : "right";
+          return { x, y: context.plot.y };
+        },
+        get placement(): ChartTooltipPlacement[] {
+          return side === "left" ? ["bottom-left", "bottom-right"] : ["bottom-right", "bottom-left"];
+        },
+        offset: 12,
+        content: (points: readonly { datum: unknown }[]) => {
+          const hovered = (points[0]!.datum as Row).time;
+          const rows = series.flatMap((s) => {
+            const p = s.data.find((d) => d.time === hovered);
+            return p
+              ? [
+                  {
+                    label: s.label,
+                    value: formatValue(p.value),
+                    color: chartColors[s.color ?? "requests"],
+                    active: true,
+                  },
+                ]
+              : [];
+          });
+          return tooltipCard(time(hovered), rows);
+        },
       },
     });
   }, [empty, series, deploy, yDomain, xDomain, formatTime, formatValue, formatTick, xTicks, yTicks, resolvedLocale]);

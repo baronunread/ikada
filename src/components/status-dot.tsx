@@ -39,11 +39,11 @@ export function StatusDot({
       data-slot="status-dot"
       ref={ref}
       data-status={status}
-      className={cn("inline-flex items-center gap-2 text-sb-base text-fg", className)}
+      className={cn("inline-flex max-w-full items-center gap-2 text-sb-base text-fg", className)}
       {...props}
     >
       <StatusGlyph tone={status} live={live} pulse={pulse} sprout={sprout} />
-      <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
+      <span className={hideLabel ? "sr-only" : "min-w-0 [overflow-wrap:anywhere]"}>{label}</span>
     </span>
   );
 }

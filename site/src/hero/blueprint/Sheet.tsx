@@ -28,6 +28,8 @@ interface Layout {
   H: number;
   mobile: boolean;
   m: number;
+  /** the header's height: the frame starts below it */
+  navH: number;
   geo: ReturnType<typeof buildIso>;
   order: PartId[];
   labels: Label[];
@@ -41,13 +43,13 @@ interface Layout {
   hint: V;
 }
 
-function layout(W: number, H: number, copyBottom?: number): Layout {
+function layout(W: number, H: number, copyBottom?: number, navHeight?: number, tbW = TB_MIN_W): Layout {
   const mobile = W < 701;
   const m = mobile ? 6 : 8;
-  const navH = mobile ? 56 : 64;
+  const navH = navHeight ?? (mobile ? 56 : 60);
   const title = mobile
     ? { w: W - 2 * (m + 14), h: 46, x: m + 14, y: H - m - 14 - 46 }
-    : { w: 468, h: 96, x: W - m - 14 - 468, y: H - m - 14 - 96 };
+    : { w: tbW, h: 96, x: W - m - 14 - tbW, y: H - m - 14 - 96 };
   // the drawing's box
   const top = mobile ? (copyBottom ? Math.max(300, copyBottom + 30) : 430) : navH + 34;
   const bottom = mobile ? title.y - 28 : title.y - 22;
@@ -100,6 +102,7 @@ function layout(W: number, H: number, copyBottom?: number): Layout {
     H,
     mobile,
     m,
+    navH,
     geo,
     order: sorted.map((p) => p[0]),
     labels,
@@ -134,6 +137,7 @@ const Tx = ({
   dl,
   anchor = "start",
   rot,
+  tref,
 }: {
   x: number;
   y: number;
@@ -142,8 +146,10 @@ const Tx = ({
   dl: number;
   anchor?: "start" | "middle" | "end";
   rot?: number;
+  tref?: (el: SVGTextElement | null) => void;
 }): ReactNode => (
   <text
+    ref={tref}
     x={x}
     y={y}
     textAnchor={anchor}
@@ -198,6 +204,132 @@ function Dim({
   );
 }
 
+// ------------------------------------------------------------------ the title block
+/** the narrowest the block is drawn; it grows when its text needs more */
+const TB_MIN_W = 300;
+/** padding inside every cell, left and right */
+const TB_PAD = 12;
+const TB_ROWS = [30, 62] as const;
+
+/**
+ * The title block is a grid whose cells size to their text: each text is measured (after the fonts load), each column is
+ * its widest text plus padding on both sides, and the block is as wide as its rows need. Nothing touches or crosses a rule.
+ */
+function TitleBlock({
+  T,
+  mobile,
+  version,
+  B0,
+  onNeed,
+}: {
+  T: Layout["title"];
+  mobile: boolean;
+  version: string;
+  B0: number;
+  onNeed(w: number): void;
+}): ReactNode {
+  const els = useRef<Record<string, SVGTextElement | null>>({});
+  const [ws, setWs] = useState<Record<string, number>>({});
+  const ref =
+    (k: string) =>
+    (el: SVGTextElement | null): void => {
+      els.current[k] = el;
+    };
+  const w = (k: string): number => ws[k] ?? 0;
+  const P = TB_PAD;
+  const cA = Math.max(w("serif"), w("sheet")) + 2 * P;
+  const cB = Math.max(w("scale"), 0) + 2 * P;
+  const cC = w("drawn") + 2 * P;
+  const cD = w("mit") + 2 * P;
+  const need = Math.ceil(Math.max(TB_MIN_W, cA + cB + cC + cD, w("main") + w("a3") + 3 * P, cA + w("moored") + 2 * P));
+  useLayoutEffect(() => {
+    if (mobile) return undefined;
+    let live = true;
+    const measure = (): void => {
+      if (!live) return;
+      const next: Record<string, number> = {};
+      for (const [k, el] of Object.entries(els.current)) if (el) next[k] = Math.ceil(el.getComputedTextLength()) + 1;
+      setWs((p) => (Object.keys(next).every((k) => p[k] === next[k]) ? p : next));
+    };
+    measure();
+    void document.fonts?.ready.then(measure);
+    return () => {
+      live = false;
+    };
+  }, [mobile, version]);
+  useEffect(() => {
+    if (!mobile && ws.main) onNeed(need);
+  }, [mobile, ws.main, need, onNeed]);
+  const rev = `IKADA · SHEET 1 · REV ${version}`;
+  if (mobile)
+    return (
+      <g className="tb">
+        <rect
+          x={T.x}
+          y={T.y}
+          width={T.w}
+          height={T.h}
+          className="tb-bg"
+          style={sv({ "--dl": `${Math.round((B0 + 700) * 0.82)}ms` })}
+        />
+        <Ln d={`M${T.x} ${T.y}H${T.x + T.w}V${T.y + T.h}H${T.x}Z`} k="main" dl={B0 + 700} />
+        <Tx x={T.x + P} y={T.y + 19} cls="tb-main" dl={B0 + 1500}>
+          {rev}
+        </Tx>
+        <Tx x={T.x + P} y={T.y + 36} cls="tb-k" dl={B0 + 1560}>
+          SCALE 1:1 · MIT · SPROUTBOAT
+        </Tx>
+      </g>
+    );
+  const x1 = T.x + cA;
+  const x2 = x1 + cB;
+  const x3 = x2 + cC;
+  const [r1, r2] = TB_ROWS;
+  const { x, y, w: tw, h } = T;
+  return (
+    <g className="tb">
+      <rect
+        x={x}
+        y={y}
+        width={tw}
+        height={h}
+        className="tb-bg"
+        style={sv({ "--dl": `${Math.round((B0 + 700) * 0.82)}ms` })}
+      />
+      <Ln d={`M${x} ${y}H${x + tw}V${y + h}H${x}Z`} k="main" dl={B0 + 700} />
+      <Ln
+        d={`M${x} ${y + r1}H${x + tw}M${x} ${y + r2}H${x + tw}M${x1} ${y + r1}V${y + h}M${x2} ${y + r2}V${y + h}M${x3} ${y + r2}V${y + h}`}
+        k="fine"
+        dl={B0 + 760}
+      />
+      <Tx tref={ref("main")} x={x + P} y={y + 19} cls="tb-main" dl={B0 + 1500}>
+        {rev}
+      </Tx>
+      <Tx tref={ref("a3")} x={x + tw - P} y={y + 19} anchor="end" cls="tb-k" dl={B0 + 1520}>
+        A3 · FIRST ANGLE
+      </Tx>
+      <Tx tref={ref("serif")} x={x + P} y={y + 53} cls="tb-serif" dl={B0 + 1560}>
+        The raft, exploded
+      </Tx>
+      <Tx tref={ref("moored")} x={x1 + P} y={y + 51} cls="tb-v" dl={B0 + 1580}>
+        Moored at Sprout Harbour
+      </Tx>
+      <Tx tref={ref("sheet")} x={x + P} y={y + 82} cls="tb-k" dl={B0 + 1600}>
+        SHEET 1 OF 1
+      </Tx>
+      <Tx tref={ref("scale")} x={x1 + P} y={y + 82} cls="tb-k" dl={B0 + 1620}>
+        SCALE 1:1
+      </Tx>
+      <Tx tref={ref("drawn")} x={x2 + P} y={y + 82} cls="tb-k" dl={B0 + 1640}>
+        DRAWN SPROUTBOAT
+      </Tx>
+      <Tx tref={ref("mit")} x={x3 + P} y={y + 82} cls="tb-k" dl={B0 + 1660}>
+        MIT
+      </Tx>
+    </g>
+  );
+}
+
 // ------------------------------------------------------------------ the sheet
 /** The blueprint of the raft: an exploded engineering drawing whose seven parts are real ikada components. `armed` runs the
  *  reveal (the paper opens from the raft marker, the ink draws on); closed, the sheet is invisible and inert. */
@@ -206,13 +338,20 @@ export function Sheet({
   h,
   armed,
   copyBottom,
+  navH,
+  version,
 }: {
   w: number;
   h: number;
   armed: boolean;
   copyBottom?: number;
+  /** the header's height (the frame sits below it) */
+  navH?: number;
+  /** the package version: the title block's REV, the same string as the hero badge */
+  version: string;
 }): ReactNode {
-  const L = useMemo(() => layout(w, h, copyBottom), [w, h, copyBottom]);
+  const [tbW, setTbW] = useState(TB_MIN_W);
+  const L = useMemo(() => layout(w, h, copyBottom, navH, tbW), [w, h, copyBottom, navH, tbW]);
   const { geo, mobile } = L;
   const [active, setActive] = useState<PartId | null>(null);
   const [pinned, setPinned] = useState(false);
@@ -356,10 +495,13 @@ export function Sheet({
   // ---- sheet furniture
   const o1 = m;
   const o2 = m + (mobile ? 9 : 14);
+  // the frame's top edge sits under the header, which lives in the sheet's top margin like a drawing's border zone
+  const t1 = Math.max(o1, L.navH);
+  const t2 = t1 + (o2 - o1);
   const zoneX = (i: number): number => o2 + ((W - 2 * o2) * i) / L.zones.cols;
-  const zoneY = (j: number): number => o2 + ((H - 2 * o2) * j) / L.zones.rows;
+  const zoneY = (j: number): number => t2 + ((H - o2 - t2) * j) / L.zones.rows;
   const ticks: string[] = [];
-  for (let i = 0; i <= L.zones.cols; i++) ticks.push(`M${zoneX(i)} ${o1}V${o2}M${zoneX(i)} ${H - o1}V${H - o2}`);
+  for (let i = 0; i <= L.zones.cols; i++) ticks.push(`M${zoneX(i)} ${t1}V${t2}M${zoneX(i)} ${H - o1}V${H - o2}`);
   for (let j = 0; j <= L.zones.rows; j++) ticks.push(`M${o1} ${zoneY(j)}H${o2}M${W - o1} ${zoneY(j)}H${W - o2}`);
 
   // ---- elevations
@@ -550,12 +692,12 @@ export function Sheet({
         </g>
         {/* neatline and zones */}
         <g className="furn">
-          <Ln d={`M${o1} ${o1}H${W - o1}V${H - o1}H${o1}Z`} k="fine" dl={B0 - 120} />
-          <Ln d={`M${o2} ${o2}H${W - o2}V${H - o2}H${o2}Z`} k="main" dl={B0 - 100} />
+          <Ln d={`M${o1} ${t1}H${W - o1}V${H - o1}H${o1}Z`} k="fine" dl={B0 - 120} />
+          <Ln d={`M${o2} ${t2}H${W - o2}V${H - o2}H${o2}Z`} k="main" dl={B0 - 100} />
           <Ln d={ticks.join("")} k="fine" dl={B0 - 60} />
           {Array.from({ length: L.zones.cols }, (_, i) => (
             <g key={i}>
-              <Tx x={(zoneX(i) + zoneX(i + 1)) / 2} y={o1 + 7} anchor="middle" cls="zn" dl={B0 + 200}>
+              <Tx x={(zoneX(i) + zoneX(i + 1)) / 2} y={t1 + 7} anchor="middle" cls="zn" dl={B0 + 200}>
                 {i + 1}
               </Tx>
               <Tx x={(zoneX(i) + zoneX(i + 1)) / 2} y={H - o1 - 2.5} anchor="middle" cls="zn" dl={B0 + 200}>
@@ -696,52 +838,7 @@ export function Sheet({
         {E && <g className="elevs">{el}</g>}
 
         {/* title block */}
-        <g className="tb">
-          <Ln d={`M${T.x} ${T.y}H${T.x + T.w}V${T.y + T.h}H${T.x}Z`} k="main" dl={B0 + 700} />
-          {!mobile && (
-            <>
-              <Ln
-                d={`M${T.x} ${T.y + 30}H${T.x + T.w}M${T.x} ${T.y + 62}H${T.x + T.w}M${T.x + 196} ${T.y + 30}V${T.y + T.h}M${T.x + 290} ${T.y + 62}V${T.y + T.h}M${T.x + 424} ${T.y + 62}V${T.y + T.h}`}
-                k="fine"
-                dl={B0 + 760}
-              />
-              <Tx x={T.x + 12} y={T.y + 19} cls="tb-main" dl={B0 + 1500}>
-                IKADA · SHEET 1 · REV 0.1.0
-              </Tx>
-              <Tx x={T.x + T.w - 12} y={T.y + 19} anchor="end" cls="tb-k" dl={B0 + 1520}>
-                A3 · FIRST ANGLE
-              </Tx>
-              <Tx x={T.x + 12} y={T.y + 46} cls="tb-serif" dl={B0 + 1560}>
-                The raft, exploded
-              </Tx>
-              <Tx x={T.x + 208} y={T.y + 46} cls="tb-v" dl={B0 + 1580}>
-                Moored at Sprout Harbour
-              </Tx>
-              <Tx x={T.x + 12} y={T.y + 76} cls="tb-k" dl={B0 + 1600}>
-                SHEET 1 OF 1
-              </Tx>
-              <Tx x={T.x + 208} y={T.y + 76} cls="tb-k" dl={B0 + 1620}>
-                SCALE 1:1
-              </Tx>
-              <Tx x={T.x + 302} y={T.y + 76} cls="tb-k" dl={B0 + 1640}>
-                DRAWN SPROUTBOAT
-              </Tx>
-              <Tx x={T.x + 436} y={T.y + 76} cls="tb-k" dl={B0 + 1660}>
-                MIT
-              </Tx>
-            </>
-          )}
-          {mobile && (
-            <>
-              <Tx x={T.x + 12} y={T.y + 19} cls="tb-main" dl={B0 + 1500}>
-                IKADA · SHEET 1 · REV 0.1.0
-              </Tx>
-              <Tx x={T.x + 12} y={T.y + 36} cls="tb-k" dl={B0 + 1560}>
-                SCALE 1:1 · MIT · SPROUTBOAT
-              </Tx>
-            </>
-          )}
-        </g>
+        <TitleBlock T={T} mobile={mobile} version={version} B0={B0} onNeed={setTbW} />
         {mobile ? (
           <Tx x={hintX} y={hintY} cls="hint" dl={B0 + 1900}>
             Tap a part. It is the real component.
@@ -815,7 +912,11 @@ function Callout({
   const w = L.mobile ? L.W - 2 * (L.m + 8) : 304;
   const low = label.y > L.H * 0.56;
   const x = L.mobile ? L.m + 8 : L.W - L.m - 14 - w;
-  const y = L.mobile ? (low ? 64 : L.H - L.m - 8 - hgt) : Math.max(80, Math.min(label.y - 52, L.title.y - 214));
+  const y = L.mobile
+    ? low
+      ? L.navH + 18
+      : L.H - L.m - 8 - hgt
+    : Math.max(L.navH + 24, Math.min(label.y - 52, L.title.y - 214));
   const style: CSSProperties = { width: w, transform: `translate3d(${x}px, ${y}px, 0)` };
   const inner = (pid: PartId, lab: Label, live: boolean): ReactNode => (
     <>

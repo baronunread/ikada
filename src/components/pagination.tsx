@@ -20,16 +20,21 @@ export interface PaginationProps extends Omit<ComponentProps<"nav">, "onChange">
 /** A run of hidden pages: before the current window or after it. */
 export type PageGap = "gap-start" | "gap-end";
 
-/** The page numbers to show: the first, the last, the current and its siblings, with gaps between. */
+/**
+ * The page numbers to show. Past a short list it is always 2 * siblings + 5 slots (first, last, two
+ * gaps or pages, and the window), so the control keeps its width while you page, and a gap never
+ * hides a single page: it would take the same room as the number it replaces.
+ */
 export function pageRange(page: number, pageCount: number, siblings = 1): (number | PageGap)[] {
-  const first = Math.max(2, page - siblings);
-  const last = Math.min(pageCount - 1, page + siblings);
-  const out: (number | PageGap)[] = [1];
-  if (first > 2) out.push("gap-start");
-  for (let n = first; n <= last; n += 1) out.push(n);
-  if (last < pageCount - 1) out.push("gap-end");
-  if (pageCount > 1) out.push(pageCount);
-  return out;
+  const s = Math.max(0, Math.floor(siblings));
+  const slots = 2 * s + 5;
+  const all = (from: number, to: number): number[] =>
+    Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);
+  if (pageCount <= slots) return all(1, pageCount);
+  const current = Math.min(Math.max(1, page), pageCount);
+  if (current - s <= 3) return [...all(1, 2 * s + 3), "gap-end", pageCount];
+  if (current + s >= pageCount - 2) return [1, "gap-start", ...all(pageCount - (2 * s + 2), pageCount)];
+  return [1, "gap-start", ...all(current - s, current + s), "gap-end", pageCount];
 }
 
 const cell = cn(
@@ -58,7 +63,7 @@ export function Pagination({
       data-slot="pagination"
       ref={ref}
       aria-label="Pagination"
-      className={cn("flex items-center gap-1", className)}
+      className={cn("flex flex-wrap items-center gap-1", className)}
       {...props}
     >
       <button
@@ -68,19 +73,19 @@ export function Pagination({
         onClick={() => go(page - 1)}
         className={cell}
       >
-        <ChevronLeftIcon />
+        <ChevronLeftIcon className="rtl:-scale-x-100" />
       </button>
       {compact ? (
-        <span className="px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
+        <span className="min-w-0 px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
           Page {page} of {pageCount}
         </span>
       ) : (
-        <ul className="flex items-center gap-1">
+        <ul className="flex flex-wrap items-center gap-1">
           {pageRange(page, pageCount, siblings).map((entry) => (
             <li key={entry}>
               {entry === "gap-start" || entry === "gap-end" ? (
                 <span aria-hidden="true" className="inline-grid h-8 min-w-6 place-items-center text-fg-muted">
-                  ...
+                  …
                 </span>
               ) : (
                 <button
@@ -107,7 +112,7 @@ export function Pagination({
         onClick={() => go(page + 1)}
         className={cell}
       >
-        <ChevronRightIcon />
+        <ChevronRightIcon className="rtl:-scale-x-100" />
       </button>
     </nav>
   );

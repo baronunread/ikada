@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "../src/theme.css";
 @source "../src";
+@source "../blocks";
 
 @layer base {
   body {

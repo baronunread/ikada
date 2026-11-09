@@ -166,8 +166,12 @@ export function ToastDeck({
                     <KeyIcon />
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col @md:flex-row @md:items-center @md:gap-3">
-                    <span className="truncate font-semibold">{token.name}</span>
-                    <span className="truncate font-mono text-sb-sm text-fg-muted">{token.hint}</span>
+                    <span className="truncate font-semibold" title={token.name}>
+                      {token.name}
+                    </span>
+                    <span className="truncate font-mono text-sb-sm text-fg-muted" title={token.hint}>
+                      {token.hint}
+                    </span>
                   </div>
                   <span className="hidden shrink-0 text-sb-sm text-fg-muted @lg:inline">Used {token.lastUsed}</span>
                   <IconButton label={`Revoke ${token.name}`} variant="ghost" size="sm" onClick={() => revoke(token)}>
@@ -202,7 +206,9 @@ export function ToastDeck({
                 <li key={s.key} className="flex items-start gap-2.5">
                   <StatusGlyph tone={s.tone} className="mt-1.5" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sb-sm font-semibold">{s.title}</p>
+                    <p className="truncate text-sb-sm font-semibold" title={s.title}>
+                      {s.title}
+                    </p>
                     {s.description ? <p className="line-clamp-2 text-sb-sm text-fg-muted">{s.description}</p> : null}
                   </div>
                   <time

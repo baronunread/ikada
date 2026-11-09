@@ -45,7 +45,7 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
           "data-starting-style:opacity-0 data-ending-style:opacity-0 data-sb-instant:transition-none",
         )}
       />
-      <BaseDialog.Viewport className="fixed inset-0 z-(--sb-z-modal) grid place-items-center overflow-y-auto p-4">
+      <BaseDialog.Viewport className="fixed inset-0 z-(--sb-z-modal) grid place-items-center overflow-y-auto overscroll-contain p-4">
         <BaseDialog.Popup
           data-slot="dialog-content"
           ref={ref}

@@ -5,7 +5,11 @@
 
 @layer components {
   :root {
+    /* One header on sproutboat.com, /docs and /ikada: 60px tall (56px at <= 900px), the logo --nav-gutter from the
+       left edge and the actions --nav-gutter from the right, full width. Same numbers in the site's base.css and the
+       docs' theme.css. */
     --nav-h: 60px;
+    --nav-gutter: 24px;
     scroll-padding-top: calc(var(--nav-h) + 24px);
     scrollbar-gutter: stable;
   }
@@ -80,8 +84,8 @@
     height: var(--nav-h);
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 0 24px;
+    gap: 8px;
+    padding: 0 var(--nav-gutter);
     background: color-mix(in oklch, var(--sb-canvas) 82%, transparent);
     backdrop-filter: blur(14px) saturate(1.2);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
@@ -100,30 +104,32 @@
     opacity: 1;
   }
   .brand {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
-    margin-inline-start: -6px;
-    padding: 4px 6px;
+    height: 40px;
+    padding-inline-end: 6px;
     border-radius: 8px;
     font-weight: 650;
-    font-size: 15px;
-    letter-spacing: -0.01em;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1;
     color: var(--sb-fg);
   }
   .nav .links {
     display: flex;
     align-items: center;
     gap: 2px;
-    margin-inline-start: 12px;
+    margin-inline-start: 18px;
   }
   .nav .links a {
     display: inline-flex;
     align-items: center;
-    height: 32px;
-    padding: 0 10px;
+    height: 36px;
+    padding: 0 11px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 14.5px;
+    line-height: 1;
     font-weight: 500;
     color: var(--sb-fg-muted);
     transition:
@@ -133,7 +139,6 @@
   }
   .nav .links a[aria-current] {
     color: var(--sb-fg);
-    font-weight: 600;
   }
   .nav .spacer {
     flex: 1;
@@ -142,7 +147,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 32px;
+    height: 34px;
     min-width: 200px;
     padding: 0 6px 0 10px;
     border: 0;
@@ -168,7 +173,7 @@
   .nav .ctl {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
   }
   .nav .burger {
     display: none;
@@ -183,8 +188,8 @@
   .ibtn {
     display: inline-grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border: 0;
     border-radius: 8px;
     background: transparent;
@@ -195,6 +200,9 @@
       color 200ms ease,
       scale var(--sb-duration-spring-bob) var(--sb-spring-bob),
       outline-color 120ms ease;
+  }
+  .nav .ibtn .i {
+    stroke-width: 1.6; /* the site's header icons: same outline weight on all three sites */
   }
   .ibtn:active {
     scale: var(--sb-scale-press);
@@ -214,9 +222,6 @@
     max-width: 1320px;
     margin: 0 auto;
     padding: 32px 24px 96px;
-  }
-  .docs.wide {
-    max-width: 1520px;
   }
   .side {
     position: sticky;
@@ -326,7 +331,7 @@
   .docs.wide .prose {
     max-width: none;
   }
-  .prose h1 {
+  .prose h1:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 40px;
     font-weight: 600;
     letter-spacing: -0.03em;
@@ -334,7 +339,7 @@
     margin: 10px 0 10px;
     text-wrap: balance;
   }
-  .prose h2 {
+  .prose h2:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.015em;
@@ -342,20 +347,21 @@
     margin: 48px 0 12px;
     text-wrap: balance;
   }
-  .prose h3 {
+  .prose h3:not(:where(.stage-preview, .bview, [data-demo]) *) {
     font-size: 16px;
     font-weight: 600;
     margin: 28px 0 8px;
   }
-  .prose p,
-  .prose li {
+  .prose > p,
+  .prose > ul > li,
+  .prose > ol > li {
     color: var(--sb-fg-muted);
     font-size: 15.5px;
     line-height: 1.65;
     max-width: 65ch;
     text-wrap: pretty;
   }
-  .prose p {
+  .prose > p {
     margin: 0 0 14px;
   }
   .prose ul.list {
@@ -363,7 +369,8 @@
     list-style: disc;
     margin: 0 0 14px;
   }
-  .prose li {
+  .prose > ul > li,
+  .prose > ol > li {
     margin: 4px 0;
   }
   .prose a.ilink {
@@ -853,59 +860,135 @@
     font-weight: 600;
   }
 
-  /* ---------- Deck's component index: a hairline grid of files with sizes ---------- */
-  .cindex {
+  /* ---------- the overview grids: a fixed-height inert preview, then name and file ---------- */
+  .cgrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
     margin: 16px 0 24px;
     padding: 0;
     list-style: none;
-    border: 1px solid var(--sb-hairline);
-    border-radius: 12px;
-    overflow: hidden;
   }
-  /* hairlines drawn by the cells (right and bottom), so a short last row leaves plain canvas, not grey */
-  .cindex > li {
-    box-shadow:
-      1px 0 0 var(--sb-hairline),
-      0 1px 0 var(--sb-hairline);
+  .docs.wide .cgrid,
+  .home .cgrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .docs.wide .cindex,
-  .home .cindex {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-  .cindex a {
+  .cgrid > li {
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 18px;
-    height: 100%;
-    min-height: 88px;
-    padding: 12px 14px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 12px;
     background: var(--sb-canvas);
+    box-shadow: 0 0 0 1px var(--sb-hairline);
+    transition:
+      box-shadow 150ms ease,
+      background-color 150ms ease;
+  }
+  /* the title link covers the whole card, so the card is the link; the preview inside is inert */
+  .cgrid .cmeta a {
+    color: var(--sb-fg);
     font-size: 14px;
     font-weight: 600;
-    color: var(--sb-fg);
-    overflow-wrap: anywhere;
-    outline: 2px solid transparent;
-    outline-offset: -2px;
-    transition:
-      background-color 120ms ease,
-      outline-color 120ms ease;
+    line-height: 20px;
+    text-decoration: none;
+    outline: none;
   }
-  .cindex a:focus-visible {
+  .cgrid .cmeta a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .cgrid .cmeta a:focus-visible::after {
     outline-color: var(--sb-focus);
   }
-  .cindex small {
+  @media (prefers-reduced-motion: reduce) {
+    .cgrid > li {
+      transition: none;
+    }
+  }
+  .cthumb {
+    position: relative;
+    display: block;
+    height: 148px;
+    overflow: hidden;
+    background: var(--sb-surface);
+    box-shadow: inset 0 -1px 0 var(--sb-hairline);
+    container-type: size;
+  }
+  .cgrid.is-blocks .cthumb {
+    height: 168px;
+  }
+  /* natural size, centred, then scaled by script; invisible until measured so nothing jumps */
+  .cfit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: max-content;
+    max-width: none;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.5;
+    transform: translate(-50%, -50%) scale(var(--s, 1));
+    transform-origin: center;
+    pointer-events: none;
+    user-select: none;
+  }
+  .cfit:not([data-ready]) {
+    opacity: 0;
+  }
+  .cfit[data-fit="width"] {
+    top: var(--y, 16px);
+    width: 880px;
+    transform: translate(-50%, 0) scale(var(--s, 1));
+    transform-origin: top center;
+  }
+  /* the server-rendered chart is unmeasured: its y-axis labels land outside the plot, so thumbnails drop them */
+  .cfit [data-ts-key^="y-tick-label"] {
+    display: none;
+  }
+  .cgrid.is-blocks .cthumb::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--sb-surface));
+  }
+  .cmeta {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px 12px;
+    min-width: 0;
+  }
+  .cmeta small {
+    display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 2px 8px;
+    gap: 8px;
+    min-width: 0;
     font-family: var(--font-mono);
     font-size: 12px;
+    line-height: 16px;
     font-weight: 400;
     color: var(--sb-fg-muted);
+  }
+  .cfile {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .csize {
+    flex: none;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1086,8 +1169,9 @@
     .pager a:hover {
       background: var(--sb-hover);
     }
-    .cindex a:hover {
+    .cgrid > li:hover {
       background: var(--sb-surface);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--sb-fg) 28%, transparent);
     }
   }
 
@@ -1127,22 +1211,25 @@
     .toc {
       display: none;
     }
-    .cindex,
-    .docs.wide .cindex,
-    .home .cindex {
+    .cgrid,
+    .docs.wide .cgrid,
+    .home .cgrid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-  @media (max-width: 860px) {
+  /* the header's compact form, shared with sproutboat.com (its drawer is the burger's) */
+  @media (max-width: 900px) {
     :root {
       --nav-h: 56px;
+      --nav-gutter: 16px;
     }
     .nav {
-      padding: 0 12px 0 16px;
+      padding: 0 var(--nav-gutter);
       gap: 8px;
     }
     .nav .links,
-    .nav .search {
+    .nav .search,
+    .nav .ctl .gh {
       display: none;
     }
     .nav .burger {
@@ -1174,6 +1261,8 @@
     .drawer .groups a {
       min-height: 40px;
     }
+  }
+  @media (max-width: 860px) {
     .docs,
     .docs.wide {
       grid-template-columns: minmax(0, 1fr);
@@ -1193,9 +1282,9 @@
       border-inline-start: 0;
       border-top: 1px solid var(--sb-hairline);
     }
-    .cindex,
-    .docs.wide .cindex,
-    .home .cindex {
+    .cgrid,
+    .docs.wide .cgrid,
+    .home .cgrid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .foot .inner {

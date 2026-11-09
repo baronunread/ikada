@@ -1,4 +1,5 @@
 ---
+import CardGrid from "../../components/docs/CardGrid.astro";
 import { Code } from "astro:components";
 import BlockPreview from "../../components/BlockPreview";
 import Install from "../../components/docs/Install.astro";
@@ -115,16 +116,7 @@ const markdown = pageMarkdown({
     uses.length ? (
       <>
         <h2 id="uses">Built from</h2>
-        <ul class="cindex" style="grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))">
-          {uses.map((u) => (
-            <li>
-              <a href={href(`/components/${u.name}`)}>
-                <span>{u.title}</span>
-                <small><span>{u.name}.tsx</span><span>{gzipKb(u)}</span></small>
-              </a>
-            </li>
-          ))}
-        </ul>
+        <CardGrid kind="component" cards={uses.map((u) => ({ slug: u.name, title: u.title, href: href(`/components/${u.name}`), file: `${u.name}.tsx`, size: gzipKb(u) }))} />
       </>
     ) : null
   }

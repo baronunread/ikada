@@ -51,16 +51,18 @@ function Quota({ quota }: { quota: UsageQuota }) {
   const value = figure(quota);
   const t = tone(quota);
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <span className="text-fg-muted">{quota.label}</span>
-      <span className={cn("font-semibold tabular-nums", t === "warning" && "text-warn-fg")}>{value}</span>
+    <span className="inline-flex max-w-full items-center gap-2 whitespace-nowrap">
+      <span className="min-w-0 truncate text-fg-muted" title={quota.label}>
+        {quota.label}
+      </span>
+      <span className={cn("shrink-0 font-semibold tabular-nums", t === "warning" && "text-warn-fg")}>{value}</span>
       <Meter
         aria-label={`${quota.label}: ${value}`}
         value={Math.min(quota.used, quota.limit)}
         max={quota.limit}
         tone={t}
         valueLabel={null}
-        className="w-14"
+        className="w-14 shrink-0"
       />
     </span>
   );

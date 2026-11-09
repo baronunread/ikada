@@ -109,7 +109,7 @@ export function Sidebar({
       className={cn(
         "flex h-full shrink-0 flex-col gap-1 overflow-y-auto overflow-x-hidden bg-surface p-3 text-fg shadow-[inset_-1px_0_0_var(--sb-hairline)]",
         "w-60 transition-[width] duration-(--sb-duration-slide) ease-in-out motion-reduce:transition-none",
-        collapsed && "w-14 px-2",
+        collapsed && "w-14",
         className,
       )}
       {...props}
@@ -188,10 +188,9 @@ export function SidebarItem({
         if (drawer) closeDrawer();
       },
       className: cn(
-        "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sb-base font-medium text-fg-muted",
+        "flex h-9 items-center gap-3 overflow-hidden whitespace-nowrap rounded-md px-2 text-sb-base font-medium text-fg-muted",
         "transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
         "aria-[current=page]:bg-hover aria-[current=page]:text-fg aria-[current=page]:shadow-pill",
-        rail && "justify-center px-0",
         "pointer-coarse:h-11",
         focusRing,
         className,
@@ -200,7 +199,15 @@ export function SidebarItem({
       children: (
         <>
           {icon}
-          <span className={cn("min-w-0 flex-1 truncate", rail && "sr-only")}>{children}</span>
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate transition-opacity duration-(--sb-duration-hover) ease-out motion-reduce:transition-none",
+              rail && "opacity-0",
+            )}
+            title={rail ? undefined : children}
+          >
+            {children}
+          </span>
           {rail ? null : trailing}
         </>
       ),
@@ -240,7 +247,7 @@ export function SidebarToggle({
         aria-expanded={!collapsed}
         onClick={() => onCollapsedChange(!collapsed)}
         className={cn(
-          "inline-grid size-9 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
+          "inline-grid size-8 shrink-0 place-items-center rounded-md text-fg-muted hover:bg-hover hover:text-fg",
           pressMotion,
           coarseTarget,
           focusRing,

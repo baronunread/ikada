@@ -182,6 +182,10 @@ ${reducedVars()}
    colours for its own palette, so shadow-drawn field edges and fills vanish. Draw them again as
    borders and fills in system colours. Selectors use the data-slot attributes. */
 @media (forced-colors: active) {
+  /* The sparkline fill is a faint gradient: drop it and keep the line. */
+  .sb-chart .ts-chart__area {
+    display: none;
+  }
   [data-slot="button"],
   [data-slot="icon-button"],
   [data-slot="input"],

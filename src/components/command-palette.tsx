@@ -118,7 +118,7 @@ export function CommandPalette({
               return input.current;
             }}
             finalFocus={() => opener.current}
-            className="flex max-h-[min(34rem,calc(100%-1rem))] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-raised text-fg shadow-dialog outline-hidden"
+            className="flex max-h-[min(32rem,calc(100%-1rem))] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-raised text-fg shadow-dialog ring-1 ring-(--sb-hairline) outline-hidden"
           >
             <PaletteBody
               inputRef={input}
@@ -231,16 +231,22 @@ function PaletteBody({
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          className="h-12 min-w-0 flex-1 bg-transparent text-sb-md font-normal text-fg outline-hidden placeholder:text-fg-muted"
+          className="h-13 min-w-0 flex-1 bg-transparent text-sb-md font-normal text-fg outline-hidden placeholder:text-fg-muted"
         />
-        {loading ? <Spinner size="sm" label="Searching" /> : <Kbd aria-hidden="true">Esc</Kbd>}
+        {loading ? <Spinner size="sm" label="Searching" /> : null}
       </div>
 
-      <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto p-2">
-        <div id={listId} role="listbox" aria-label="Results" className="flex flex-col gap-1">
+      <div
+        ref={listRef}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5 [scrollbar-color:var(--sb-hairline-strong)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]"
+      >
+        <div id={listId} role="listbox" aria-label="Results" className="flex flex-col gap-0.5">
           {sections.map((section) => (
             <div key={section.id} role="group" aria-labelledby={`${listId}-${section.id}`} className="flex flex-col">
-              <div id={`${listId}-${section.id}`} className="px-2.5 pt-2 pb-1 text-sb-xs font-semibold text-fg-muted">
+              <div
+                id={`${listId}-${section.id}`}
+                className="px-2.5 pt-3 pb-1 text-sb-xs font-medium tracking-wide text-fg-muted first:pt-1.5"
+              >
                 {section.label}
               </div>
               {section.items.map((item) => {
@@ -258,8 +264,9 @@ function PaletteBody({
                     onMouseMove={() => i !== activeIndex && setActive(i)}
                     onClick={() => onSelect(item)}
                     className={cn(
-                      "flex min-h-10 cursor-default items-center gap-3 rounded-md px-2.5 py-1.5 text-sb-base",
-                      "data-active:bg-hover data-active:shadow-[inset_2px_0_0_var(--sb-fg)]",
+                      "flex min-h-9 cursor-default items-center gap-2.5 rounded-lg px-2.5 py-1 text-sb-base",
+                      "data-active:bg-[color-mix(in_oklch,var(--sb-fg)_7%,transparent)]",
+                      "data-active:after:ms-auto data-active:after:text-sb-xs data-active:after:text-fg-muted data-active:after:content-['↵']",
                       "pointer-coarse:min-h-11",
                     )}
                   >
@@ -286,13 +293,13 @@ function PaletteBody({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2.5 text-sb-xs text-fg-muted shadow-[inset_0_1px_0_var(--sb-hairline)]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2 text-sb-xs text-fg-muted shadow-[inset_0_1px_0_var(--sb-hairline)]">
         <span className="inline-flex items-center gap-1.5">
           <Kbd>↑</Kbd>
-          <Kbd>↓</Kbd> move
+          <Kbd>↓</Kbd> Navigate
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Kbd>↵</Kbd> open
+          <Kbd>↵</Kbd> Open
         </span>
         {prefixes.length ? (
           <span className="inline-flex flex-wrap items-center gap-1.5">
@@ -304,7 +311,11 @@ function PaletteBody({
             ))}
           </span>
         ) : null}
-        <BaseDialog.Close className={cn("ms-auto rounded-xs px-1 hover:text-fg", focusRing)}>Close</BaseDialog.Close>
+        <BaseDialog.Close
+          className={cn("ms-auto inline-flex items-center gap-1.5 rounded-xs hover:text-fg", focusRing)}
+        >
+          <Kbd aria-hidden="true">Esc</Kbd> Close
+        </BaseDialog.Close>
       </div>
     </>
   );

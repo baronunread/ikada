@@ -13,7 +13,7 @@ import { InlineConfirm } from "../../src/components/inline-confirm";
 import { Input } from "../../src/components/input";
 import { SegmentedControl } from "../../src/components/segmented-control";
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from "../../src/components/table";
-import { cn, focusRing } from "../../src/lib/cn";
+import { cn, focusRing, pressMotion } from "../../src/lib/cn";
 import { formatBytes } from "../../src/lib/format";
 import { CheckIcon, KeyIcon, SearchIcon, TrashIcon, UndoIcon } from "../../src/lib/icons";
 
@@ -157,9 +157,9 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-sb-xs shadow-[inset_0_0_0_1px_var(--sb-hairline)]",
-        "transition-colors duration-(--sb-duration-hover) ease-hover",
-        active ? "bg-hover font-semibold text-fg" : "text-fg-muted hover:bg-hover hover:text-fg",
+        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-sb-xs shadow-[inset_0_0_0_1px_var(--sb-hairline-strong)] pointer-coarse:h-11",
+        pressMotion,
+        active ? "bg-neutral-soft font-semibold text-fg" : "text-fg-muted hover:bg-hover hover:text-fg",
         focusRing,
       )}
     >
@@ -258,7 +258,9 @@ export function KvBrowser({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <span className="inline-flex min-w-0 items-center gap-2 font-semibold">
             <KeyIcon className="text-fg-muted" />
-            <span className="truncate font-mono text-sb-sm">{namespace}</span>
+            <span className="truncate font-mono text-sb-sm" title={namespace}>
+              {namespace}
+            </span>
           </span>
           <span className="text-sb-sm text-fg-muted tabular-nums">
             {entries.length.toLocaleString("en")} keys · {formatBytes(entries.reduce((n, e) => n + sizeOf(e), 0))}
