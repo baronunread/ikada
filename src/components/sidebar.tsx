@@ -200,7 +200,9 @@ export function SidebarItem({
       children: (
         <>
           {icon}
-          <span className={cn("min-w-0 flex-1 truncate", rail && "sr-only")}>{children}</span>
+          <span className={cn("min-w-0 flex-1 truncate", rail && "sr-only")} title={rail ? undefined : children}>
+            {children}
+          </span>
           {rail ? null : trailing}
         </>
       ),

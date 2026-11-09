@@ -172,9 +172,14 @@ function SproutCard({ sprout, href }: { sprout: Sprout; href: string }) {
     >
       <span className="flex min-w-0 items-center gap-2">
         <SproutTile status={l.status} />
-        <span className="min-w-0 flex-1 truncate text-sb-base font-semibold">{sprout.name}</span>
+        <span className="min-w-0 flex-1 truncate text-sb-base font-semibold" title={sprout.name}>
+          {sprout.name}
+        </span>
         {sprout.trigger && sprout.trigger !== "http" ? (
-          <span className="shrink-0 rounded-md bg-neutral-soft px-1.5 py-0.5 font-mono text-sb-xs font-semibold text-neutral-fg">
+          <span
+            title={sprout.trigger}
+            className="max-w-[40%] shrink-0 truncate rounded-md bg-neutral-soft px-1.5 py-0.5 font-mono text-sb-xs font-semibold text-neutral-fg"
+          >
             {sprout.trigger}
           </span>
         ) : null}
@@ -220,7 +225,7 @@ function Tray({
       className="@container rounded-2xl bg-well p-1.5 shadow-[inset_0_0_0_1px_var(--sb-hairline)]"
     >
       <div className="flex min-w-0 items-center gap-2.5 px-3 pt-2 pb-2.5">
-        <h2 id={id} className="min-w-0 truncate text-sb-md font-semibold">
+        <h2 id={id} title={project.name} className="min-w-0 truncate text-sb-md font-semibold">
           <a href={href} className={cn("rounded-sm hover:underline", focusRing)}>
             {project.name}
           </a>

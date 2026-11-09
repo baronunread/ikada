@@ -24,13 +24,22 @@ export interface AvatarProps extends Omit<ComponentProps<typeof BaseAvatar.Root>
   className?: string;
 }
 
+const segmenter = typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter() : null;
+
+/** First user-perceived character: an emoji or a combining sequence stays whole instead of splitting a surrogate pair. */
+function initialOf(name: string): string {
+  const text = name.trim();
+  const first = segmenter ? segmenter.segment(text)[Symbol.iterator]().next().value?.segment : Array.from(text)[0];
+  return first?.toUpperCase() || "?";
+}
+
 /** A person's picture with their initial when there is none (or it fails to load). Decorative next to a visible name. */
 export function Avatar({ src, name, size, className, ref, ...props }: AvatarProps) {
   return (
     <BaseAvatar.Root data-slot="avatar" ref={ref} className={cn(avatarStyles({ size }), className)} {...props}>
       {src ? <BaseAvatar.Image src={src} alt={`${name} avatar`} className="size-full object-cover" /> : null}
       <BaseAvatar.Fallback aria-hidden="true" delay={src ? 400 : 0}>
-        {name.trim().slice(0, 1).toUpperCase() || "?"}
+        {initialOf(name)}
       </BaseAvatar.Fallback>
     </BaseAvatar.Root>
   );

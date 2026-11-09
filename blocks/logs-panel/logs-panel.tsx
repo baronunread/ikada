@@ -11,6 +11,7 @@ import { StatusGlyph } from "../../src/components/status-glyph";
 import type { Status } from "../../src/components/status";
 import { cn, focusRing, focusRingInset, pressMotion } from "../../src/lib/cn";
 import { SearchIcon } from "../../src/lib/icons";
+import { formatNumber } from "../../src/lib/format";
 
 export type LogLevel = "info" | "warn" | "error";
 
@@ -210,7 +211,7 @@ function Line({ line }: { line: LogLine }) {
           {body}
         </span>
         <span className="text-fg-muted tabular-nums @3xl:text-end">
-          {line.durationMs !== undefined ? `${line.durationMs} ms` : ""}
+          {line.durationMs !== undefined ? `${formatNumber(line.durationMs)} ms` : ""}
         </span>
       </div>
       <p className="mt-0.5 break-words @3xl:hidden">{body}</p>

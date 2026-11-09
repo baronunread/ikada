@@ -1,14 +1,14 @@
 "use client";
 
 import { Button as BaseButton } from "@base-ui/react/button";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { coarseTarget, focusRing, pressMotion, tv } from "../lib/cn";
 import type { VariantProps } from "../lib/cn";
 import { SpinnerIcon } from "../lib/icons";
 
 export const buttonStyles = tv({
   base: [
-    "relative inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
+    "relative inline-flex max-w-full shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold",
     pressMotion,
     // Optical alignment: the icon side gets 2px less padding than the text side.
     "has-[>svg:first-child:not(:only-child)]:ps-3 has-[>svg:last-child:not(:only-child)]:pe-3",
@@ -40,6 +40,11 @@ export const buttonStyles = tv({
   },
   defaultVariants: { variant: "secondary", size: "md" },
 });
+
+/** A plain-text label truncates at the button's max width instead of overflowing; icons and nodes are left alone. */
+function Label({ children }: { children: ReactNode }) {
+  return typeof children === "string" ? <span className="min-w-0 truncate">{children}</span> : children;
+}
 
 export type ButtonVariants = VariantProps<typeof buttonStyles>;
 
@@ -78,11 +83,13 @@ export function Button({
     >
       {loading ? (
         <>
-          <span className="inline-flex items-center gap-2 opacity-0">{children}</span>
+          <span className="inline-flex min-w-0 items-center gap-2 opacity-0">
+            <Label>{children}</Label>
+          </span>
           <SpinnerIcon className="absolute" />
         </>
       ) : (
-        children
+        <Label>{children}</Label>
       )}
     </BaseButton>
   );

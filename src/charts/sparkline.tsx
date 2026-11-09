@@ -54,7 +54,7 @@ export type SparklineProps = SparklineBase & AccessibleName;
 
 /** A 44px trend line with no axes, a dot on the current point, a hover value and the same tokens as TimeseriesChart. */
 export function Sparkline({
-  data,
+  data: rawData,
   "aria-label": ariaLabelStd,
   ariaLabel: ariaLabelLegacy,
   color = "requests",
@@ -69,6 +69,8 @@ export function Sparkline({
 }: SparklineProps) {
   const gradientId = `sb-spark-${useId().replaceAll(/[^a-zA-Z0-9_-]/g, "")}`;
   const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
+  // A NaN or Infinity (a failed division upstream) would make the scale throw and take the page with it: drop it.
+  const data = useMemo(() => rawData.filter(Number.isFinite), [rawData]);
   const definition = useMemo(() => {
     const rows: Row[] = data.map((v, i) => ({ i, v }));
     const last = rows.at(-1);

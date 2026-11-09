@@ -1,7 +1,7 @@
 "use client";
 
 import { crosshair } from "@tanstack/charts/crosshair";
-import { areaY, defineChart, lineY, ruleX, text } from "@tanstack/charts";
+import { areaY, defineChart, dot, lineY, ruleX, text } from "@tanstack/charts";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { decorative } from "@tanstack/charts/mark/decorative";
@@ -87,6 +87,13 @@ const defaultValue = (value: number): string => formatNumber(value);
 const EPOCH_MS_FLOOR = 978_307_200_000;
 const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
 
+/** A deploy label is one line of SVG text with no wrapping; past this it would run off the plot. */
+const MAX_LABEL = 28;
+function truncateLabel(label: string): string {
+  const chars = Array.from(label);
+  return chars.length > MAX_LABEL ? `${chars.slice(0, MAX_LABEL - 1).join("")}…` : label;
+}
+
 /** The default x formatter for a domain: clock time, date, or a plain number. */
 export function timeFormatter(domain: readonly [number, number], locale = "en"): (time: number) => string {
   const [x0, x1] = domain;
@@ -132,7 +139,7 @@ export type TimeseriesChartProps = TimeseriesChartBase & AccessibleName;
  * or dates; with no points at all it keeps its height and says so instead of plotting.
  */
 export function TimeseriesChart({
-  series,
+  series: rawSeries,
   deploy,
   "aria-label": ariaLabelStd,
   ariaLabel: ariaLabelLegacy,
@@ -150,6 +157,15 @@ export function TimeseriesChart({
 }: TimeseriesChartProps) {
   const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
   const resolvedLocale = useLocale(locale);
+  // A NaN or Infinity point would make a scale throw and take the page with it: drop it.
+  const series = useMemo(
+    () =>
+      rawSeries.map((s) => ({
+        ...s,
+        data: s.data.filter((p) => Number.isFinite(p.time) && Number.isFinite(p.value)),
+      })),
+    [rawSeries],
+  );
   const empty = !series.some((s) => s.data.length > 0);
   const definition = useMemo(() => {
     if (empty) return null;
@@ -181,6 +197,8 @@ export function TimeseriesChart({
             strokeDasharray: s.dashed ? "6 4" : undefined,
             id: s.id,
           }),
+          // One point draws no line: show it as a dot so a brand-new series is not mistaken for no data.
+          ...(rows.length === 1 ? [dot(rows, { x: "time", y: "value", r: 3, fill: color, id: `${s.id}-dot` })] : []),
         ];
       }),
       // A vertical guide that the card sits beside. Not a mark in the tooltip, so deploy markers stay out of it.
@@ -200,12 +218,14 @@ export function TimeseriesChart({
           }),
         ),
         decorative(
-          text([{ time: m.time, y: yMax * 0.96, t: m.label }], {
+          text([{ time: m.time, y: yMax * 0.96, t: truncateLabel(m.label) }], {
             x: "time",
             y: "y",
             text: "t",
             anchor: "start",
             dx: 8,
+            // Markers close together would print their labels over each other: step every other one down.
+            dy: i % 2 === 0 ? 0 : 14,
             fill: chartColors.deploy,
             fontSize: 11,
             fontWeight: 600,

@@ -32,7 +32,7 @@ export function Badge({
       ref={ref}
       data-tone={tone}
       className={cn(
-        "inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-sb-xs font-semibold",
+        "inline-flex h-6 max-w-full min-w-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-sb-xs font-semibold",
         dot && "ps-2",
         softSurface[tone],
         className,
@@ -40,7 +40,13 @@ export function Badge({
       {...props}
     >
       {dot ? <StatusGlyph tone={tone} live={live} sprout={sprout} /> : null}
-      {children}
+      {typeof children === "string" ? (
+        <span className="min-w-0 truncate" title={children}>
+          {children}
+        </span>
+      ) : (
+        children
+      )}
     </span>
   );
 }

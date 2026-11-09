@@ -38,18 +38,25 @@ export function Field({
       {...props}
     >
       <BaseField.Label className={labelStyles}>
-        {label}
-        {required ? (
-          <span aria-hidden="true" className="text-fg-muted">
-            *
-          </span>
-        ) : null}
+        <span className="min-w-0 [overflow-wrap:anywhere]">
+          {label}
+          {required ? (
+            <span aria-hidden="true" className="ms-1 text-fg-muted">
+              *
+            </span>
+          ) : null}
+        </span>
       </BaseField.Label>
       {children}
       {description ? (
-        <BaseField.Description className="text-sb-sm text-fg-muted">{description}</BaseField.Description>
+        <BaseField.Description className="text-sb-sm text-fg-muted [overflow-wrap:anywhere]">
+          {description}
+        </BaseField.Description>
       ) : null}
-      <BaseField.Error match={Boolean(error)} className="flex items-start gap-1.5 text-sb-sm text-danger-fg">
+      <BaseField.Error
+        match={Boolean(error)}
+        className="flex items-start gap-1.5 text-sb-sm text-danger-fg [overflow-wrap:anywhere]"
+      >
         {error}
       </BaseField.Error>
     </BaseField.Root>

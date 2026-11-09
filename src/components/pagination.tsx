@@ -58,7 +58,7 @@ export function Pagination({
       data-slot="pagination"
       ref={ref}
       aria-label="Pagination"
-      className={cn("flex items-center gap-1", className)}
+      className={cn("flex flex-wrap items-center gap-1", className)}
       {...props}
     >
       <button
@@ -71,11 +71,11 @@ export function Pagination({
         <ChevronLeftIcon />
       </button>
       {compact ? (
-        <span className="px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
+        <span className="min-w-0 px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
           Page {page} of {pageCount}
         </span>
       ) : (
-        <ul className="flex items-center gap-1">
+        <ul className="flex flex-wrap items-center gap-1">
           {pageRange(page, pageCount, siblings).map((entry) => (
             <li key={entry}>
               {entry === "gap-start" || entry === "gap-end" ? (

@@ -258,7 +258,9 @@ export function KvBrowser({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <span className="inline-flex min-w-0 items-center gap-2 font-semibold">
             <KeyIcon className="text-fg-muted" />
-            <span className="truncate font-mono text-sb-sm">{namespace}</span>
+            <span className="truncate font-mono text-sb-sm" title={namespace}>
+              {namespace}
+            </span>
           </span>
           <span className="text-sb-sm text-fg-muted tabular-nums">
             {entries.length.toLocaleString("en")} keys · {formatBytes(entries.reduce((n, e) => n + sizeOf(e), 0))}

@@ -58,7 +58,7 @@ export function RadioGroup({
           <label
             key={option.value}
             className={cn(
-              "inline-flex items-start gap-2.5 text-sb-base text-fg",
+              "inline-flex max-w-full items-start gap-2.5 text-sb-base text-fg",
               option.disabled && "cursor-not-allowed opacity-50",
             )}
           >
@@ -89,7 +89,7 @@ export function RadioGroup({
                 )}
               />
             </Radio.Root>
-            <span className="flex flex-col">
+            <span className="flex min-w-0 flex-col [overflow-wrap:anywhere]">
               <span id={`${legendId}-label-${index}`}>{option.label}</span>
               {option.description ? (
                 <span id={`${legendId}-description-${index}`} className="text-sb-sm text-fg-muted">

@@ -101,7 +101,11 @@ export function SegmentedControl<T extends string = string>({
         if (chosen) onValueChange(chosen.value);
       }}
       data-pebble={box ? "" : undefined}
-      className={cn("group/seg relative inline-flex w-full gap-0.5 p-0.5", traySurface, className)}
+      className={cn(
+        "group/seg relative inline-flex w-full max-w-full gap-0.5 overflow-x-auto p-0.5 [scrollbar-width:none]",
+        traySurface,
+        className,
+      )}
     >
       {box ? (
         <span
@@ -124,7 +128,7 @@ export function SegmentedControl<T extends string = string>({
           disabled={option.disabled}
           aria-label={option["aria-label"] ?? option.ariaLabel}
           className={cn(
-            "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-semibold text-fg-muted",
+            "relative z-10 inline-flex max-w-64 min-w-max flex-1 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md font-semibold text-fg-muted",
             "transition-[background-color,color,box-shadow] duration-(--sb-duration-hover) ease-hover hover:text-fg",
             "data-pressed:bg-raised data-pressed:text-fg data-pressed:shadow-pill",
             "group-data-pebble/seg:data-pressed:bg-transparent group-data-pebble/seg:data-pressed:shadow-none",
@@ -134,7 +138,13 @@ export function SegmentedControl<T extends string = string>({
             focusRing,
           )}
         >
-          {option.label}
+          {typeof option.label === "string" ? (
+            <span className="min-w-0 truncate" title={option.label}>
+              {option.label}
+            </span>
+          ) : (
+            option.label
+          )}
         </Toggle>
       ))}
     </ToggleGroup>
