@@ -1,7 +1,6 @@
 "use client";
 
 import { areaY, defineChart, dot, lineY } from "@tanstack/charts";
-import { crosshair } from "@tanstack/charts/crosshair";
 import { decorative } from "@tanstack/charts/mark/decorative";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
@@ -86,11 +85,7 @@ export function Sparkline({
       marks: [
         ...(area ? [areaY(rows, { x: "i", y: "v", y1: yMin, fill: stroke, fillOpacity: 0.1, id: "area" })] : []),
         lineY(rows, { x: "i", y: "v", stroke, strokeWidth: 1.75, id: "line" }),
-        // No crosshair marker: the library clips it to the plot rectangle, which cut the ring in half on the first and last point. The built-in focus ring (below) is not clipped.
-        crosshair({
-          x: { stroke, strokeOpacity: 0.4, strokeWidth: 1, strokeDasharray: "2 3" },
-          y: false,
-        }),
+        // No crosshair: its marker is clipped to the plot rectangle (cutting the ring on the first and last point) and its rule draws through the ring. At 28–64px the focus ring alone marks the point.
         ...(current && last
           ? [
               decorative(
