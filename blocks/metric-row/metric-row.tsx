@@ -118,7 +118,7 @@ export function MetricRow({ metrics = sampleMetrics, formatPoint = hourLabel, cl
                 <Sparkline
                   data={m.trend}
                   color={m.trendColor}
-                  ariaLabel={`${m.label}, per hour over the last 24 hours`}
+                  aria-label={`${m.label}, per hour over the last 24 hours`}
                   formatValue={m.formatTrend}
                   formatPoint={formatPoint}
                 />

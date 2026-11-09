@@ -68,28 +68,28 @@ export const examples: Example[] = [
             <TableCell>robin</TableCell>
             <TableCell>eu-west</TableCell>
             <TableCell>
-              <StatusDot status="success" live label="Live" />
+              <StatusDot tone="success" live label="Live" />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>wren</TableCell>
             <TableCell>us-east</TableCell>
             <TableCell>
-              <StatusDot status="success" live label="Live" />
+              <StatusDot tone="success" live label="Live" />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>finch</TableCell>
             <TableCell>eu-west</TableCell>
             <TableCell>
-              <StatusDot status="info" pulse label="Building" />
+              <StatusDot tone="info" pulse label="Building" />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>heron</TableCell>
             <TableCell>us-east</TableCell>
             <TableCell>
-              <StatusDot status="neutral" label="Paused" />
+              <StatusDot tone="neutral" label="Paused" />
             </TableCell>
           </TableRow>
         </TableBody>
@@ -108,28 +108,28 @@ export const examples: Example[] = [
       <TableCell>robin</TableCell>
       <TableCell>eu-west</TableCell>
       <TableCell>
-        <StatusDot status="success" live label="Live" />
+        <StatusDot tone="success" live label="Live" />
       </TableCell>
     </TableRow>
     <TableRow>
       <TableCell>wren</TableCell>
       <TableCell>us-east</TableCell>
       <TableCell>
-        <StatusDot status="success" live label="Live" />
+        <StatusDot tone="success" live label="Live" />
       </TableCell>
     </TableRow>
     <TableRow>
       <TableCell>finch</TableCell>
       <TableCell>eu-west</TableCell>
       <TableCell>
-        <StatusDot status="info" pulse label="Building" />
+        <StatusDot tone="info" pulse label="Building" />
       </TableCell>
     </TableRow>
     <TableRow>
       <TableCell>heron</TableCell>
       <TableCell>us-east</TableCell>
       <TableCell>
-        <StatusDot status="neutral" label="Paused" />
+        <StatusDot tone="neutral" label="Paused" />
       </TableCell>
     </TableRow>
   </TableBody>

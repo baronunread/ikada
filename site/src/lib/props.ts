@@ -1,3 +1,7 @@
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
+import { withCustomConfig } from "react-docgen-typescript";
+
 /**
  * Props tables from the source: the members each exported `…Props` interface declares itself,
  * with their types and JSDoc. Inherited props (a Base UI part's, a DOM element's) are named by
@@ -43,7 +47,78 @@ export const standardDocs: Record<string, string> = {
   onOpenChange: "Called with the new open state when it opens or closes.",
 };
 
+// The build runs from site/ (as registry.ts assumes), and bundling moves this file, so no import.meta paths.
+const root = join(process.cwd(), "..");
+
+/**
+ * The type checker's view of every exported component in src/ and blocks/: resolved types (a union
+ * of variant names, not `ButtonVariants`), defaults, and props inherited from ikada's own types.
+ * Props that come only from node_modules (a Base UI part, the DOM) stay behind the "Also takes
+ * every prop of" line. Parsed once per build, with TypeScript 5 (the site's own copy; the repo
+ * itself type-checks with 7, which has no JS compiler API).
+ */
+let docgen: Map<string, Prop[]> | undefined;
+function resolved(): Map<string, Prop[]> {
+  if (docgen) return docgen;
+  const files = ["src/components", "src/charts"]
+    .flatMap((d) => readdirSync(join(root, d)).map((f) => join(root, d, f)))
+    .filter((f) => f.endsWith(".tsx"));
+  for (const b of readdirSync(join(root, "blocks"))) files.push(join(root, "blocks", b, `${b}.tsx`));
+  const parser = withCustomConfig(join(root, "tsconfig.json"), {
+    shouldExtractLiteralValuesFromEnum: true,
+    shouldRemoveUndefinedFromOptional: true,
+    propFilter: (prop) => !prop.parent || !/node_modules/.test(prop.parent.fileName),
+  });
+  docgen = new Map();
+  for (const c of parser.parse(files)) {
+    if (!/^[A-Z]/.test(c.displayName)) continue;
+    docgen.set(
+      c.displayName,
+      Object.values(c.props)
+        .filter((p) => !/^(style|render|key|ref)$/.test(p.name) || p.description)
+        .map((p) => ({
+          name: p.name,
+          optional: !p.required,
+          type: (p.type.name === "enum" && p.type.raw ? p.type.raw : p.type.name).replace(/\s+/g, " "),
+          doc: [
+            p.description.replace(/\s+/g, " ").trim() || standardDocs[p.name] || "",
+            p.defaultValue && !/\bdefault/i.test(p.description) ? `Default \`${p.defaultValue.value}\`.` : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+        })),
+    );
+  }
+  return docgen;
+}
+
 export function propsTables(source: string): PropsTable[] {
+  const tables = propsTablesFromSource(source);
+  const types = resolved();
+  // Components the interface scan missed (props declared as an intersection type) get a table too.
+  for (const m of source.matchAll(/export function ([A-Z]\w*)\b/g)) {
+    const name = m[1] ?? "";
+    const props = types.get(name);
+    if (!props?.length) continue;
+    // `AccessibleName` is a union (aria-label or the deprecated ariaLabel), which the checker cannot list as one prop.
+    if (/AccessibleName/.test(source) && !props.some((p) => p.name === "aria-label"))
+      props.unshift(
+        {
+          name: "aria-label",
+          optional: false,
+          type: "string",
+          doc: "Accessible name of the chart. Required (or the deprecated `ariaLabel`).",
+        },
+        { name: "ariaLabel", optional: true, type: "string", doc: "Deprecated: use `aria-label`. Removed in 0.3.0." },
+      );
+    const hit = tables.find((t) => t.name === `${name}Props`);
+    if (hit) hit.props = props;
+    else tables.push({ name: `${name}Props`, extends: "", props });
+  }
+  return tables;
+}
+
+function propsTablesFromSource(source: string): PropsTable[] {
   const tables: PropsTable[] = [];
   const re = /export interface (\w+Props)\b([^{]*)\{/g;
   for (let m = re.exec(source); m; m = re.exec(source)) {

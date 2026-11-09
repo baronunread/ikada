@@ -39,7 +39,7 @@ export function Badge({
       )}
       {...props}
     >
-      {dot ? <StatusGlyph status={tone} live={live} sprout={sprout} /> : null}
+      {dot ? <StatusGlyph tone={tone} live={live} sprout={sprout} /> : null}
       {children}
     </span>
   );

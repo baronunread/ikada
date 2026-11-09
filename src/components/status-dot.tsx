@@ -4,8 +4,10 @@ import type { Status } from "./status";
 import { StatusGlyph } from "./status-glyph";
 
 export interface StatusDotProps extends Omit<ComponentProps<"span">, "children"> {
-  /** Which status: sets the shape and the colour. */
-  status: Status;
+  /** Which status: sets the shape and the colour. Default neutral. */
+  tone?: Status;
+  /** @deprecated Use `tone`; removed in 0.3.0. */
+  status?: Status;
   /** Required: a dot is never the only signal. */
   label: string;
   /** Keeps the label for screen readers and hides it visually (dense tables). */
@@ -20,7 +22,8 @@ export interface StatusDotProps extends Omit<ComponentProps<"span">, "children">
 
 /** A status shape with its label, for lists and headers. Never colour alone. */
 export function StatusDot({
-  status,
+  tone,
+  status: legacyStatus,
   label,
   hideLabel = false,
   live = false,
@@ -30,6 +33,7 @@ export function StatusDot({
   ref,
   ...props
 }: StatusDotProps) {
+  const status: Status = tone ?? legacyStatus ?? "neutral";
   return (
     <span
       data-slot="status-dot"
@@ -38,7 +42,7 @@ export function StatusDot({
       className={cn("inline-flex items-center gap-2 text-sb-base text-fg", className)}
       {...props}
     >
-      <StatusGlyph status={status} live={live} pulse={pulse} sprout={sprout} />
+      <StatusGlyph tone={status} live={live} pulse={pulse} sprout={sprout} />
       <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
     </span>
   );

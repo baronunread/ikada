@@ -9,42 +9,42 @@ export const examples: Example[] = [
     description: "Circle, triangle, cross, half ring and square. Decorative: always pair a glyph with a label.",
     render: () => (
       <div className="flex items-center gap-3">
-        <StatusGlyph status="success" />
-        <StatusGlyph status="warning" />
-        <StatusGlyph status="danger" />
-        <StatusGlyph status="info" />
-        <StatusGlyph status="neutral" />
+        <StatusGlyph tone="success" />
+        <StatusGlyph tone="warning" />
+        <StatusGlyph tone="danger" />
+        <StatusGlyph tone="info" />
+        <StatusGlyph tone="neutral" />
       </div>
     ),
-    code: `<StatusGlyph status="success" />
-<StatusGlyph status="warning" />
-<StatusGlyph status="danger" />
-<StatusGlyph status="info" />
-<StatusGlyph status="neutral" />`,
+    code: `<StatusGlyph tone="success" />
+<StatusGlyph tone="warning" />
+<StatusGlyph tone="danger" />
+<StatusGlyph tone="info" />
+<StatusGlyph tone="neutral" />`,
   },
   {
     title: "Live",
     description: "A bullseye for success that is serving traffic.",
-    render: () => <StatusGlyph status="success" live />,
-    code: `<StatusGlyph status="success" live />`,
+    render: () => <StatusGlyph tone="success" live />,
+    code: `<StatusGlyph tone="success" live />`,
   },
   {
     title: "Pulse",
     description: "While in progress. The half ring spins when motion is allowed.",
     render: () => (
       <div className="flex items-center gap-3">
-        <StatusGlyph status="info" pulse />
-        <StatusGlyph status="warning" pulse />
+        <StatusGlyph tone="info" pulse />
+        <StatusGlyph tone="warning" pulse />
       </div>
     ),
-    code: `<StatusGlyph status="info" pulse />
-<StatusGlyph status="warning" pulse />`,
+    code: `<StatusGlyph tone="info" pulse />
+<StatusGlyph tone="warning" pulse />`,
   },
   {
     title: "Sprout",
     description: "Grows up from its base and sends one ring out. Under reduced motion it fades in place.",
-    render: () => <StatusGlyph status="success" sprout />,
-    code: `<StatusGlyph status="success" sprout />`,
+    render: () => <StatusGlyph tone="success" sprout />,
+    code: `<StatusGlyph tone="success" sprout />`,
   },
 ];
 
@@ -62,7 +62,7 @@ export const playground: Playground = {
     <StatusGlyph
       // sprout plays on mount, so a change remounts it.
       key={`${v.sprout}`}
-      status={v.status as (typeof statuses)[number]}
+      tone={v.status as (typeof statuses)[number]}
       live={Boolean(v.live)}
       pulse={Boolean(v.pulse)}
       sprout={Boolean(v.sprout)}
@@ -73,10 +73,10 @@ export const playground: Playground = {
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
   <div className="flex items-center gap-3">
-    <StatusGlyph status="success" />
-    <StatusGlyph status="warning" />
-    <StatusGlyph status="danger" />
-    <StatusGlyph status="info" />
-    <StatusGlyph status="neutral" />
+    <StatusGlyph tone="success" />
+    <StatusGlyph tone="warning" />
+    <StatusGlyph tone="danger" />
+    <StatusGlyph tone="info" />
+    <StatusGlyph tone="neutral" />
   </div>
 );

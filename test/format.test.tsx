@@ -124,7 +124,7 @@ describe("StatusGlyph outlines", () => {
 
   test("no two statuses share a shape (Ready and Live differ)", () => {
     const outlines = statuses.map(({ status, live }) => {
-      const { container } = render(<StatusGlyph status={status} live={live} />);
+      const { container } = render(<StatusGlyph tone={status} live={live} />);
       const el = container.querySelector("[data-glyph]");
       expect(el?.getAttribute("aria-hidden")).toBe("true");
       return (el?.className ?? "")
@@ -139,7 +139,7 @@ describe("StatusGlyph outlines", () => {
   });
 
   test("in progress is a closed ring with a wedge, not an open arc, and spins only when motion is safe", () => {
-    const { container } = render(<StatusGlyph status="info" pulse />);
+    const { container } = render(<StatusGlyph tone="info" pulse />);
     const cls = container.querySelector("[data-glyph]")?.className ?? "";
     expect(cls).toContain("conic-gradient");
     expect(cls).toContain("border-2");

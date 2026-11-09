@@ -24,21 +24,21 @@ export const examples: Example[] = [
     description: "Line is the default; block stands in for a chart or image, circle for an avatar.",
     render: () => (
       <div className="flex w-56 flex-col gap-3">
-        <Skeleton kind="line" />
-        <Skeleton kind="block" />
-        <Skeleton kind="circle" />
+        <Skeleton variant="line" />
+        <Skeleton variant="block" />
+        <Skeleton variant="circle" />
       </div>
     ),
-    code: `<Skeleton kind="line" />
-<Skeleton kind="block" />
-<Skeleton kind="circle" />`,
+    code: `<Skeleton variant="line" />
+<Skeleton variant="block" />
+<Skeleton variant="circle" />`,
   },
   {
     title: "Sprout row",
     description: "Keep the layout of the loaded row so nothing jumps when the data arrives.",
     render: () => (
       <div aria-busy="true" className="flex w-64 items-center gap-3">
-        <Skeleton kind="circle" />
+        <Skeleton variant="circle" />
         <div className="flex flex-1 flex-col gap-2">
           <Skeleton className="w-24" />
           <Skeleton className="w-40" />
@@ -46,7 +46,7 @@ export const examples: Example[] = [
       </div>
     ),
     code: `<div aria-busy="true" className="flex items-center gap-3">
-  <Skeleton kind="circle" />
+  <Skeleton variant="circle" />
   <div className="flex flex-1 flex-col gap-2">
     <Skeleton className="w-24" />
     <Skeleton className="w-40" />

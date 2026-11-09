@@ -164,7 +164,7 @@ export function UsageMeter({
                 status === "danger" ? "text-danger-fg" : "text-warn-fg",
               )}
             >
-              <StatusGlyph status={status} />
+              <StatusGlyph tone={status} />
               {stateLabel}
             </span>
           ) : null}

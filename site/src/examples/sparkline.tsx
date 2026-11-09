@@ -13,44 +13,44 @@ export const examples: Example[] = [
     description: "A trend with no axes and a dot on now. Hover for the value of the nearest point.",
     render: () => (
       <div className="w-56">
-        <Sparkline ariaLabel="Requests, last 24 hours" data={requests} />
+        <Sparkline aria-label="Requests, last 24 hours" data={requests} />
       </div>
     ),
     code: `${dataConst}
 
-<Sparkline ariaLabel="Requests, last 24 hours" data={requests} />`,
+<Sparkline aria-label="Requests, last 24 hours" data={requests} />`,
   },
   {
     title: "Colour",
     description: "Any chart colour token. The same tokens colour TimeseriesChart.",
     render: () => (
       <div className="w-56">
-        <Sparkline ariaLabel="Errors, last 24 hours" data={errors} color="errors" />
+        <Sparkline aria-label="Errors, last 24 hours" data={errors} color="errors" />
       </div>
     ),
     code: `const errors = [3, 2, 4, 3, 9, 14, 7, 5, 4, 3, 2, 2];
 
-<Sparkline ariaLabel="Errors, last 24 hours" data={errors} color="errors" />`,
+<Sparkline aria-label="Errors, last 24 hours" data={errors} color="errors" />`,
   },
   {
     title: "Line only",
     description: "Drop the fill and the current-point dot for the quietest form.",
     render: () => (
       <div className="w-56">
-        <Sparkline ariaLabel="Requests, last 24 hours" data={requests} area={false} current={false} />
+        <Sparkline aria-label="Requests, last 24 hours" data={requests} area={false} current={false} />
       </div>
     ),
-    code: `<Sparkline ariaLabel="Requests, last 24 hours" data={requests} area={false} current={false} />`,
+    code: `<Sparkline aria-label="Requests, last 24 hours" data={requests} area={false} current={false} />`,
   },
   {
     title: "Fixed domain and height",
     description: "Pin the domain so several sparklines compare on one scale.",
     render: () => (
       <div className="w-56">
-        <Sparkline ariaLabel="Requests, last 24 hours" data={requests} domain={[0, 100]} height={64} />
+        <Sparkline aria-label="Requests, last 24 hours" data={requests} domain={[0, 100]} height={64} />
       </div>
     ),
-    code: `<Sparkline ariaLabel="Requests, last 24 hours" data={requests} domain={[0, 100]} height={64} />`,
+    code: `<Sparkline aria-label="Requests, last 24 hours" data={requests} domain={[0, 100]} height={64} />`,
   },
 ];
 
@@ -68,7 +68,7 @@ export const playground: Playground = {
   render: (v) => (
     <div className="w-56">
       <Sparkline
-        ariaLabel="Requests, last 24 hours"
+        aria-label="Requests, last 24 hours"
         data={requests}
         color={v.color as ChartColorName}
         height={Number(v.height)}
@@ -93,6 +93,6 @@ export const playground: Playground = {
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
   <div className="w-56">
-    <Sparkline ariaLabel="Requests" data={requests} />
+    <Sparkline aria-label="Requests" data={requests} />
   </div>
 );

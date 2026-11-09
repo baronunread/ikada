@@ -225,8 +225,8 @@ describe("sprouting success glyph", () => {
   test("only success sprouts", () => {
     const { container } = render(
       <>
-        <StatusGlyph status="success" sprout />
-        <StatusGlyph status="danger" sprout />
+        <StatusGlyph tone="success" sprout />
+        <StatusGlyph tone="danger" sprout />
       </>,
     );
     const [ok, bad] = container.querySelectorAll("[data-glyph]");
@@ -241,7 +241,7 @@ describe("sprouting success glyph", () => {
         <Badge tone="success" dot sprout>
           checkout-edge
         </Badge>
-        <StatusDot status="success" label="Deployed" sprout />
+        <StatusDot tone="success" label="Deployed" sprout />
       </>,
     );
     expect(container.querySelectorAll("[data-sprout]")).toHaveLength(2);
@@ -278,7 +278,7 @@ describe("sprouting success glyph", () => {
 
 describe("TimeseriesChart", () => {
   test("an empty series renders a labelled placeholder at the same height instead of crashing", () => {
-    const { container } = render(<TimeseriesChart ariaLabel="Requests" series={[]} height={150} />);
+    const { container } = render(<TimeseriesChart aria-label="Requests" series={[]} height={150} />);
     const empty = container.querySelector("[data-empty]") as HTMLElement;
     expect(empty).not.toBeNull();
     expect(empty.getAttribute("role")).toBe("img");
@@ -288,11 +288,11 @@ describe("TimeseriesChart", () => {
 
   test("series with no points count as empty; one point still plots", () => {
     const { container, rerender } = render(
-      <TimeseriesChart ariaLabel="Errors" series={[{ id: "e", label: "Errors", data: [] }]} emptyText="Nothing yet" />,
+      <TimeseriesChart aria-label="Errors" series={[{ id: "e", label: "Errors", data: [] }]} emptyText="Nothing yet" />,
     );
     expect(container.textContent).toContain("Nothing yet");
     rerender(
-      <TimeseriesChart ariaLabel="Errors" series={[{ id: "e", label: "Errors", data: [{ time: 5, value: 1 }] }]} />,
+      <TimeseriesChart aria-label="Errors" series={[{ id: "e", label: "Errors", data: [{ time: 5, value: 1 }] }]} />,
     );
     expect(container.querySelector("[data-empty]")).toBeNull();
     expect(container.querySelector(".sb-chart")).not.toBeNull();
@@ -324,7 +324,7 @@ describe("TimeseriesChart", () => {
     const t0 = Date.UTC(2026, 10, 5, 0, 0);
     const data = Array.from({ length: 25 }, (_, h) => ({ time: t0 + h * 3_600_000, value: 100 + h }));
     const { container } = render(
-      <TimeseriesChart ariaLabel="Requests" series={[{ id: "r", label: "Requests", data }]} />,
+      <TimeseriesChart aria-label="Requests" series={[{ id: "r", label: "Requests", data }]} />,
     );
     expect(container.textContent ?? "").not.toMatch(/\d{12,}/);
   });
@@ -332,14 +332,14 @@ describe("TimeseriesChart", () => {
 
 describe("Sparkline", () => {
   test("marks the current point, and can opt out", () => {
-    const { container, rerender } = render(<Sparkline ariaLabel="Requests" data={[1, 4, 2, 6]} />);
+    const { container, rerender } = render(<Sparkline aria-label="Requests" data={[1, 4, 2, 6]} />);
     const withDot = container.querySelectorAll("circle").length;
-    rerender(<Sparkline ariaLabel="Requests" data={[1, 4, 2, 6]} current={false} />);
+    rerender(<Sparkline aria-label="Requests" data={[1, 4, 2, 6]} current={false} />);
     expect(withDot).toBeGreaterThan(container.querySelectorAll("circle").length);
   });
 
   test("an empty sparkline renders without a dot or a crash", () => {
-    const { container } = render(<Sparkline ariaLabel="Requests" data={[]} />);
+    const { container } = render(<Sparkline aria-label="Requests" data={[]} />);
     expect(container.querySelector('[aria-label="Requests"]')).not.toBeNull();
   });
 });

@@ -162,7 +162,7 @@ export function TrafficChart({
         />
       </div>
       <TimeseriesChart
-        ariaLabel={`Requests and 5xx errors, ${RANGE_TEXT[range]}`}
+        aria-label={`Requests and 5xx errors, ${RANGE_TEXT[range]}`}
         series={[
           { id: "requests", label: "Requests", data: traffic.requests, area: true },
           { id: "errors", label: "Errors", color: "errors", data: traffic.errors },

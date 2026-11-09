@@ -9,25 +9,28 @@ const skeletonStyles = tv({
     "[&:nth-child(2)]:[animation-delay:120ms] [&:nth-child(3)]:[animation-delay:240ms] [&:nth-child(4)]:[animation-delay:360ms] [&:nth-child(n+5)]:[animation-delay:480ms]",
   ],
   variants: {
-    kind: {
+    variant: {
       line: "h-3.5 w-full rounded-sm",
       block: "h-20 w-full rounded-lg",
       circle: "size-8 rounded-full",
     },
   },
-  defaultVariants: { kind: "line" },
+  defaultVariants: { variant: "line" },
 });
 
-export interface SkeletonProps extends Omit<ComponentProps<"span">, "children">, VariantProps<typeof skeletonStyles> {}
+export interface SkeletonProps extends Omit<ComponentProps<"span">, "children">, VariantProps<typeof skeletonStyles> {
+  /** @deprecated Use `variant`; removed in 0.3.0. */
+  kind?: "line" | "block" | "circle";
+}
 
 /** Decorative placeholder (a fade, so it stays under reduced motion). Give the loading region `aria-busy`. */
-export function Skeleton({ kind, className, ref, ...props }: SkeletonProps) {
+export function Skeleton({ variant, kind, className, ref, ...props }: SkeletonProps) {
   return (
     <span
       data-slot="skeleton"
       ref={ref}
       aria-hidden="true"
-      className={skeletonStyles({ kind, className })}
+      className={skeletonStyles({ variant: variant ?? kind, className })}
       {...props}
     />
   );

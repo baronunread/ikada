@@ -222,7 +222,7 @@ function Waitlist({
     return (
       <div className="flex flex-col gap-4" role="status">
         <span className="grid size-10 place-items-center rounded-full bg-brand-soft" aria-hidden="true">
-          <StatusGlyph status="success" sprout className="size-3.5" />
+          <StatusGlyph tone="success" sprout className="size-3.5" />
         </span>
         <h2 className="text-sb-xl font-bold">You are on the list</h2>
         <p className="text-sb-base text-fg-muted">

@@ -50,7 +50,7 @@ export function Banner({
       className={cn("flex items-start gap-3 rounded-lg px-4 py-3 text-sb-base", softSurface[tone], className)}
       {...props}
     >
-      <StatusGlyph status={tone} className="mt-[5px]" />
+      <StatusGlyph tone={tone} className="mt-[5px]" />
       <div className="flex min-w-0 flex-1 flex-col gap-x-4 gap-y-2 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1">
           {title ? <p className="font-semibold">{title}</p> : null}

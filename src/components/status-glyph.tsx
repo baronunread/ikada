@@ -22,8 +22,10 @@ const liveClass =
   "rounded-full border-2 border-brand-dot bg-[radial-gradient(circle,var(--sb-brand-dot)_0_30%,transparent_35%)]";
 
 export interface StatusGlyphProps extends Omit<ComponentProps<"span">, "children"> {
-  /** Which status: sets the shape and the colour. */
-  status: Status;
+  /** Which status: sets the shape and the colour. Default neutral. */
+  tone?: Status;
+  /** @deprecated Use `tone`; removed in 0.3.0. */
+  status?: Status;
   /** Success that is serving traffic ("Live"): a bullseye instead of the solid "Ready" circle. */
   live?: boolean;
   /** Pulses (a fade) while in progress; the building ring and its wedge spin when motion is allowed. */
@@ -44,13 +46,15 @@ const sproutClass = [
 
 /** A 10px shape per status (circle, bullseye for live, triangle, cross, half ring, square). Decorative: always paired with a label. */
 export function StatusGlyph({
-  status,
+  tone,
+  status: legacyStatus,
   live = false,
   pulse = false,
   sprout = false,
   className,
   ...props
 }: StatusGlyphProps) {
+  const status: Status = tone ?? legacyStatus ?? "neutral";
   const isLive = live && status === "success";
   return (
     <span
