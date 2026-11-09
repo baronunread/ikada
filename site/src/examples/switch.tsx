@@ -12,7 +12,7 @@ export const examples: Example[] = [
         <Switch label="Auto-promote" defaultChecked />
         <Switch label="Disabled" disabled />
         {/* The forced ring belongs on the track, so the label sits outside the component. */}
-        <span className="inline-flex items-center gap-2.5 text-base text-fg">
+        <span className="inline-flex items-center gap-2.5 text-sb-base text-fg">
           <Switch id="switch-example-focused" className={forcedFocus} defaultChecked />
           <label htmlFor="switch-example-focused">Focused</label>
         </span>

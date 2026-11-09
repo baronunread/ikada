@@ -317,11 +317,11 @@ function TablesTree({
               >
                 <TableIcon className="text-fg-muted" />
                 <span
-                  className={cn("min-w-0 flex-1 truncate font-mono text-sm", current === t.name && "font-semibold")}
+                  className={cn("min-w-0 flex-1 truncate font-mono text-sb-sm", current === t.name && "font-semibold")}
                 >
                   {t.name}
                 </span>
-                <span className="shrink-0 text-xs text-fg-muted tabular-nums">
+                <span className="shrink-0 text-sb-xs text-fg-muted tabular-nums">
                   {t.rows.length.toLocaleString("en")}
                 </span>
               </button>
@@ -329,7 +329,7 @@ function TablesTree({
             {expanded ? (
               <ul className="flex flex-col gap-1 pt-1 pb-2 ps-11 pe-2" aria-label={`Columns of ${t.name}`}>
                 {t.columns.map((c) => (
-                  <li key={c.name} className="flex min-w-0 items-baseline justify-between gap-2 font-mono text-xs">
+                  <li key={c.name} className="flex min-w-0 items-baseline justify-between gap-2 font-mono text-sb-xs">
                     <span className="truncate">{c.name}</span>
                     <span className="shrink-0 text-fg-muted">
                       {c.type}
@@ -349,7 +349,7 @@ function TablesTree({
 function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean }) {
   if (!outcome) {
     return (
-      <p className="border-t border-hairline px-4 py-8 text-center text-sm text-fg-muted">
+      <p className="border-t border-hairline px-4 py-8 text-center text-sb-sm text-fg-muted">
         Run a query to see its rows here.
       </p>
     );
@@ -358,7 +358,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
     return (
       <div className="border-t border-hairline p-3 @lg:p-4" role="alert">
         <Banner tone="danger" title="The query failed">
-          <span className="font-mono text-sm break-words">{outcome.message}</span>
+          <span className="font-mono text-sb-sm break-words">{outcome.message}</span>
         </Banner>
       </div>
     );
@@ -369,7 +369,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
   return (
     <div className={cn("flex min-w-0 flex-col border-t border-hairline transition-opacity", busy && "opacity-60")}>
       <div
-        className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 text-sm text-fg-muted @lg:px-4"
+        className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 text-sb-sm text-fg-muted @lg:px-4"
         role="status"
       >
         <Badge tone="success" dot>
@@ -388,7 +388,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
               {result.columns.map((c, i) => (
                 <TableHead key={c.name} className={cn("bg-surface whitespace-nowrap", numeric[i] && "text-end")}>
                   <span className="font-mono">{c.name}</span>{" "}
-                  <span className="text-xs font-normal text-fg-muted">{c.type}</span>
+                  <span className="text-sb-xs font-normal text-fg-muted">{c.type}</span>
                 </TableHead>
               ))}
             </TableRow>
@@ -396,13 +396,15 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
           <TableBody>
             {result.rows.map((row, r) => (
               <TableRow key={r}>
-                <TableCell className="py-1.5 text-end font-mono text-xs text-fg-muted tabular-nums">{r + 1}</TableCell>
+                <TableCell className="py-1.5 text-end font-mono text-sb-xs text-fg-muted tabular-nums">
+                  {r + 1}
+                </TableCell>
                 {row.map((value, c) => (
                   <TableCell
                     key={c}
                     title={value === null ? "NULL" : String(value)}
                     className={cn(
-                      "max-w-72 truncate py-1.5 font-mono text-sm whitespace-nowrap",
+                      "max-w-72 truncate py-1.5 font-mono text-sb-sm whitespace-nowrap",
                       numeric[c] && "text-end tabular-nums",
                     )}
                   >
@@ -420,7 +422,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
           </TableBody>
         </Table>
       ) : (
-        <p className="px-4 pb-4 text-sm text-fg-muted">The query ran and matched no rows.</p>
+        <p className="px-4 pb-4 text-sb-sm text-fg-muted">The query ran and matched no rows.</p>
       )}
     </div>
   );
@@ -472,13 +474,13 @@ export function D1Console({
         <aside className="min-w-0 border-hairline @max-3xl:border-b @3xl:border-e" aria-label="Schema">
           <div className="flex items-center gap-2 px-3 pt-3 pb-1">
             <DatabaseIcon className="text-fg-muted" />
-            <span className="min-w-0 flex-1 truncate font-mono text-sm font-semibold">{database}</span>
+            <span className="min-w-0 flex-1 truncate font-mono text-sb-sm font-semibold">{database}</span>
             <button
               type="button"
               aria-expanded={showTables}
               onClick={() => setShowTables((v) => !v)}
               className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sm text-fg-muted hover:bg-hover hover:text-fg @3xl:hidden",
+                "inline-flex h-7 items-center gap-1 rounded-md px-2 text-sb-sm text-fg-muted hover:bg-hover hover:text-fg @3xl:hidden",
                 focusRing,
               )}
             >
@@ -492,17 +494,17 @@ export function D1Console({
             </button>
           </div>
           <div className={cn(!showTables && "@max-3xl:hidden")}>
-            <p className="px-3 pt-2 text-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
+            <p className="px-3 pt-2 text-sb-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
             <TablesTree tables={tables} current={current} onQuery={queryTable} />
           </div>
         </aside>
 
         <div className="flex min-w-0 flex-col">
           <div className="flex items-center gap-3 border-b border-hairline px-3 py-2">
-            <label htmlFor={editorId} className="text-sm font-semibold">
+            <label htmlFor={editorId} className="text-sb-sm font-semibold">
               Query
             </label>
-            <span className="text-xs text-fg-muted @max-md:hidden">Read-only · one statement</span>
+            <span className="text-sb-xs text-fg-muted @max-md:hidden">Read-only · one statement</span>
             <Button
               variant="primary"
               size="sm"

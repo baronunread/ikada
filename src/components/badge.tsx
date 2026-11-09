@@ -31,7 +31,7 @@ export function Badge({
       ref={ref}
       data-tone={tone}
       className={cn(
-        "inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold",
+        "inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-sb-xs font-semibold",
         dot && "ps-2",
         softSurface[tone],
         className,

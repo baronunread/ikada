@@ -1,3 +1,5 @@
+"use client";
+
 import { areaY, defineChart, lineY, ruleX, text } from "@tanstack/charts";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
@@ -232,7 +234,7 @@ export function TimeseriesChart({
         style={{ height }}
         className={cn(
           chartClassName,
-          "grid w-full place-items-center rounded-lg bg-well text-sm text-fg-muted shadow-tray",
+          "grid w-full place-items-center rounded-lg bg-well text-sb-sm text-fg-muted shadow-tray",
           className,
         )}
       >

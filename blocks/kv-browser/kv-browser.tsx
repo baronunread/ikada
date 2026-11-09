@@ -157,7 +157,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-xs shadow-[inset_0_0_0_1px_var(--sb-hairline)]",
+        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 font-mono text-sb-xs shadow-[inset_0_0_0_1px_var(--sb-hairline)]",
         "transition-colors duration-(--sb-duration-hover) ease-hover",
         active ? "bg-hover font-semibold text-fg" : "text-fg-muted hover:bg-hover hover:text-fg",
         focusRing,
@@ -258,9 +258,9 @@ export function KvBrowser({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <span className="inline-flex min-w-0 items-center gap-2 font-semibold">
             <KeyIcon className="text-fg-muted" />
-            <span className="truncate font-mono text-sm">{namespace}</span>
+            <span className="truncate font-mono text-sb-sm">{namespace}</span>
           </span>
-          <span className="text-sm text-fg-muted tabular-nums">
+          <span className="text-sb-sm text-fg-muted tabular-nums">
             {entries.length.toLocaleString("en")} keys · {formatBytes(entries.reduce((n, e) => n + sizeOf(e), 0))}
           </span>
           <div className="relative w-full @2xl:ms-auto @2xl:w-64">
@@ -313,7 +313,7 @@ export function KvBrowser({
             <TableBody ref={listRef}>
               {rows.length === 0 ? (
                 <TableEmpty colSpan={3}>
-                  <p className="text-sm text-fg-muted">
+                  <p className="text-sb-sm text-fg-muted">
                     {filtered ? "No keys match this filter." : "This namespace is empty."}
                   </p>
                 </TableEmpty>
@@ -337,7 +337,7 @@ export function KvBrowser({
                         onKeyDown={(event) => onListKey(event, index)}
                         title={entry.key}
                         className={cn(
-                          "block max-w-full truncate rounded-sm text-start font-mono text-sm",
+                          "block max-w-full truncate rounded-sm text-start font-mono text-sb-sm",
                           entry.key === selected && "font-semibold",
                           focusRing,
                         )}
@@ -347,11 +347,11 @@ export function KvBrowser({
                     </TableCell>
                     <TableCell
                       hideBelow="sm"
-                      className="py-1.5 text-end text-sm whitespace-nowrap text-fg-muted tabular-nums"
+                      className="py-1.5 text-end text-sb-sm whitespace-nowrap text-fg-muted tabular-nums"
                     >
                       {formatBytes(sizeOf(entry))}
                     </TableCell>
-                    <TableCell className="py-1.5 text-end text-sm whitespace-nowrap tabular-nums">
+                    <TableCell className="py-1.5 text-end text-sb-sm whitespace-nowrap tabular-nums">
                       {entry.expiresIn === undefined ? (
                         <span className="text-fg-muted">never</span>
                       ) : (
@@ -363,7 +363,7 @@ export function KvBrowser({
               )}
             </TableBody>
           </Table>
-          <footer className="mt-auto flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-hairline px-4 py-2 text-sm text-fg-muted">
+          <footer className="mt-auto flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-hairline px-4 py-2 text-sb-sm text-fg-muted">
             <span className="tabular-nums">
               {filtered ? `${rows.length} of ${entries.length} keys` : `${entries.length} keys, in name order`}
             </span>
@@ -395,7 +395,7 @@ export function KvBrowser({
                 className="min-w-0 font-semibold"
               />
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm text-fg-muted">Value</span>
+                <span className="text-sb-sm text-fg-muted">Value</span>
                 {formatted ? (
                   <SegmentedControl
                     aria-label="Show the value as"
@@ -454,7 +454,7 @@ export function KvBrowser({
               </div>
             </>
           ) : (
-            <div className="flex min-h-40 flex-1 items-center justify-center text-center text-sm text-fg-muted">
+            <div className="flex min-h-40 flex-1 items-center justify-center text-center text-sb-sm text-fg-muted">
               Pick a key to see its value, metadata and expiry.
             </div>
           )}

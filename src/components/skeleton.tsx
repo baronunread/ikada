@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { tv } from "../lib/cn";
-import type { VariantProps } from "tailwind-variants";
+import type { VariantProps } from "../lib/cn";
 
 const skeletonStyles = tv({
   // A slow breath, not a sweep; siblings start 120ms apart so a block of lines swells top to bottom.

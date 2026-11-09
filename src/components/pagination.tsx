@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentProps } from "react";
 import { cn, coarseTarget, focusRing, pressMotion } from "../lib/cn";
 import { ChevronLeftIcon, ChevronRightIcon } from "../lib/icons";
@@ -31,7 +33,7 @@ export function pageRange(page: number, pageCount: number, siblings = 1): (numbe
 }
 
 const cell = cn(
-  "inline-grid h-8 min-w-8 place-items-center rounded-md px-2 text-sm font-semibold tabular-nums text-fg-muted",
+  "inline-grid h-8 min-w-8 place-items-center rounded-md px-2 text-sb-sm font-semibold tabular-nums text-fg-muted",
   "hover:bg-hover hover:text-fg",
   pressMotion,
   "disabled:pointer-events-none disabled:opacity-50",
@@ -63,7 +65,7 @@ export function Pagination({
         <ChevronLeftIcon />
       </button>
       {compact ? (
-        <span className="px-2 text-sm text-fg-muted tabular-nums" aria-live="polite">
+        <span className="px-2 text-sb-sm text-fg-muted tabular-nums" aria-live="polite">
           Page {page} of {pageCount}
         </span>
       ) : (

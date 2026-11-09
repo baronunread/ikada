@@ -20,11 +20,11 @@ export const examples: Example[] = [
     title: "Decorative",
     description: "When the parent already says it, hide the spinner from assistive tech.",
     render: () => (
-      <div className="flex items-center gap-2 text-sm text-fg-muted">
+      <div className="flex items-center gap-2 text-sb-sm text-fg-muted">
         <Spinner decorative /> Deploying
       </div>
     ),
-    code: `<div className="flex items-center gap-2 text-sm text-fg-muted">
+    code: `<div className="flex items-center gap-2 text-sb-sm text-fg-muted">
   <Spinner decorative /> Deploying
 </div>`,
   },
@@ -58,7 +58,7 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex items-center gap-2 text-sm text-fg-muted">
+  <div className="flex items-center gap-2 text-sb-sm text-fg-muted">
     <Spinner decorative /> Deploying
   </div>
 );

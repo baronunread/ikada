@@ -22,12 +22,12 @@ export const examples: Example[] = [
     render: () => (
       <div className="flex items-center gap-2.5">
         <Avatar name="heron" />
-        <span className="text-base font-medium">heron</span>
+        <span className="text-sb-base font-medium">heron</span>
       </div>
     ),
     code: `<div className="flex items-center gap-2.5">
   <Avatar name="heron" />
-  <span className="text-base font-medium">heron</span>
+  <span className="text-sb-base font-medium">heron</span>
 </div>`,
   },
 ];

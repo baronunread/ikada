@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn, coarseTarget, fieldSurface, focusRing } from "../lib/cn";
 
 export const inputStyles = cn(
-  "h-(--sb-control-h) w-full min-w-0 px-3 text-base",
+  "h-(--sb-control-h) w-full min-w-0 px-3 text-sb-base",
   fieldSurface,
   "placeholder:text-fg-muted pointer-coarse:text-[16px]",
   "read-only:bg-hover",
@@ -25,7 +25,7 @@ export function Input({ invalid, mono, className, ref, ...props }: InputProps) {
     <BaseInput
       ref={ref}
       aria-invalid={invalid || undefined}
-      className={cn(inputStyles, mono && "font-mono text-sm", className)}
+      className={cn(inputStyles, mono && "font-mono text-sb-sm", className)}
       {...props}
     />
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { useId } from "react";
@@ -46,7 +48,7 @@ export function RadioGroup({
       {...props}
     >
       {legend ? (
-        <span id={legendId} className="text-sm font-semibold text-fg">
+        <span id={legendId} className="text-sb-sm font-semibold text-fg">
           {legend}
         </span>
       ) : null}
@@ -55,7 +57,7 @@ export function RadioGroup({
           <label
             key={option.value}
             className={cn(
-              "inline-flex items-start gap-2.5 text-base text-fg",
+              "inline-flex items-start gap-2.5 text-sb-base text-fg",
               option.disabled && "cursor-not-allowed opacity-50",
             )}
           >
@@ -85,7 +87,7 @@ export function RadioGroup({
             </Radio.Root>
             <span className="flex flex-col">
               <span>{option.label}</span>
-              {option.description ? <span className="text-sm text-fg-muted">{option.description}</span> : null}
+              {option.description ? <span className="text-sb-sm text-fg-muted">{option.description}</span> : null}
             </span>
           </label>
         ))}

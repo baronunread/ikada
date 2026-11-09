@@ -142,3 +142,5 @@ export { SegmentedControl } from "./components/segmented-control";
 export type { SegmentedControlProps, SegmentedOption } from "./components/segmented-control";
 export { SensitiveInput } from "./components/sensitive-input";
 export type { SensitiveInputProps } from "./components/sensitive-input";
+
+export type { ButtonVariants } from "./components/button";

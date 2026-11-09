@@ -78,7 +78,7 @@ export function UsageLine({
       href={href}
       aria-label="Usage today. Open the usage page"
       className={cn(
-        "group @container block rounded-xl bg-surface px-4 py-3 text-sm text-fg shadow-card",
+        "group @container block rounded-xl bg-surface px-4 py-3 text-sb-sm text-fg shadow-card",
         "transition-shadow duration-(--sb-duration-hover) ease-hover hover:shadow-float",
         focusRing,
         className,

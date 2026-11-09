@@ -1,3 +1,5 @@
+"use client";
+
 /** The number and date locale for a subtree, with `en` as the default. */
 import { createContext, useContext } from "react";
 import { DEFAULT_LOCALE } from "./format";

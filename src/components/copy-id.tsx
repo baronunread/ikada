@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import { CheckIcon, CopyIcon } from "../lib/icons";
@@ -40,7 +42,7 @@ export function CopyId({ value, display, label = "Copy ID", onCopied, className,
       )}
       {...props}
     >
-      <code className="min-w-0 truncate font-mono text-sm font-medium text-fg" title={value}>
+      <code className="min-w-0 truncate font-mono text-sb-sm font-medium text-fg" title={value}>
         {display ?? value}
       </code>
       <InlineConfirm message="Copied" announce="Copied to clipboard" className="shrink-0">

@@ -94,7 +94,7 @@ const LEGEND: { label: string; color: ChartColorName; dashed?: boolean }[] = [
 
 function Legend() {
   return (
-    <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-fg-muted">
+    <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sb-sm text-fg-muted">
       {LEGEND.map((entry) => (
         <li key={entry.label} className="inline-flex items-center gap-1.5">
           <svg aria-hidden="true" width="16" height="8" viewBox="0 0 16 8" className="shrink-0">
@@ -135,10 +135,10 @@ export function TrafficChart({
     >
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h2 id="traffic-title" className="text-md font-semibold">
+          <h2 id="traffic-title" className="text-sb-md font-semibold">
             {title}
           </h2>
-          <p className="text-sm text-fg-muted" aria-live="polite">
+          <p className="text-sb-sm text-fg-muted" aria-live="polite">
             <span className="font-semibold text-fg tabular-nums">
               {formatCompact(total, { maximumFractionDigits: 1 })}
             </span>{" "}

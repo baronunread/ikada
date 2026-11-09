@@ -18,6 +18,7 @@ function announce(text: string): void {
 export function setTheme(next: "light" | "dark", scope: HTMLElement = root): void {
   root.classList.add("no-transitions");
   scope.dataset.theme = next;
+  scope.classList.toggle("dark", next === "dark");
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("no-transitions")));
 }
 

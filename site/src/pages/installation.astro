@@ -9,7 +9,7 @@ import { addCommands, fence, href, pageMarkdown } from "../lib/site";
 
 const lede = "Add components one file at a time with the shadcn CLI and own the source, or install the package and take every update.";
 const alias = `"registries": {\n  "@ikada": "${REGISTRY_URL}/{name}.json"\n}`;
-const css = `/* app.css */\n@import "tailwindcss";\n@import "@sproutboat/ikada/theme.css";\n@source "../node_modules/@sproutboat/ikada/src";`;
+const css = `/* app.css */\n@import "tailwindcss";\n@import "@sproutboat/ikada/theme.css";\n/* theme.css already tells Tailwind to scan the compiled components */`;
 const toc = [
   { id: "cli", label: "With the shadcn CLI" },
   { id: "all", label: "Everything at once", sub: true },
@@ -48,17 +48,17 @@ const markdown = pageMarkdown({
 
   <h2 id="package">As a package</h2>
   <p>
-    The Sproutboat dashboards use the package, so they take every update. It ships TypeScript source for a bundler that compiles it
-    (Vite, Bun, Next.js with <code>transpilePackages</code>). It is not on npm yet.
+    The Sproutboat dashboards use the package, so they take every update. It ships compiled ESM with types and <code>"use client"</code>
+    kept, so it works from Server Components and needs no <code>transpilePackages</code>. Install the peers too:
+    <code>@base-ui/react</code>, and <code>@tanstack/charts</code> if you use the charts.
   </p>
   <Install commands={{ npm: "npm install @sproutboat/ikada", pnpm: "pnpm add @sproutboat/ikada", bun: "bun add @sproutboat/ikada", yarn: "yarn add @sproutboat/ikada" }} />
   <Snippet code={css} label="app.css" />
 
   <h2 id="fonts">Fonts and dark mode</h2>
   <p>
-    The theme uses Figtree and JetBrains Mono when they are installed and falls back to the system faces otherwise. Dark is the default;
-    light opts in with <code>data-theme="light"</code> on <code>&lt;html&gt;</code>. The shadcn theme maps light to <code>:root</code> and dark to{" "}
-    <code>.dark</code>. See <a class="ilink" href={href("/theming")}>Theming and tokens</a>.
+    The theme uses Figtree and JetBrains Mono when they are installed and falls back to the system faces otherwise. Light is the default;
+    dark is a <code>dark</code> class on <code>&lt;html&gt;</code> (shadcn and next-themes <code>attribute="class"</code>), for the package and the shadcn theme alike. See <a class="ilink" href={href("/theming")}>Theming and tokens</a>.
   </p>
   <Pager />
 </Docs>

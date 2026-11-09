@@ -158,7 +158,7 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex w-44 flex-col rounded-xl bg-raised p-1 text-sm shadow-float">
+  <div className="flex w-44 flex-col rounded-xl bg-raised p-1 text-sb-sm shadow-float">
     <span className="rounded-md bg-hover px-2.5 py-1.5">Rename</span>
     <span className="px-2.5 py-1.5">Duplicate</span>
     <span className="my-1 h-px bg-hairline" />

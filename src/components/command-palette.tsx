@@ -1,3 +1,5 @@
+"use client";
+
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useEffect, useEffectEvent, useId, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode, RefObject } from "react";
@@ -203,7 +205,7 @@ function PaletteBody({
       <div className="flex items-center gap-3 px-4 shadow-[inset_0_-1px_0_var(--sb-hairline)]">
         <SearchIcon className="text-fg-muted" />
         {prefix ? (
-          <span className="inline-flex h-6 shrink-0 items-center rounded-sm bg-neutral-soft px-2 font-mono text-xs font-medium text-neutral-fg">
+          <span className="inline-flex h-6 shrink-0 items-center rounded-sm bg-neutral-soft px-2 font-mono text-sb-xs font-medium text-neutral-fg">
             {prefix.scope}:
           </span>
         ) : null}
@@ -228,7 +230,7 @@ function PaletteBody({
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          className="h-12 min-w-0 flex-1 bg-transparent text-md font-normal text-fg outline-hidden placeholder:text-fg-muted"
+          className="h-12 min-w-0 flex-1 bg-transparent text-sb-md font-normal text-fg outline-hidden placeholder:text-fg-muted"
         />
         {loading ? <Spinner size="sm" label="Searching" /> : <Kbd aria-hidden="true">Esc</Kbd>}
       </div>
@@ -237,7 +239,7 @@ function PaletteBody({
         <div id={listId} role="listbox" aria-label="Results" className="flex flex-col gap-1">
           {sections.map((section) => (
             <div key={section.id} role="group" aria-labelledby={`${listId}-${section.id}`} className="flex flex-col">
-              <div id={`${listId}-${section.id}`} className="px-2.5 pt-2 pb-1 text-xs font-semibold text-fg-muted">
+              <div id={`${listId}-${section.id}`} className="px-2.5 pt-2 pb-1 text-sb-xs font-semibold text-fg-muted">
                 {section.label}
               </div>
               {section.items.map((item) => {
@@ -255,7 +257,7 @@ function PaletteBody({
                     onMouseMove={() => i !== activeIndex && setActive(i)}
                     onClick={() => onSelect(item)}
                     className={cn(
-                      "flex min-h-10 cursor-default items-center gap-3 rounded-md px-2.5 py-1.5 text-base",
+                      "flex min-h-10 cursor-default items-center gap-3 rounded-md px-2.5 py-1.5 text-sb-base",
                       "data-active:bg-hover data-active:shadow-[inset_2px_0_0_var(--sb-fg)]",
                       "pointer-coarse:min-h-11",
                     )}
@@ -263,7 +265,7 @@ function PaletteBody({
                     {item.icon ? <span className="text-fg-muted [&>svg]:size-4">{item.icon}</span> : null}
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
                     {item.hint ? (
-                      <span className="hidden shrink-0 font-mono text-xs text-fg-muted sm:inline">{item.hint}</span>
+                      <span className="hidden shrink-0 font-mono text-sb-xs text-fg-muted sm:inline">{item.hint}</span>
                     ) : null}
                   </div>
                 );
@@ -283,7 +285,7 @@ function PaletteBody({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2.5 text-xs text-fg-muted shadow-[inset_0_1px_0_var(--sb-hairline)]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2.5 text-sb-xs text-fg-muted shadow-[inset_0_1px_0_var(--sb-hairline)]">
         <span className="inline-flex items-center gap-1.5">
           <Kbd>↑</Kbd>
           <Kbd>↓</Kbd> move

@@ -176,7 +176,7 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex w-60 items-start gap-2.5 rounded-xl bg-raised p-3 text-sm shadow-float">
+  <div className="flex w-60 items-start gap-2.5 rounded-xl bg-raised p-3 text-sb-sm shadow-float">
     <StatusGlyph status="success" className="mt-0.5" />
     <div>
       <p className="font-semibold">Deployed</p>

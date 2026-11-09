@@ -24,7 +24,7 @@ function ThemePanel({ theme, children }: { theme: Theme; children: ReactNode }) 
       ref={setScope}
       data-theme={theme}
       data-panel={theme}
-      className="relative min-w-0 rounded-2xl bg-canvas p-4 text-fg sm:p-6"
+      className={`${theme === "dark" ? "dark " : ""}relative min-w-0 rounded-2xl bg-canvas p-4 text-fg sm:p-6`}
     >
       <h2 className="mb-5 text-lg font-bold capitalize">{theme} theme</h2>
       <PortalContainer value={scope}>{children}</PortalContainer>
@@ -60,6 +60,7 @@ export function App() {
 
   function pickTheme(next: Theme) {
     document.documentElement.setAttribute("data-theme", next);
+    document.documentElement.classList.toggle("dark", next === "dark");
     try {
       localStorage.setItem("sb-theme", next);
     } catch {

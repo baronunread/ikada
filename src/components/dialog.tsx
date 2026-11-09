@@ -1,3 +1,5 @@
+"use client";
+
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import type { ComponentProps } from "react";
 import { cn, focusRing, pressMotion, type WithClass } from "../lib/cn";
@@ -79,12 +81,12 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
 
 /** The dialog heading, wired to aria-labelledby. */
 export function DialogTitle({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Title>>) {
-  return <BaseDialog.Title className={cn("pe-8 text-lg font-bold", className)} {...props} />;
+  return <BaseDialog.Title className={cn("pe-8 text-sb-lg font-bold", className)} {...props} />;
 }
 
 /** Supporting text under the title, wired to aria-describedby. */
 export function DialogDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Description>>) {
-  return <BaseDialog.Description className={cn("mt-2 text-base text-fg-muted", className)} {...props} />;
+  return <BaseDialog.Description className={cn("mt-2 text-sb-base text-fg-muted", className)} {...props} />;
 }
 
 /** Right-aligned row of actions; stacks on small screens. */

@@ -46,7 +46,10 @@ jobs:
           fi
       - run: bun run tokens:check
       - run: bun run typecheck
+      - run: bun run fmt:check
       - run: bun run test
+      - run: bun run lint:package
+      - run: bun run size
       - name: Publish if this version is not on npm yet
         run: |
           set -euo pipefail

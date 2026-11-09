@@ -67,7 +67,7 @@ export type ColorName = (typeof colorNames)[number];
 export type ColorTheme = Record<ColorName, string>;
 
 /**
- * Dark is the default theme: it applies with no `data-theme` attribute.
+ * Light is the default theme; dark applies under a `.dark` class (or the deprecated `data-theme="dark"`).
  * Cool slate graphite (hue 255, chroma 0.014 to 0.02). Accent buttons are a step
  * quieter than the v3 sheet (#67d283): L 0.72 and C 0.12 instead of 0.78 and 0.15.
  */

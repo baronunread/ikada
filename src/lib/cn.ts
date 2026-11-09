@@ -5,18 +5,46 @@
 import { clsx } from "clsx";
 import type { ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
-import { createTV } from "tailwind-variants";
 import { typeScale } from "../tokens.generated";
 
-/** tailwind-merge that knows our `text-<step>` sizes are sizes, not colors. */
+/** tailwind-merge that knows our `text-sb-<step>` sizes (and the plain 0.1.x `text-<step>` ones) are sizes, not colors. */
+const steps = Object.keys(typeScale);
 export const merge = extendTailwindMerge({
-  extend: { classGroups: { "font-size": [{ text: Object.keys(typeScale) }] } },
+  extend: { classGroups: { "font-size": [{ text: [...steps.map((k) => "sb-" + k), ...steps] }] } },
 });
 
 /** Join and de-conflict class names; later arguments win. */
 export const cn = (...inputs: ClassValue[]): string => merge(clsx(inputs));
 
-export const tv = createTV({ twMerge: merge });
+type Variants = Record<string, Record<string, ClassValue>>;
+
+/** Props a `tv` style function takes: one key per variant group plus `className`, which wins. */
+export type TvProps<V extends Variants> = {
+  [K in keyof V]?: (keyof V[K] & string) | null | undefined;
+} & { className?: ClassValue };
+
+/** The variant props of a style function made by `tv`, without `className`: `VariantProps<typeof buttonStyles>`. */
+export type VariantProps<F> = F extends (props?: infer P) => string ? Omit<NonNullable<P>, "className"> : never;
+
+/**
+ * A small class-variance helper (the part of tailwind-variants ikada used, without its bundled
+ * tailwind-merge): `base` plus one class set per chosen variant, merged so `className` wins.
+ */
+export function tv<const V extends Variants>(config: {
+  base?: ClassValue;
+  variants: V;
+  defaultVariants?: { [K in keyof V]?: keyof V[K] & string };
+}): (props?: TvProps<V>) => string {
+  return (props = {}) =>
+    cn(
+      config.base,
+      Object.keys(config.variants).map((group) => {
+        const chosen = (props as Record<string, unknown>)[group] ?? config.defaultVariants?.[group];
+        return chosen == null ? null : config.variants[group]?.[String(chosen)];
+      }),
+      props.className,
+    );
+}
 
 /**
  * The focus wake: a halo that ripples 6px out from the ring once, like a wake behind a raft.

@@ -1,3 +1,5 @@
+"use client";
+
 import { useRender } from "@base-ui/react/use-render";
 import { cn, focusRing } from "../lib/cn";
 import { ArrowUpRightIcon } from "../lib/icons";

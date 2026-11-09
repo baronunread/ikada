@@ -80,10 +80,10 @@ function Section({
     >
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-0 flex-1 basis-60">
-          <h2 id={`${id}-title`} className={cn("text-md font-semibold", tone === "danger" && "text-danger-fg")}>
+          <h2 id={`${id}-title`} className={cn("text-sb-md font-semibold", tone === "danger" && "text-danger-fg")}>
             {title}
           </h2>
-          {description ? <p className="mt-0.5 text-base text-fg-muted">{description}</p> : null}
+          {description ? <p className="mt-0.5 text-sb-base text-fg-muted">{description}</p> : null}
         </div>
         {action ? <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div> : null}
       </div>
@@ -108,7 +108,7 @@ function SwitchRow({
     <label className="flex cursor-pointer items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
       <span className="min-w-0">
         <span className="block font-medium">{label}</span>
-        <span className="block text-sm text-fg-muted">{description}</span>
+        <span className="block text-sb-sm text-fg-muted">{description}</span>
       </span>
       <Switch checked={checked} onCheckedChange={onCheckedChange} className="mt-0.5" />
     </label>
@@ -271,7 +271,7 @@ export function SettingsSection({
           "data-dirty:-translate-y-(--sb-offset-press) data-dirty:bg-raised data-dirty:shadow-float",
         )}
       >
-        <p className="me-auto text-sm text-fg-muted" aria-live="polite">
+        <p className="me-auto text-sb-sm text-fg-muted" aria-live="polite">
           {error ? (
             <span className="text-danger-fg">{error}</span>
           ) : dirty ? (

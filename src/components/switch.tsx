@@ -1,3 +1,5 @@
+"use client";
+
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
@@ -51,7 +53,7 @@ export function Switch({ label, className, id, ref, ...props }: SwitchProps) {
   );
   if (!label) return control;
   return (
-    <label htmlFor={controlId} className={cn("inline-flex items-center gap-2.5 text-base text-fg", className)}>
+    <label htmlFor={controlId} className={cn("inline-flex items-center gap-2.5 text-sb-base text-fg", className)}>
       {control}
       <span>{label}</span>
     </label>

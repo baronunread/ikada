@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Badge (server-safe)",
+    "path": "dist/index.js",
+    "import": "{ Badge }",
+    "ignore": ["react", "react-dom"],
+    "limit": "10 kB"
+  },
+  {
+    "name": "Button",
+    "path": "dist/index.js",
+    "import": "{ Button }",
+    "ignore": ["react", "react-dom"],
+    "limit": "10.5 kB"
+  },
+  {
+    "name": "Button via subpath",
+    "path": "dist/components/button.js",
+    "ignore": ["react", "react-dom"],
+    "limit": "10.5 kB"
+  },
+  {
+    "name": "Dialog",
+    "path": "dist/index.js",
+    "import": "{ Dialog, DialogContent }",
+    "ignore": ["react", "react-dom"],
+    "limit": "10.5 kB"
+  },
+  {
+    "name": "Table",
+    "path": "dist/index.js",
+    "import": "{ Table }",
+    "ignore": ["react", "react-dom"],
+    "limit": "10 kB"
+  },
+  {
+    "name": "Whole barrel",
+    "path": "dist/index.js",
+    "import": "*",
+    "ignore": ["react", "react-dom"],
+    "limit": "34 kB"
+  },
+  { "name": "Charts", "path": "dist/charts/index.js", "ignore": ["react", "react-dom"], "limit": "12 kB" }
+]

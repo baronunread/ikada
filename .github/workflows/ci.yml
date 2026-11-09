@@ -19,6 +19,38 @@ jobs:
       - run: bun run fmt:check
       - run: bun run test
 
+  # The npm package: compiled ESM with types, "use client" kept, valid exports, size budgets.
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - run: bun install --frozen-lockfile
+      - run: bun run lint:package
+      - run: bun run size
+
+  # The packed tarball, installed into a fresh app the way a consumer would: a Next.js App Router
+  # page that is a Server Component (the 0.1.0 failure), and a Vite app.
+  tarball:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [next, vite]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bun scripts/test-tarball.ts ${{ matrix.app }}
+
   # The docs site and the shadcn registry, both generated from src/: a component the registry
   # cannot map, or a page that fails to render, fails here.
   site:

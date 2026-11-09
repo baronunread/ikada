@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Toasts as a deck at the bottom end: hover or focus fans out the history, ↩ undoes (⌘Z), a flick
  * dismisses. They arrive on the snappy spring, leave in 110ms, and success sprouts as it lands.
@@ -136,7 +138,7 @@ function CountBadge({ count }: { count: number }) {
   return (
     <span
       ref={ref}
-      className="inline-flex min-h-[18px] shrink-0 items-center rounded-full bg-well px-1.5 text-xs font-semibold tabular-nums text-fg shadow-button"
+      className="inline-flex min-h-[18px] shrink-0 items-center rounded-full bg-well px-1.5 text-sb-xs font-semibold tabular-nums text-fg shadow-button"
     >
       <span aria-hidden="true">×{count}</span>
       <span className="sr-only">, {count} times</span>
@@ -217,7 +219,7 @@ function ToastActions({ face, id, live }: { face: Face; id: string; live: boolea
 function Face({ face, id, live }: { face: Face; id: string; live: boolean }) {
   return (
     <div className="py-px">
-      <div className="flex min-h-6 items-center gap-1.5 text-base font-semibold">
+      <div className="flex min-h-6 items-center gap-1.5 text-sb-base font-semibold">
         {live ? (
           <Toast.Title className="min-w-0 text-balance wrap-anywhere" />
         ) : (
@@ -227,9 +229,9 @@ function Face({ face, id, live }: { face: Face; id: string; live: boolean }) {
       </div>
       {face.description ? (
         live ? (
-          <Toast.Description className="mt-px text-sm text-fg-muted wrap-anywhere" />
+          <Toast.Description className="mt-px text-sb-sm text-fg-muted wrap-anywhere" />
         ) : (
-          <div className="mt-px text-sm text-fg-muted wrap-anywhere">{face.description}</div>
+          <div className="mt-px text-sb-sm text-fg-muted wrap-anywhere">{face.description}</div>
         )
       ) : null}
       <ToastActions face={face} id={id} live={live} />
