@@ -40,7 +40,7 @@ const markdown = pageMarkdown({
     "## Installation",
     fence(commands.npm, "sh"),
     `Built from: ${uses.map((u) => u.title).join(", ")}.`,
-    ...files.flatMap((f) => [`## components/${f.name}`, fence(f.source)]),
+    ...files.flatMap((f) => [`## components/ikada/blocks/${item.name}/${f.name}`, fence(f.source)]),
   ],
 });
 ---
@@ -92,11 +92,11 @@ const markdown = pageMarkdown({
             </div>
           </div>
         ) : (
-          <p class="file-name">components/{files[0]?.name}</p>
+          <p class="file-name">components/ikada/blocks/{item.name}/{files[0]?.name}</p>
         )
       }
       {files.map((f, i) => (
-        <div data-file={String(i)} hidden={i > 0} class="shiki-wrap" tabindex="0" aria-label={`components/${f.name}`}>
+        <div data-file={String(i)} hidden={i > 0} class="shiki-wrap" tabindex="0" aria-label={`components/ikada/blocks/${item.name}/${f.name}`}>
           <Code code={f.source} lang="tsx" themes={{ light: "github-light", dark: "github-dark-dimmed" }} defaultColor={false} wrap={false} />
           <template id={`${id}-src-${i}`} set:text={f.source} />
         </div>
@@ -107,7 +107,7 @@ const markdown = pageMarkdown({
   <h2 id="install">Installation</h2>
   <Install commands={commands} />
   <p>
-    Copies {files.map((f, i) => <>{i ? ", " : ""}<code>components/{f.name}</code></>)} into your project with the ikada theme. It is your
+    Copies {files.map((f, i) => <>{i ? ", " : ""}<code>components/ikada/blocks/{item.name}/{f.name}</code></>)} into your project with the ikada theme. It is your
     code from then on: rename it, restyle it, and feed it your own data through its props.
   </p>
 

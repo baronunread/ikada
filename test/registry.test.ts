@@ -94,4 +94,29 @@ describe("shadcn registry", () => {
       }
     }
   });
+
+  test("every item has categories and a description a list can show", () => {
+    for (const item of registry.items) {
+      expect(item.categories?.length, item.name).toBeGreaterThan(0);
+      expect(item.description.length, item.name).toBeGreaterThanOrEqual(40);
+    }
+  });
+
+  test("items that need setup carry docs", () => {
+    for (const name of ["theme", "toast", "tooltip", "timeseries-chart"]) {
+      expect(registry.items.find((i) => i.name === name)?.docs, name).toBeTruthy();
+    }
+  });
+
+  test("everything installs under components/ikada with a target placeholder, imports included", () => {
+    for (const item of registry.items) {
+      for (const f of item.files ?? []) expect(f.target, f.path).toMatch(/^@components\/ikada\//);
+    }
+    for (const [path, content] of files) {
+      expect(content, path).not.toMatch(/@\/(components\/ui|lib\/ikada)\//);
+      for (const m of content.matchAll(/from\s+["'](@\/[^"']+)["']/g)) {
+        expect(m[1], path).toMatch(/^@\/components\/ikada\//);
+      }
+    }
+  });
 });
