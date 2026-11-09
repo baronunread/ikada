@@ -238,7 +238,9 @@
     "size": "size-limit",
     "check:dist": "bun scripts/check-dist.ts",
     "test:tarball:next": "bun scripts/test-tarball.ts next",
-    "test:tarball:vite": "bun scripts/test-tarball.ts vite"
+    "test:tarball:vite": "bun scripts/test-tarball.ts vite",
+    "test:registry:next": "bun scripts/test-registry.ts next",
+    "test:registry:vite": "bun scripts/test-registry.ts vite"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -266,6 +268,7 @@
     "publint": "^0.3.25",
     "react": "19",
     "react-dom": "19",
+    "shadcn": "4.23.0",
     "size-limit": "^14.3.0",
     "tailwindcss": "4.3.3",
     "typescript": "^7.0.2",

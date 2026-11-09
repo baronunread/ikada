@@ -63,6 +63,32 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run site:build
       - run: test -f site/dist/ikada/r/registry.json && test -f site/dist/ikada/components/button.html
+      - name: llms.txt, a markdown twin per page, sitemap and robots exist
+        run: |
+          for f in llms.txt llms-full.txt sitemap.xml robots.txt components/button.md installation.md; do
+            test -s "site/dist/ikada/$f" || { echo "missing $f" >&2; exit 1; }
+          done
+
+  # Every registry item installed into a stock shadcn project (with its own button, input, dialog,
+  # sidebar... and lib/utils.ts): the stock files must survive byte for byte, everything lands in
+  # components/ikada, and tsc and the build pass. `shadcn build` validates the registry first.
+  registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [next, vite]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bun scripts/test-registry.ts ${{ matrix.app }}
 
   # Screenshot and overflow checks of the playground at 390px and 1440px, light and dark.
   e2e:

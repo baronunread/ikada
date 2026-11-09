@@ -7,6 +7,8 @@ import { href, pageMarkdown, VERSION } from "../lib/site";
 
 const pr = (n: number): string => `${REPO_URL}/pull/${n}`;
 const entries: { title: string; pr?: number; text: string }[] = [
+  { title: "Registry installs under components/ikada", text: "Every item installs to components/ikada (blocks to components/ikada/blocks), through target placeholders that follow your components.json aliases, so no stock shadcn file is overwritten. Install as @ikada/<name>; every item has categories, and llms.txt, a markdown page per doc and a sitemap are published." },
+  { title: "Compiled package, class-based dark mode", pr: 11, text: "Compiled ESM with types and a subpath per component, use client kept for Server Components, Base UI as a peer, light by default with a dark class, and the text-sb-* type scale. See the package CHANGELOG for migration notes." },
   { title: "The docs site, redesigned", text: "A shader hero on the home page, the Waterline docs chrome on every page, prop playgrounds, install tabs for four package managers and a component index with sizes." },
   { title: "The ikada mark", pr: 6, text: "E4, Buoyed: two lashed logs riding low on one wave line, with a press, a first-paint drop and a loading loop." },
   { title: "Blocks", pr: 5, text: "Eleven dashboard patterns as shadcn registry:block items, each with a live preview and sample data." },
@@ -15,7 +17,7 @@ const entries: { title: string; pr?: number; text: string }[] = [
   { title: "Menus above modals", pr: 2, text: "Menus stack above dialogs and the mobile drawer, so they open from inside them." },
   { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard’s vendored copy." },
 ];
-const lede = "What changed in each release of ikada. The package is not on npm yet; everything below is in the first release.";
+const lede = "What changed in each release of ikada. 0.1.0 shipped raw TypeScript; 0.2.0 is the compiled package and the Kibo-style registry. Entries below the first two are in 0.1.0.";
 const markdown = pageMarkdown({ title: "Changelog", description: lede, url: href("/changelog"), body: [`## ${VERSION} (unreleased)`, ...entries.map((e) => `- ${e.title}${e.pr ? ` (#${e.pr})` : ""}: ${e.text}`)] });
 ---
 

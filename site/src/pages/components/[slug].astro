@@ -34,7 +34,7 @@ const mods = import.meta.glob<{ examples?: Example[]; playground?: Playground }>
 const mod = mods[`../../examples/${item.name}.tsx`] ?? {};
 const examples = mod.examples ?? [];
 const usageJsx = mod.playground ? writeCode(mod.playground, initialValues(mod.playground)) : (examples[0]?.code ?? "");
-const importLine = `import { ${exported.join(", ")} } from "@/components/ui/${fileName.replace(/\.tsx?$/, "")}";`;
+const importLine = `import { ${exported.join(", ")} } from "@/components/ikada/${fileName.replace(/\.tsx?$/, "")}";`;
 const usage = usageJsx ? `${importLine}\n\n${usageJsx}` : importLine;
 const commands = addCommands(item.name);
 const size = gzipKb(item);
@@ -86,7 +86,7 @@ const markdown = pageMarkdown({
   <h2 id="install">Installation</h2>
   <Install commands={commands} />
   <p>
-    The CLI writes <code>components/ui/{fileName}</code> and merges the ikada theme into your CSS.{" "}
+    The CLI writes <code>components/ikada/{fileName}</code> and merges the ikada theme into your CSS.{" "}
     {deps.length ? (
       <>
         It also installs the components it is built from:{" "}

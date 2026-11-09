@@ -10,12 +10,14 @@
  *
  *   bunx shadcn build registry.json --output <public>/ikada/r
  *
- * Where files land in the user's project (with the default aliases):
- *   src/components/x.tsx, src/charts/x.tsx  ->  components/ui/x.tsx   (registry:ui)
- *   src/charts/theme.ts                     ->  components/ui/chart-theme.ts
- *   src/lib/x.ts                            ->  lib/ikada/x.ts        (registry:lib)
- *   src/tokens.generated.ts                 ->  lib/ikada/tokens.ts
- *   blocks/<name>/<file>.tsx                ->  components/<file>.tsx  (registry:block)
+ * Where files land in the user's project: always under the components directory, in an `ikada/`
+ * folder (Kibo UI style), so no stock shadcn file is ever overwritten. Targets use the
+ * `@components/` placeholder, so it follows `components.json` aliases:
+ *   src/components/x.tsx, src/charts/x.tsx  ->  components/ikada/x.tsx
+ *   src/charts/theme.ts                     ->  components/ikada/chart-theme.ts
+ *   src/lib/x.ts                            ->  components/ikada/lib/x.ts
+ *   src/tokens.generated.ts                 ->  components/ikada/lib/tokens.ts
+ *   blocks/<name>/<file>.tsx                ->  components/ikada/blocks/<name>/<file>.tsx
  *
  * A block is a copyable dashboard pattern: blocks/<name>/<name>.tsx exports a component named
  * after the folder that renders with no props (its defaults are sample data), built only from
@@ -25,6 +27,7 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join, posix } from "node:path";
 import { parseArgs } from "node:util";
 import pkg from "../package.json" with { type: "json" };
+import { CATEGORIES, DOCS, TEXT } from "./registry-meta";
 import {
   motionAtProperties,
   motionKeyframes,
@@ -43,7 +46,18 @@ const CLIENT = `"use client";`;
 export interface RegistryFile {
   path: string;
   type: "registry:ui" | "registry:lib" | "registry:component";
+  /** Where the CLI writes it, with a shadcn placeholder so any `components.json` alias works. */
+  target: string;
 }
+
+/**
+ * Everything installs under the user's components directory in an `ikada/` folder, so nothing
+ * overwrites a stock shadcn file (`button.tsx`, `input.tsx`, `lib/utils.ts`...). `@components/`
+ * is a shadcn target placeholder for `aliases.components`; the in-file import prefix below is the
+ * same path as an alias import, which the CLI rewrites to the user's alias.
+ */
+const TARGET = "@components/ikada";
+const IMPORT = "@/components/ikada";
 
 export interface RegistryItem {
   name: string;
@@ -60,6 +74,8 @@ export interface RegistryItem {
   };
   css?: CssTree;
   categories?: string[];
+  /** Shown by the CLI after install: setup the files cannot do themselves. */
+  docs?: string;
 }
 
 /** A CSS block as shadcn reads it: selectors and at-rules nest, leaves are declarations. */
@@ -74,8 +90,10 @@ interface SourceFile {
   type: "registry:ui" | "registry:lib";
   /** Path written under the output dir: "registry/ikada/ui/button.tsx". */
   outPath: string;
-  /** Import specifier other files use for it: "@/components/ui/button". */
+  /** Import specifier other files use for it: "@/components/ikada/button". */
   alias: string;
+  /** Install target with a placeholder: "@components/ikada/button.tsx". */
+  target: string;
 }
 
 const kebabToTitle = (s: string): string =>
@@ -102,7 +120,8 @@ export function sourceFiles(): SourceFile[] {
         item,
         type: "registry:ui",
         outPath: `registry/${STYLE}/ui/${item}${ext}`,
-        alias: `@/components/ui/${item}`,
+        alias: `${IMPORT}/${item}`,
+        target: `${TARGET}/${item}${ext}`,
       });
     }
   }
@@ -113,7 +132,8 @@ export function sourceFiles(): SourceFile[] {
       item: stem,
       type: "registry:lib",
       outPath: `registry/${STYLE}/lib/${STYLE}/${f}`,
-      alias: `@/lib/${STYLE}/${stem}`,
+      alias: `${IMPORT}/lib/${stem}`,
+      target: `${TARGET}/lib/${f}`,
     });
   }
   out.push({
@@ -121,7 +141,8 @@ export function sourceFiles(): SourceFile[] {
     item: "tokens",
     type: "registry:lib",
     outPath: `registry/${STYLE}/lib/${STYLE}/tokens.ts`,
-    alias: `@/lib/${STYLE}/tokens`,
+    alias: `${IMPORT}/lib/tokens`,
+    target: `${TARGET}/lib/tokens.ts`,
   });
   const names = new Set<string>();
   for (const f of out) {
@@ -249,7 +270,7 @@ function blockItem(
         return target && { alias: target.alias, item: target.item };
       }
       const sibling = block.files.find((f) => f.replace(/\.tsx?$/, "") === resolved);
-      return sibling ? { alias: `@/components/${posix.basename(resolved)}`, item: null } : undefined;
+      return sibling ? { alias: `${IMPORT}/blocks/${block.name}/${posix.basename(resolved)}`, item: null } : undefined;
     });
     for (const l of rewritten.local) local.add(l);
     for (const p of rewritten.packages) packages.add(p);
@@ -260,7 +281,11 @@ function blockItem(
         ? `${CLIENT}\n\n${rewritten.content}`
         : rewritten.content,
     );
-    out.push({ path: outPath, type: "registry:component" });
+    out.push({
+      path: outPath,
+      type: "registry:component",
+      target: `${TARGET}/blocks/${block.name}/${posix.basename(path)}`,
+    });
     if (!description) description = describe(raw, block.name, "");
   }
   if (!description) throw new Error(`${block.files[0]}: describe the block in a JSDoc comment`);
@@ -445,7 +470,7 @@ export function buildRegistry(url: string): BuiltRegistry {
       title: kebabToTitle(file.item),
       description: describe(raw, file.item, `${kebabToTitle(file.item)} from ikada, the Sproutboat design system.`),
       registryDependencies: [...(file.type === "registry:ui" ? ["theme"] : []), ...local].map(ref),
-      files: [{ path: file.outPath, type: file.type }],
+      files: [{ path: file.outPath, type: file.type, target: file.target }],
     };
     if (dependencies.length) item.dependencies = dependencies;
     items.push(item);
@@ -460,6 +485,19 @@ export function buildRegistry(url: string): BuiltRegistry {
     description: "Every ikada component, its helpers and the theme.",
     registryDependencies: sources.flatMap((f) => (f.type === "registry:ui" ? [ref(f.item)] : [])),
   });
+
+  for (const item of items) {
+    const text = TEXT[item.name];
+    if (text?.title) item.title = text.title;
+    if (text?.description) item.description = text.description;
+    const blockCategories = item.type === "registry:block" ? item.categories : undefined;
+    const categories = blockCategories ?? CATEGORIES[item.name];
+    if (!categories)
+      throw new Error(`registry item "${item.name}" has no category: add it to scripts/registry-meta.ts`);
+    item.categories = categories;
+    const docs = DOCS[item.name];
+    if (docs) item.docs = docs;
+  }
 
   return {
     registry: {
