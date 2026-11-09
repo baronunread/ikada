@@ -850,59 +850,131 @@
     font-weight: 600;
   }
 
-  /* ---------- Deck's component index: a hairline grid of files with sizes ---------- */
-  .cindex {
+  /* ---------- the overview grids: a fixed-height inert preview, then name and file ---------- */
+  .cgrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
     margin: 16px 0 24px;
     padding: 0;
     list-style: none;
-    border: 1px solid var(--sb-hairline);
-    border-radius: 12px;
-    overflow: hidden;
   }
-  /* hairlines drawn by the cells (right and bottom), so a short last row leaves plain canvas, not grey */
-  .cindex > li {
-    box-shadow:
-      1px 0 0 var(--sb-hairline),
-      0 1px 0 var(--sb-hairline);
+  .docs.wide .cgrid,
+  .home .cgrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .docs.wide .cindex,
-  .home .cindex {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-  .cindex a {
+  .cgrid > li {
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 18px;
-    height: 100%;
-    min-height: 88px;
-    padding: 12px 14px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 12px;
     background: var(--sb-canvas);
+    box-shadow: 0 0 0 1px var(--sb-hairline);
+    transition:
+      box-shadow 150ms ease,
+      background-color 150ms ease;
+  }
+  /* the title link covers the whole card, so the card is the link; the preview inside is inert */
+  .cgrid .cmeta a {
+    color: var(--sb-fg);
     font-size: 14px;
     font-weight: 600;
-    color: var(--sb-fg);
-    overflow-wrap: anywhere;
-    outline: 2px solid transparent;
-    outline-offset: -2px;
-    transition:
-      background-color 120ms ease,
-      outline-color 120ms ease;
+    line-height: 20px;
+    text-decoration: none;
+    outline: none;
   }
-  .cindex a:focus-visible {
+  .cgrid .cmeta a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .cgrid .cmeta a:focus-visible::after {
     outline-color: var(--sb-focus);
   }
-  .cindex small {
+  @media (prefers-reduced-motion: reduce) {
+    .cgrid > li {
+      transition: none;
+    }
+  }
+  .cthumb {
+    position: relative;
+    display: block;
+    height: 148px;
+    overflow: hidden;
+    background: var(--sb-surface);
+    box-shadow: inset 0 -1px 0 var(--sb-hairline);
+    container-type: size;
+  }
+  .cgrid.is-blocks .cthumb {
+    height: 168px;
+  }
+  /* natural size, centred, then scaled by script; invisible until measured so nothing jumps */
+  .cfit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: max-content;
+    max-width: none;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.5;
+    transform: translate(-50%, -50%) scale(var(--s, 1));
+    transform-origin: center;
+    pointer-events: none;
+    user-select: none;
+  }
+  .cfit:not([data-ready]) {
+    opacity: 0;
+  }
+  .cfit[data-fit="width"] {
+    top: 0;
+    width: 880px;
+    transform: translate(-50%, 0) scale(var(--s, 1));
+    transform-origin: top center;
+  }
+  .cgrid.is-blocks .cthumb::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--sb-surface));
+  }
+  .cmeta {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px 12px;
+    min-width: 0;
+  }
+  .cmeta small {
+    display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 2px 8px;
+    gap: 8px;
+    min-width: 0;
     font-family: var(--font-mono);
     font-size: 12px;
+    line-height: 16px;
     font-weight: 400;
     color: var(--sb-fg-muted);
+  }
+  .cfile {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .csize {
+    flex: none;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1083,8 +1155,9 @@
     .pager a:hover {
       background: var(--sb-hover);
     }
-    .cindex a:hover {
+    .cgrid > li:hover {
       background: var(--sb-surface);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--sb-fg) 28%, transparent);
     }
   }
 
@@ -1124,9 +1197,9 @@
     .toc {
       display: none;
     }
-    .cindex,
-    .docs.wide .cindex,
-    .home .cindex {
+    .cgrid,
+    .docs.wide .cgrid,
+    .home .cgrid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -1190,9 +1263,9 @@
       border-inline-start: 0;
       border-top: 1px solid var(--sb-hairline);
     }
-    .cindex,
-    .docs.wide .cindex,
-    .home .cindex {
+    .cgrid,
+    .docs.wide .cgrid,
+    .home .cgrid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .foot .inner {

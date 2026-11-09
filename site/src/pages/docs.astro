@@ -1,4 +1,5 @@
 ---
+import CardGrid from "../components/docs/CardGrid.astro";
 import ComponentIndex from "../components/docs/ComponentIndex.astro";
 import Install from "../components/docs/Install.astro";
 import PageHead from "../components/docs/PageHead.astro";
@@ -46,16 +47,7 @@ const markdown = pageMarkdown({
 
   <h2 id="blocks">Blocks</h2>
   <p>Whole dashboard patterns assembled from the components, with sample data. <a class="ilink" href={href("/blocks")}>See them all live</a>.</p>
-  <ul class="cindex">
-    {blocks.map((b) => (
-      <li>
-        <a href={href(`/blocks/${b.name}`)}>
-          <span>{b.title}</span>
-          <small><span>{b.name}</span><span>{gzipKb(b)}</span></small>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <CardGrid kind="block" cards={blocks.map((b) => ({ slug: b.name, title: b.title, href: href(`/blocks/${b.name}`), file: `${b.name}.tsx`, size: gzipKb(b) }))} />
 
   <h2 id="guides">Guides</h2>
   <ul class="list">

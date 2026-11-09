@@ -1,0 +1,60 @@
+---
+/**
+ * The overview grids: a fixed-height inert preview on top, the name and, on one line, the file and
+ * size below. The whole card is the link. Previews are server-rendered React (no JS); a few lines of
+ * script scale each one to fit its box.
+ */
+import { BlockThumb, ComponentThumb } from "../Thumbs";
+
+export interface Card {
+  slug: string;
+  title: string;
+  href: string;
+  file: string;
+  size: string;
+}
+interface Props {
+  cards: Card[];
+  kind: "component" | "block";
+}
+const { cards, kind } = Astro.props;
+---
+
+<ul class:list={["cgrid", { "is-blocks": kind === "block" }]}>
+  {cards.map((c) => (
+    <li>
+      <span class="cthumb" aria-hidden="true" inert>
+        <span class="cfit" data-fit={kind === "block" ? "width" : "contain"}>
+          {kind === "block" ? <BlockThumb slug={c.slug} /> : <ComponentThumb slug={c.slug} />}
+        </span>
+      </span>
+      <span class="cmeta">
+        <a href={c.href}>{c.title}</a>
+        <small><span class="cfile">{c.file}</span><span class="csize">{c.size}<span class="sr-only"> gzipped</span></span></small>
+      </span>
+    </li>
+  ))}
+</ul>
+
+<script>
+  // Scale each inert preview to fit its box (a transform, never zoom). Components are contained and
+  // centred; blocks fill the width and show their top.
+  const fit = (el: HTMLElement) => {
+    const box = el.parentElement as HTMLElement;
+    el.style.setProperty("--s", "1");
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h) return;
+    const bw = box.clientWidth - (el.dataset.fit === "width" ? 0 : 56);
+    const bh = box.clientHeight - (el.dataset.fit === "width" ? 0 : 40);
+    const s = el.dataset.fit === "width" ? Math.min(1, bw / w) : Math.min(1, bw / w, bh / h);
+    el.style.setProperty("--s", s.toFixed(4));
+    el.dataset.ready = "";
+  };
+  const all = [...document.querySelectorAll<HTMLElement>(".cfit")];
+  const ro = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target.firstElementChild as HTMLElement)));
+  all.forEach((el) => {
+    fit(el);
+    ro.observe(el.parentElement as HTMLElement);
+  });
+</script>

@@ -1,18 +1,16 @@
 ---
-/** Deck's component index: every component as one file, with its gzipped size. */
+/** The component index: every component as a live thumbnail, its file and its gzipped size. */
 import { sourcePath, components } from "../../lib/registry";
 import { gzipKb, href } from "../../lib/site";
+import CardGrid from "./CardGrid.astro";
 
-const cells = components.map((c) => ({ name: c.name, title: c.title, file: sourcePath(c).split("/").pop() ?? `${c.name}.tsx`, size: gzipKb(c) }));
+const cards = components.map((c) => ({
+  slug: c.name,
+  title: c.title,
+  href: href(`/components/${c.name}`),
+  file: sourcePath(c).split("/").pop() ?? `${c.name}.tsx`,
+  size: gzipKb(c),
+}));
 ---
 
-<ul class="cindex">
-  {cells.map((c) => (
-    <li>
-      <a href={href(`/components/${c.name}`)}>
-        <span>{c.title}</span>
-        <small><span>{c.file}</span><span>{c.size}<span class="sr-only"> gzipped</span></span></small>
-      </a>
-    </li>
-  ))}
-</ul>
+<CardGrid kind="component" cards={cards} />
