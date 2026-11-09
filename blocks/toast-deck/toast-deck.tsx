@@ -140,12 +140,10 @@ export function ToastDeck({
         >
           <header className="flex flex-wrap items-center gap-3 px-4 pt-4 pb-3">
             <div className="me-auto min-w-0">
-              <h2 id="toast-deck-tokens" className="m-0 text-sb-md font-semibold">
+              <h2 id="toast-deck-tokens" className="text-sb-md font-semibold">
                 API tokens
               </h2>
-              <p className="m-0 text-sb-sm text-fg-muted">
-                Revoke one: it goes at once, and Undo (or ⌘Z) brings it back.
-              </p>
+              <p className="text-sb-sm text-fg-muted">Revoke one: it goes at once, and Undo (or ⌘Z) brings it back.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" size="sm" disabled={deploying} onClick={() => deploy(true)}>
@@ -160,10 +158,7 @@ export function ToastDeck({
           {tokens.length ? (
             <ul className="divide-y divide-hairline border-t border-hairline">
               {tokens.map((token) => (
-                <li
-                  key={token.id}
-                  className="m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit] flex min-h-(--sb-row-h) items-center gap-3 px-4 py-2"
-                >
+                <li key={token.id} className="flex min-h-(--sb-row-h) items-center gap-3 px-4 py-2">
                   <span
                     aria-hidden="true"
                     className="grid size-8 shrink-0 place-items-center rounded-lg bg-well text-fg-muted"
@@ -187,7 +182,7 @@ export function ToastDeck({
             </ul>
           ) : (
             <div className="flex flex-col items-center gap-2 border-t border-hairline px-4 py-8 text-center">
-              <p className="m-0 text-fg-muted">Every token is revoked.</p>
+              <p className="text-fg-muted">Every token is revoked.</p>
               <Button size="sm" variant="ghost" onClick={() => setTokens(initial)}>
                 Bring the samples back
               </Button>
@@ -200,18 +195,15 @@ export function ToastDeck({
           className="flex min-w-0 flex-col gap-3 rounded-xl bg-surface p-4 shadow-card"
         >
           <div>
-            <h2 id="toast-deck-history" className="m-0 text-sb-md font-semibold">
+            <h2 id="toast-deck-history" className="text-sb-md font-semibold">
               Recent
             </h2>
-            <p className="m-0 text-sb-sm text-fg-muted">What the toasts said this session.</p>
+            <p className="text-sb-sm text-fg-muted">What the toasts said this session.</p>
           </div>
           {history.length ? (
             <ol className="flex flex-col gap-2.5" aria-label="Recent notifications">
               {history.map((s) => (
-                <li
-                  key={s.key}
-                  className="m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit] flex items-start gap-2.5"
-                >
+                <li key={s.key} className="flex items-start gap-2.5">
                   <StatusGlyph tone={s.tone} className="mt-1.5" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sb-sm font-semibold" title={s.title}>
@@ -229,7 +221,7 @@ export function ToastDeck({
               ))}
             </ol>
           ) : (
-            <p className="m-0 rounded-lg bg-well px-3 py-4 text-center text-sb-sm text-fg-muted shadow-tray">
+            <p className="rounded-lg bg-well px-3 py-4 text-center text-sb-sm text-fg-muted shadow-tray">
               Nothing yet. Revoke a token or deploy.
             </p>
           )}

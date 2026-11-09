@@ -133,8 +133,8 @@ function SignIn({
           <MailIcon className="size-5" />
         </span>
         <div className="flex flex-col gap-2">
-          <h2 className="m-0 text-sb-xl font-bold">Check your inbox</h2>
-          <p className="m-0 text-sb-base text-fg-muted">
+          <h2 className="text-sb-xl font-bold">Check your inbox</h2>
+          <p className="text-sb-base text-fg-muted">
             A sign-in link is on its way to <span className="font-semibold break-all text-fg">{email.trim()}</span>. It
             works once and expires in 15 minutes.
           </p>
@@ -149,8 +149,8 @@ function SignIn({
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-6">
       <div className="flex flex-col gap-1.5">
-        <h2 className="m-0 text-sb-xl font-bold">Sign in</h2>
-        <p className="m-0 text-sb-base text-fg-muted">{note}</p>
+        <h2 className="text-sb-xl font-bold">Sign in</h2>
+        <p className="text-sb-base text-fg-muted">{note}</p>
       </div>
       <div className="flex flex-col gap-3">
         <Field label="Email" error={error ?? undefined}>
@@ -177,7 +177,7 @@ function SignIn({
         <GitHubIcon />
         Continue with GitHub
       </Button>
-      <p className="m-0 text-center text-sb-sm text-fg-muted">
+      <p className="text-center text-sb-sm text-fg-muted">
         No invite yet? <SwitchLink onClick={toWaitlist}>Join the waitlist</SwitchLink>
       </p>
     </form>
@@ -224,12 +224,12 @@ function Waitlist({
         <span className="grid size-10 place-items-center rounded-full bg-brand-soft" aria-hidden="true">
           <StatusGlyph tone="success" sprout className="size-3.5" />
         </span>
-        <h2 className="m-0 text-sb-xl font-bold">You are on the list</h2>
-        <p className="m-0 text-sb-base text-fg-muted">
+        <h2 className="text-sb-xl font-bold">You are on the list</h2>
+        <p className="text-sb-base text-fg-muted">
           We let people in a few at a time and will write to{" "}
           <span className="font-semibold break-all text-fg">{done}</span> when your spot opens. Nothing else.
         </p>
-        <p className="m-0 text-sb-sm text-fg-muted">
+        <p className="text-sb-sm text-fg-muted">
           Invited after all? <SwitchLink onClick={toSignIn}>Sign in</SwitchLink>
         </p>
       </div>
@@ -239,8 +239,8 @@ function Waitlist({
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <h2 className="m-0 text-sb-xl font-bold">Join the waitlist</h2>
-        <p className="m-0 text-sb-base text-fg-muted">Tell us a little, and we will invite you when a spot opens.</p>
+        <h2 className="text-sb-xl font-bold">Join the waitlist</h2>
+        <p className="text-sb-base text-fg-muted">Tell us a little, and we will invite you when a spot opens.</p>
       </div>
       <Field label="Email" error={errors.email}>
         <Input
@@ -264,11 +264,11 @@ function Waitlist({
       <Field label="Anything we should know?" description="Optional. Your framework, or what you are missing today.">
         <Textarea value={note} onChange={(event) => setNote(event.target.value)} rows={3} maxLength={500} />
       </Field>
-      {errors.form ? <p className="m-0 text-sb-sm text-danger-fg">{errors.form}</p> : null}
+      {errors.form ? <p className="text-sb-sm text-danger-fg">{errors.form}</p> : null}
       <Button type="submit" variant="primary" loading={saving}>
         Join the waitlist
       </Button>
-      <p className="m-0 text-center text-sb-sm text-fg-muted">
+      <p className="text-center text-sb-sm text-fg-muted">
         Already invited? <SwitchLink onClick={toSignIn}>Sign in</SwitchLink>
       </p>
     </form>

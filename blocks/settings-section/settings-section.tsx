@@ -276,7 +276,7 @@ export function SettingsSection({
           "data-dirty:-translate-y-(--sb-offset-press) data-dirty:bg-raised data-dirty:shadow-float",
         )}
       >
-        <p className="m-0 me-auto text-sb-sm text-fg-muted" aria-live="polite">
+        <p className="me-auto text-sb-sm text-fg-muted" aria-live="polite">
           {error ? (
             <span className="text-danger-fg">{error}</span>
           ) : dirty ? (

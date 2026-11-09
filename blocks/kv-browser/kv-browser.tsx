@@ -315,7 +315,7 @@ export function KvBrowser({
             <TableBody ref={listRef}>
               {rows.length === 0 ? (
                 <TableEmpty colSpan={3}>
-                  <p className="m-0 text-sb-sm text-fg-muted">
+                  <p className="text-sb-sm text-fg-muted">
                     {filtered ? "No keys match this filter." : "This namespace is empty."}
                   </p>
                 </TableEmpty>

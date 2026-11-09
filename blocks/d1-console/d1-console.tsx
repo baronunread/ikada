@@ -282,7 +282,7 @@ function TablesTree({
       {tables.map((t) => {
         const expanded = open.has(t.name);
         return (
-          <li key={t.name} className="m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit]">
+          <li key={t.name} className="">
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
@@ -352,7 +352,7 @@ function TablesTree({
 function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean }) {
   if (!outcome) {
     return (
-      <p className="m-0 border-t border-hairline px-4 py-8 text-center text-sb-sm text-fg-muted">
+      <p className="border-t border-hairline px-4 py-8 text-center text-sb-sm text-fg-muted">
         Run a query to see its rows here.
       </p>
     );
@@ -425,7 +425,7 @@ function ResultGrid({ outcome, busy }: { outcome: Outcome | null; busy: boolean 
           </TableBody>
         </Table>
       ) : (
-        <p className="m-0 px-4 pb-4 text-sb-sm text-fg-muted">The query ran and matched no rows.</p>
+        <p className="px-4 pb-4 text-sb-sm text-fg-muted">The query ran and matched no rows.</p>
       )}
     </div>
   );
@@ -499,7 +499,7 @@ export function D1Console({
             </button>
           </div>
           <div className={cn(!showTables && "@max-3xl:hidden")}>
-            <p className="m-0 px-3 pt-2 text-sb-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
+            <p className="px-3 pt-2 text-sb-xs text-fg-muted @max-3xl:hidden">Tables · click one to query it</p>
             <TablesTree tables={tables} current={current} onQuery={queryTable} />
           </div>
         </aside>

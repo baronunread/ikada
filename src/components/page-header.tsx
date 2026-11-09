@@ -40,10 +40,10 @@ export function PageHeader({
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-            <Title className="m-0 min-w-0 break-words text-balance text-sb-xl font-bold">{title}</Title>
+            <Title className="min-w-0 break-words text-balance text-sb-xl font-bold">{title}</Title>
             {status}
           </div>
-          {description ? <p className="m-0 break-words text-pretty text-sb-base text-fg-muted">{description}</p> : null}
+          {description ? <p className="break-words text-pretty text-sb-base text-fg-muted">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>

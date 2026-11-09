@@ -192,13 +192,7 @@ function Line({ line }: { line: LogLine }) {
     </>
   );
   return (
-    <li
-      className={cn(
-        "m-0 max-w-none [font-size:inherit] [line-height:inherit] text-[color:inherit] px-4 py-1.5",
-        ROW,
-        line.level === "error" ? "bg-danger-soft/45" : "hover:bg-hover/50",
-      )}
-    >
+    <li className={cn("px-4 py-1.5", ROW, line.level === "error" ? "bg-danger-soft/45" : "hover:bg-hover/50")}>
       <div className="flex flex-wrap items-center gap-x-3 @3xl:contents">
         <time className="text-fg-muted tabular-nums" dateTime={new Date(line.t).toISOString()}>
           {clock(line.t)}
@@ -220,7 +214,7 @@ function Line({ line }: { line: LogLine }) {
           {line.durationMs !== undefined ? `${formatNumber(line.durationMs)} ms` : ""}
         </span>
       </div>
-      <p className="m-0 mt-0.5 break-words @3xl:hidden">{body}</p>
+      <p className="mt-0.5 break-words @3xl:hidden">{body}</p>
     </li>
   );
 }
@@ -313,7 +307,7 @@ export function LogsPanel({
     >
       <div className="flex flex-col gap-3 px-4 pt-4 pb-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 id="logs-panel-title" className="m-0 me-auto min-w-0 truncate text-sb-md font-semibold">
+          <h2 id="logs-panel-title" className="me-auto min-w-0 truncate text-sb-md font-semibold">
             {title}
           </h2>
           <div className="relative order-last w-full @2xl:order-none @2xl:w-64">
@@ -401,7 +395,7 @@ export function LogsPanel({
         )}
       </div>
 
-      <p className="m-0 flex min-h-11 items-center border-t border-hairline px-4 py-2.5 text-sb-sm text-fg-muted">
+      <p className="flex min-h-11 items-center border-t border-hairline px-4 py-2.5 text-sb-sm text-fg-muted">
         <StatusDot tone={held ? "neutral" : "success"} live={!held} label={statusLabel} />
       </p>
     </section>
