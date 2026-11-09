@@ -31,6 +31,7 @@ export function Field({
 }: FieldProps) {
   return (
     <BaseField.Root
+      data-slot="field"
       ref={ref}
       invalid={invalid ?? Boolean(error)}
       className={cn("flex w-full flex-col gap-1.5", className)}

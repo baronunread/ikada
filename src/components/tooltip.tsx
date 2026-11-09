@@ -1,6 +1,7 @@
 "use client";
 
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
+import { cloneElement, useId, useState } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { cn, floatingSurface } from "../lib/cn";
 import { usePortalContainer } from "../lib/portal";
@@ -29,9 +30,16 @@ export interface TooltipProps {
 /** A short plain-text label on hover or focus, after a delay. Arrives on the snappy spring. */
 export function Tooltip({ content, children, side = "top", delay, defaultOpen, className, ref }: TooltipProps) {
   const container = usePortalContainer();
+  // Base UI shows the label but does not link it to the trigger, so a screen reader never hears it.
+  // While it is open, the trigger is described by it.
+  const id = useId();
+  const [open, setOpen] = useState(Boolean(defaultOpen));
   return (
-    <BaseTooltip.Root defaultOpen={defaultOpen}>
-      <BaseTooltip.Trigger render={children} delay={delay} />
+    <BaseTooltip.Root defaultOpen={defaultOpen} onOpenChange={setOpen}>
+      <BaseTooltip.Trigger
+        render={cloneElement(children, { "aria-describedby": open ? id : undefined } as Record<string, unknown>)}
+        delay={delay}
+      />
       <BaseTooltip.Portal container={container}>
         <BaseTooltip.Positioner
           side={side === "start" ? "inline-start" : side === "end" ? "inline-end" : side}
@@ -40,7 +48,10 @@ export function Tooltip({ content, children, side = "top", delay, defaultOpen, c
           className="z-(--sb-z-tooltip)"
         >
           <BaseTooltip.Popup
+            data-slot="tooltip-content"
             ref={ref}
+            id={id}
+            role="tooltip"
             className={cn(
               floatingSurface,
               "max-w-64 rounded-md px-2.5 py-1.5 text-sb-xs font-medium",

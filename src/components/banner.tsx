@@ -43,6 +43,7 @@ export function Banner({
   if (!open) return null;
   return (
     <div
+      data-slot="banner"
       ref={ref}
       role={tone === "danger" ? "alert" : "status"}
       data-tone={tone}

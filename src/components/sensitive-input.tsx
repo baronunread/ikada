@@ -52,7 +52,7 @@ export function SensitiveInput({
   }
 
   return (
-    <div ref={box} className="relative flex w-full min-w-0 items-center">
+    <div data-slot="sensitive-input" ref={box} className="relative flex w-full min-w-0 items-center">
       <Input
         {...props}
         type={revealed ? "text" : "password"}

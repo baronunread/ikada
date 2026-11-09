@@ -23,6 +23,7 @@ export interface SpinnerProps extends Omit<ComponentProps<"span">, "children">, 
 export function Spinner({ size, label = "Loading", decorative = false, className, ref, ...props }: SpinnerProps) {
   return (
     <span
+      data-slot="spinner"
       ref={ref}
       role={decorative ? undefined : "status"}
       aria-hidden={decorative || undefined}

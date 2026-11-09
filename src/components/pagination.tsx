@@ -54,7 +54,13 @@ export function Pagination({
 }: PaginationProps) {
   const go = (next: number) => onPageChange(Math.min(Math.max(1, next), Math.max(1, pageCount)));
   return (
-    <nav ref={ref} aria-label="Pagination" className={cn("flex items-center gap-1", className)} {...props}>
+    <nav
+      data-slot="pagination"
+      ref={ref}
+      aria-label="Pagination"
+      className={cn("flex items-center gap-1", className)}
+      {...props}
+    >
       <button
         type="button"
         aria-label="Previous page"

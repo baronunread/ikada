@@ -41,6 +41,7 @@ export function RadioGroup({
   const legendId = useId();
   return (
     <BaseRadioGroup
+      data-slot="radio-group"
       ref={ref}
       aria-labelledby={legend ? legendId : undefined}
       aria-invalid={invalid || undefined}
@@ -53,7 +54,7 @@ export function RadioGroup({
         </span>
       ) : null}
       <div className={cn("flex gap-x-5 gap-y-2.5", orientation === "vertical" ? "flex-col" : "flex-row flex-wrap")}>
-        {options.map((option) => (
+        {options.map((option, index) => (
           <label
             key={option.value}
             className={cn(
@@ -64,6 +65,9 @@ export function RadioGroup({
             <Radio.Root
               value={option.value}
               disabled={option.disabled}
+              // A <label> does not name a role="radio" span, so name it by reference.
+              aria-labelledby={`${legendId}-label-${index}`}
+              aria-describedby={option.description ? `${legendId}-description-${index}` : undefined}
               className={cn(
                 "relative mt-px inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-well",
                 "shadow-[inset_0_0_0_1.5px_var(--sb-control-edge)]",
@@ -86,8 +90,12 @@ export function RadioGroup({
               />
             </Radio.Root>
             <span className="flex flex-col">
-              <span>{option.label}</span>
-              {option.description ? <span className="text-sb-sm text-fg-muted">{option.description}</span> : null}
+              <span id={`${legendId}-label-${index}`}>{option.label}</span>
+              {option.description ? (
+                <span id={`${legendId}-description-${index}`} className="text-sb-sm text-fg-muted">
+                  {option.description}
+                </span>
+              ) : null}
             </span>
           </label>
         ))}

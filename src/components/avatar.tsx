@@ -27,7 +27,7 @@ export interface AvatarProps extends Omit<ComponentProps<typeof BaseAvatar.Root>
 /** A person's picture with their initial when there is none (or it fails to load). Decorative next to a visible name. */
 export function Avatar({ src, name, size, className, ref, ...props }: AvatarProps) {
   return (
-    <BaseAvatar.Root ref={ref} className={cn(avatarStyles({ size }), className)} {...props}>
+    <BaseAvatar.Root data-slot="avatar" ref={ref} className={cn(avatarStyles({ size }), className)} {...props}>
       {src ? <BaseAvatar.Image src={src} alt={`${name} avatar`} className="size-full object-cover" /> : null}
       <BaseAvatar.Fallback aria-hidden="true" delay={src ? 400 : 0}>
         {name.trim().slice(0, 1).toUpperCase() || "?"}

@@ -54,6 +54,7 @@ export function StatusGlyph({
   const isLive = live && status === "success";
   return (
     <span
+      data-slot="status-glyph"
       aria-hidden="true"
       data-glyph={isLive ? "live" : status}
       data-sprout={sprout && status === "success" ? "" : undefined}

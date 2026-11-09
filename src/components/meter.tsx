@@ -1,6 +1,7 @@
 "use client";
 
 import { Meter as BaseMeter } from "@base-ui/react/meter";
+import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatCompact } from "../lib/format";
@@ -31,16 +32,34 @@ export interface MeterProps extends Omit<ComponentProps<typeof BaseMeter.Root>, 
 /** A bar for a bounded measurement. The fill grows over 250ms ease-out (a width change, so it also stays under reduced motion). */
 export function Meter({ label, tone = "normal", valueLabel, className, locale, ...props }: MeterProps) {
   const resolved = useLocale(locale);
+  // Base UI does not always link the label to the meter; do it here so the meter always has a name.
+  const labelId = useId();
   return (
-    <BaseMeter.Root className={cn("flex flex-col gap-1.5", className)} locale={resolved} {...props}>
+    <BaseMeter.Root
+      data-slot="meter"
+      className={cn("flex flex-col gap-1.5", className)}
+      locale={resolved}
+      aria-labelledby={label ? labelId : undefined}
+      {...props}
+    >
       {label || valueLabel !== null ? (
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-sb-base">
-          {label ? <BaseMeter.Label className="font-medium">{label}</BaseMeter.Label> : <span />}
+          {label ? (
+            <BaseMeter.Label id={labelId} className="font-medium">
+              {label}
+            </BaseMeter.Label>
+          ) : (
+            <span />
+          )}
           {valueLabel === undefined ? <BaseMeter.Value className="tabular-nums text-fg-muted" /> : valueLabel}
         </div>
       ) : null}
-      <BaseMeter.Track className="h-2 w-full overflow-hidden rounded-full shadow-[inset_0_0_0_1px_var(--sb-hairline-strong)]">
+      <BaseMeter.Track
+        data-slot="meter-track"
+        className="h-2 w-full overflow-hidden rounded-full shadow-[inset_0_0_0_1px_var(--sb-hairline-strong)]"
+      >
         <BaseMeter.Indicator
+          data-slot="meter-indicator"
           data-tone={tone}
           className={cn(
             "h-full rounded-full transition-[width] duration-(--sb-duration-slide) ease-out motion-reduce:transition-none",

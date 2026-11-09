@@ -531,7 +531,8 @@ export function Sheet({
         width={W}
         height={H}
         viewBox={`0 0 ${W} ${H}`}
-        role="img"
+        role="group"
+        aria-roledescription="drawing"
         aria-label="Engineering drawing of the ikada raft, exploded, with seven parts that are ikada components."
         data-active={active ?? undefined}
       >

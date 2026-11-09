@@ -17,9 +17,11 @@ export interface PageHeaderProps extends Omit<ComponentProps<"header">, "title">
   actions?: ReactNode;
   /** Usually <PageTabs>. Sits on the header's bottom rule. */
   tabs?: ReactNode;
+  /** Heading level of the title. Default `h1`; use a lower level when the header is not the page's own title. */
+  headingLevel?: "h1" | "h2" | "h3" | "h4";
 }
 
-/** Title row for a page. The title is the page's only `h1`. */
+/** Title row for a page. The title is the page's only `h1` unless `headingLevel` says otherwise. */
 export function PageHeader({
   breadcrumbs,
   title,
@@ -27,17 +29,18 @@ export function PageHeader({
   description,
   actions,
   tabs,
+  headingLevel: Title = "h1",
   className,
   ref,
   ...props
 }: PageHeaderProps) {
   return (
-    <header ref={ref} className={cn("flex flex-col gap-4", className)} {...props}>
+    <header data-slot="page-header" ref={ref} className={cn("flex flex-col gap-4", className)} {...props}>
       {breadcrumbs}
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="min-w-0 break-words text-sb-xl font-bold">{title}</h1>
+            <Title className="min-w-0 break-words text-sb-xl font-bold">{title}</Title>
             {status}
           </div>
           {description ? <p className="text-sb-base text-fg-muted">{description}</p> : null}
@@ -58,6 +61,7 @@ export function PageTabs({
 }: ComponentProps<"nav"> & { label?: string }) {
   return (
     <nav
+      data-slot="page-tabs"
       aria-label={label}
       className={cn(
         "-mx-1 overflow-x-auto px-1 shadow-[inset_0_-1px_0_var(--sb-hairline)] [scrollbar-width:none]",
@@ -94,5 +98,5 @@ export function PageTab({ current = false, className, ref, render, ...props }: P
       ...props,
     },
   });
-  return <li>{tab}</li>;
+  return <li data-slot="page-tab">{tab}</li>;
 }

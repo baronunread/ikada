@@ -324,6 +324,7 @@ function ToastItem({ item }: { item: BaseToast }) {
 
   return (
     <Toast.Root
+      data-slot="toast"
       toast={item}
       swipeDirection={["left", "right"]}
       data-sb-toast=""
@@ -451,6 +452,7 @@ export function ToastProvider({ children, onToast, limit = 5, label = "Notificat
       {children}
       <Toast.Portal>
         <Toast.Viewport
+          data-slot="toast-viewport"
           ref={setViewport}
           aria-label={label}
           aria-keyshortcuts="Alt+T F6"

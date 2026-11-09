@@ -353,6 +353,66 @@
   --sb-duration-spring-bob: 160ms;
 }
 
+/* Forced colors (Windows High Contrast): the OS drops box-shadow and background images and swaps
+   colours for its own palette, so shadow-drawn field edges and fills vanish. Draw them again as
+   borders and fills in system colours. Selectors use the data-slot attributes. */
+@media (forced-colors: active) {
+  [data-slot="button"],
+  [data-slot="icon-button"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"],
+  [data-slot="segmented-control"],
+  [data-slot="code-block"],
+  [data-slot="badge"],
+  [data-slot="kbd"],
+  [data-slot="meter-track"],
+  [data-slot="dialog-content"],
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="select-content"],
+  [data-slot="command-palette-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="toast"] {
+    border: 1px solid ButtonText;
+  }
+  [data-slot="checkbox"],
+  [data-slot="switch"],
+  [data-slot="radio-group"] [role="radio"] {
+    border: 1px solid ButtonText;
+    forced-color-adjust: none;
+    background-color: Canvas;
+    color: ButtonText;
+  }
+  [data-slot="checkbox"][data-checked],
+  [data-slot="checkbox"][data-indeterminate],
+  [data-slot="switch"][data-checked],
+  [data-slot="radio-group"] [role="radio"][data-checked] {
+    background-color: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+  [data-slot="radio-group"] [role="radio"] {
+    border-radius: 9999px;
+  }
+  [data-slot="switch-thumb"] {
+    background-color: ButtonText;
+    forced-color-adjust: none;
+  }
+  [data-slot="switch"][data-checked] [data-slot="switch-thumb"] {
+    background-color: HighlightText;
+  }
+  [data-slot="meter-indicator"] {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+  [data-slot="segmented-control"] [aria-checked="true"],
+  [data-slot="tabs-tab"][aria-selected="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 /* Shared motion primitives (see DESIGN.md, Motion). */
 @property --sb-wake {
   syntax: "<length>";

@@ -5,6 +5,7 @@ import { cn } from "../lib/cn";
 export function Kbd({ className, ref, ...props }: ComponentProps<"kbd">) {
   return (
     <kbd
+      data-slot="kbd"
       ref={ref}
       className={cn(
         "inline-flex h-5 min-w-5 items-center justify-center rounded-xs bg-well px-1.5 font-mono text-sb-xs font-medium text-fg-muted shadow-button",

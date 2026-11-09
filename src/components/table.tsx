@@ -67,6 +67,7 @@ export function Table({
 }: TableProps) {
   return (
     <div
+      data-slot="table"
       role="region"
       aria-label={label}
       // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll region must be keyboard-focusable
@@ -93,6 +94,7 @@ export function Table({
 export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
   return (
     <thead
+      data-slot="table-header"
       className={cn(
         "[[data-sticky]_&_th]:sticky [[data-sticky]_&_th]:top-0 [[data-sticky]_&_th]:z-(--sb-z-sticky)",
         className,
@@ -103,7 +105,7 @@ export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
 }
 
 export function TableBody({ className, ...props }: ComponentProps<"tbody">) {
-  return <tbody className={className} {...props} />;
+  return <tbody data-slot="table-body" className={className} {...props} />;
 }
 
 export interface TableRowProps extends ComponentProps<"tr"> {
@@ -114,6 +116,7 @@ export interface TableRowProps extends ComponentProps<"tr"> {
 export function TableRow({ selected = false, className, ...props }: TableRowProps) {
   return (
     <tr
+      data-slot="table-row"
       aria-selected={selected || undefined}
       data-selected={selected || undefined}
       className={cn(
@@ -150,6 +153,7 @@ export function TableHead({
   const ariaSort = sortable ? (sort === "asc" ? "ascending" : sort === "desc" ? "descending" : "none") : undefined;
   return (
     <th
+      data-slot="table-head"
       scope="col"
       aria-sort={ariaSort}
       className={cn(
@@ -189,6 +193,7 @@ export function TableHead({
 export function TableCell({ hideBelow, className, ...props }: ComponentProps<"td"> & HideBelowProps) {
   return (
     <td
+      data-slot="table-cell"
       className={cn(
         cellBase,
         "h-(--sb-row-h) shadow-[inset_0_-1px_0_var(--sb-hairline)] group-last/row:shadow-none",
@@ -204,7 +209,7 @@ export function TableCell({ hideBelow, className, ...props }: ComponentProps<"td
 function StateRow({ colSpan, className, children }: { colSpan: number; className?: string; children: ReactNode }) {
   return (
     <TableRow className="hover:bg-transparent">
-      <td colSpan={colSpan} className={cn("px-4 py-10 text-center", className)}>
+      <td data-slot="table-state" colSpan={colSpan} className={cn("px-4 py-10 text-center", className)}>
         {children}
       </td>
     </TableRow>

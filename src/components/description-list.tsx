@@ -20,7 +20,12 @@ export interface DescriptionListProps extends Omit<ComponentProps<"dl">, "childr
 /** Term and details pairs: an account, a deployment. Rules between rows, no boxes. */
 export function DescriptionList({ items, layout = "inline", className, ref, ...props }: DescriptionListProps) {
   return (
-    <dl ref={ref} className={cn("@container m-0 flex flex-col text-sb-base", className)} {...props}>
+    <dl
+      data-slot="description-list"
+      ref={ref}
+      className={cn("@container m-0 flex flex-col text-sb-base", className)}
+      {...props}
+    >
       {items.map((item) => (
         <div
           key={item.id}

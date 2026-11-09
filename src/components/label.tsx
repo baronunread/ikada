@@ -11,7 +11,7 @@ export interface LabelProps extends ComponentProps<"label"> {
 /** A form label. `required` adds a marked asterisk for sighted users; the control carries `required`. */
 export function Label({ required, className, children, ref, ...props }: LabelProps) {
   return (
-    <label ref={ref} className={cn(labelStyles, className)} {...props}>
+    <label data-slot="label" ref={ref} className={cn(labelStyles, className)} {...props}>
       {children}
       {required ? (
         <span aria-hidden="true" className="text-fg-muted">

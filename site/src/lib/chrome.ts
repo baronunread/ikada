@@ -40,6 +40,40 @@ function themeToggle(): void {
   });
 }
 
+/**
+ * Several demos on one page often render the same landmark (four Sidebars, four Paginations) and
+ * landmarks need unique names. Suffix each demo's landmark label with the demo's title. This runs
+ * here, not in a React effect, because demo islands hydrate lazily and the SSR markup must be right too.
+ */
+function distinctLandmarks(): void {
+  const used = new Map<string, number>();
+  const label = (scope: Element, title: string): void => {
+    scope
+      .querySelectorAll<HTMLElement>('nav[aria-label], aside, section[aria-label], [role="region"][aria-label]')
+      .forEach((el) => {
+        if (el.dataset.demoLabel) return;
+        el.dataset.demoLabel = "1";
+        const base = el.getAttribute("aria-label") ?? (el.tagName === "ASIDE" ? "Complementary" : "Region");
+        const wanted = `${base} (${title} demo)`;
+        const n = (used.get(wanted) ?? 0) + 1;
+        used.set(wanted, n);
+        el.setAttribute("aria-label", n > 1 ? `${wanted} ${n}` : wanted);
+      });
+  };
+  const run = (): void => {
+    document.querySelectorAll<HTMLElement>(".stage").forEach((stage) => {
+      const heading = stage.querySelector("h2, h3")?.textContent?.trim() ?? "example";
+      const preview = stage.querySelector(".stage-preview");
+      if (preview) label(preview, heading);
+    });
+    document
+      .querySelectorAll<HTMLElement>("[data-block-ready]")
+      .forEach((el) => label(el, `${el.dataset.blockReady} block`));
+  };
+  run();
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+}
+
 function scrolled(): void {
   const nav = document.querySelector<HTMLElement>("[data-nav]");
   if (!nav) return;
@@ -266,6 +300,7 @@ export function boot(): void {
   wireAll();
   themeToggle();
   scrolled();
+  distinctLandmarks();
   drawer();
   copy();
   toc();

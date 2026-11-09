@@ -29,6 +29,7 @@ export function CodeBlock({ code, label, wrap = false, copyable = true, classNam
   }
   return (
     <div
+      data-slot="code-block"
       ref={ref}
       className={cn("relative min-w-0 max-w-full rounded-lg bg-code-bg shadow-tray", className)}
       {...props}
