@@ -13,7 +13,8 @@ const dataConst = `const requests = [12, 18, 15, 22, 28, 24, 31, 27, 35, 40, 36,
 export const examples: Example[] = [
   {
     title: "Default",
-    description: "A trend with no axes and a dot on now. Hover for the value of the nearest point; formatPoint adds its time as a title.",
+    description:
+      "A trend with no axes and a dot on now. Hover for the value of the nearest point; formatPoint adds its time as a title.",
     render: () => (
       <div className="w-56">
         <Sparkline aria-label="Requests, last 24 hours" data={requests} formatPoint={hour} />
