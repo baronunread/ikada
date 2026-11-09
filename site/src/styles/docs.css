@@ -935,10 +935,14 @@
     opacity: 0;
   }
   .cfit[data-fit="width"] {
-    top: 0;
+    top: var(--y, 16px);
     width: 880px;
     transform: translate(-50%, 0) scale(var(--s, 1));
     transform-origin: top center;
+  }
+  /* the server-rendered chart is unmeasured: its y-axis labels land outside the plot, so thumbnails drop them */
+  .cfit [data-ts-key^="y-tick-label"] {
+    display: none;
   }
   .cgrid.is-blocks .cthumb::after {
     content: "";

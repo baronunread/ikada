@@ -130,12 +130,14 @@ export const preview: Preview = () => (
 
 /** The overview card: the dialog statically open, built from its classes (the real one is portaled). */
 export const thumb: Preview = () => (
-  <div className="w-72 rounded-xl bg-raised p-5 text-fg shadow-dialog">
+  <div className="w-60 rounded-xl bg-raised p-4 text-fg shadow-dialog">
     <p className="text-sb-lg font-bold">Delete project?</p>
-    <p className="mt-2 text-sb-base text-fg-muted">This cannot be undone.</p>
-    <div className="mt-5 flex justify-end gap-2">
-      <Button>Cancel</Button>
-      <Button variant="danger">Delete</Button>
+    <p className="mt-1.5 text-sb-base text-fg-muted">This cannot be undone.</p>
+    <div className="mt-4 flex justify-end gap-2">
+      <Button size="sm">Cancel</Button>
+      <Button size="sm" variant="danger">
+        Delete
+      </Button>
     </div>
   </div>
 );

@@ -39,16 +39,26 @@ const { cards, kind } = Astro.props;
 <script>
   // Scale each inert preview to fit its box (a transform, never zoom). Components are contained and
   // centred; blocks fill the width and show their top.
+  // Components share one scale (never above BASE) and only shrink to keep PAD of air on every side,
+  // down to FLOOR (narrow 2-column cards go lower); blocks fill the width. Anything under FLOOR needs a narrower `thumb` export.
+  const BASE = 0.8;
+  const PAD = 16;
+  const FLOOR = 0.6;
   const fit = (el: HTMLElement) => {
     const box = el.parentElement as HTMLElement;
     el.style.setProperty("--s", "1");
     const w = el.offsetWidth;
     const h = el.offsetHeight;
     if (!w || !h) return;
-    const bw = box.clientWidth - (el.dataset.fit === "width" ? 0 : 56);
-    const bh = box.clientHeight - (el.dataset.fit === "width" ? 0 : 40);
-    const s = el.dataset.fit === "width" ? Math.min(1, bw / w) : Math.min(1, bw / w, bh / h);
+    let s: number;
+    if (el.dataset.fit === "width") s = Math.min(1, (box.clientWidth - 2 * PAD) / w);
+    else s = Math.max(Math.min(BASE, (box.clientWidth - 2 * PAD) / w, (box.clientHeight - 2 * PAD) / h), 0);
     el.style.setProperty("--s", s.toFixed(4));
+    // a short block sits in the middle of the box instead of hugging the top
+    const free = box.clientHeight - 2 * PAD - h * s;
+    el.style.setProperty("--y", el.dataset.fit === "width" ? `${PAD + Math.max(0, free / 2)}px` : "0px");
+    el.dataset.low = el.dataset.fit !== "width" && s < FLOOR ? "" : "x";
+    if (el.dataset.low === "x") delete el.dataset.low;
     el.dataset.ready = "";
   };
   const all = [...document.querySelectorAll<HTMLElement>(".cfit")];
