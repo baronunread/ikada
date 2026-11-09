@@ -37,6 +37,7 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
   return (
     <BaseDialog.Portal container={container}>
       <BaseDialog.Backdrop
+        data-slot="dialog-overlay"
         {...instantAttr(instant)}
         className={cn(
           "fixed inset-0 z-(--sb-z-overlay) bg-scrim",
@@ -46,6 +47,7 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
       />
       <BaseDialog.Viewport className="fixed inset-0 z-(--sb-z-modal) grid place-items-center overflow-y-auto p-4">
         <BaseDialog.Popup
+          data-slot="dialog-content"
           ref={ref}
           {...instantAttr(instant)}
           className={cn(
@@ -81,15 +83,29 @@ export function DialogContent({ className, hideClose = false, children, ref, ...
 
 /** The dialog heading, wired to aria-labelledby. */
 export function DialogTitle({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Title>>) {
-  return <BaseDialog.Title className={cn("pe-8 text-sb-lg font-bold", className)} {...props} />;
+  return (
+    <BaseDialog.Title data-slot="dialog-title" className={cn("pe-8 text-sb-lg font-bold", className)} {...props} />
+  );
 }
 
 /** Supporting text under the title, wired to aria-describedby. */
 export function DialogDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseDialog.Description>>) {
-  return <BaseDialog.Description className={cn("mt-2 text-sb-base text-fg-muted", className)} {...props} />;
+  return (
+    <BaseDialog.Description
+      data-slot="dialog-description"
+      className={cn("mt-2 text-sb-base text-fg-muted", className)}
+      {...props}
+    />
+  );
 }
 
 /** Right-aligned row of actions; stacks on small screens. */
 export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+      {...props}
+    />
+  );
 }

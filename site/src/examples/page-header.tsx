@@ -18,6 +18,7 @@ export const examples: Example[] = [
     description: "The title is the page's only h1. Actions sit on the right and wrap under it on narrow screens.",
     render: () => (
       <PageHeader
+        headingLevel="h3"
         title="robin"
         description="robin.sproutboat.app"
         actions={
@@ -30,6 +31,7 @@ export const examples: Example[] = [
       />
     ),
     code: `<PageHeader
+        headingLevel="h3"
   title="robin"
   description="robin.sproutboat.app"
   actions={
@@ -44,6 +46,7 @@ export const examples: Example[] = [
     title: "Breadcrumbs and status",
     render: () => (
       <PageHeader
+        headingLevel="h3"
         breadcrumbs={<Breadcrumbs items={trail} />}
         title="wren"
         status={<StatusDot status="success" live label="Live" />}
@@ -52,6 +55,7 @@ export const examples: Example[] = [
       />
     ),
     code: `<PageHeader
+        headingLevel="h3"
   breadcrumbs={
     <Breadcrumbs
       items={[
@@ -71,6 +75,7 @@ export const examples: Example[] = [
     description: "PageTabs sit on the header's bottom rule; the current tab carries the underline.",
     render: () => (
       <PageHeader
+        headingLevel="h3"
         title="finch"
         status={<Badge tone="info">Building</Badge>}
         description="finch.sproutboat.app"
@@ -89,6 +94,7 @@ export const examples: Example[] = [
       />
     ),
     code: `<PageHeader
+        headingLevel="h3"
   title="finch"
   status={<Badge tone="info">Building</Badge>}
   description="finch.sproutboat.app"
@@ -121,6 +127,7 @@ export const playground: Playground = {
   initial: { title: "heron", description: "heron.sproutboat.app", status: true, actions: true },
   render: (v) => (
     <PageHeader
+      headingLevel="h3"
       title={String(v.title)}
       description={v.description ? String(v.description) : undefined}
       breadcrumbs={v.breadcrumbs ? <Breadcrumbs items={trail} /> : undefined}

@@ -13,8 +13,13 @@ export const examples: Example[] = [
         <Switch label="Disabled" disabled />
         {/* The forced ring belongs on the track, so the label sits outside the component. */}
         <span className="inline-flex items-center gap-2.5 text-sb-base text-fg">
-          <Switch id="switch-example-focused" className={forcedFocus} defaultChecked />
-          <label htmlFor="switch-example-focused">Focused</label>
+          <Switch
+            id="switch-example-focused"
+            aria-labelledby="switch-example-focused-label"
+            className={forcedFocus}
+            defaultChecked
+          />
+          <span id="switch-example-focused-label">Focused</span>
         </span>
       </div>
     ),

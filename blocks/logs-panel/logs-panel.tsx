@@ -9,7 +9,7 @@ import { SegmentedControl } from "../../src/components/segmented-control";
 import { StatusDot } from "../../src/components/status-dot";
 import { StatusGlyph } from "../../src/components/status-glyph";
 import type { Status } from "../../src/components/status";
-import { cn, focusRing, pressMotion } from "../../src/lib/cn";
+import { cn, focusRing, focusRingInset, pressMotion } from "../../src/lib/cn";
 import { SearchIcon } from "../../src/lib/icons";
 
 export type LogLevel = "info" | "warn" | "error";
@@ -352,7 +352,14 @@ export function LogsPanel({
       </div>
 
       <div
-        className="h-[26rem] overflow-y-auto border-t border-hairline font-mono text-[13px] leading-5"
+        // A scroller must be reachable by keyboard so the log can be read without a mouse.
+        tabIndex={0}
+        role="region"
+        aria-label="Log lines"
+        className={cn(
+          "h-[26rem] overflow-y-auto border-t border-hairline font-mono text-[13px] leading-5",
+          focusRingInset,
+        )}
         onPointerEnter={(event) => event.pointerType === "mouse" && setHovering(true)}
         onPointerLeave={() => setHovering(false)}
       >

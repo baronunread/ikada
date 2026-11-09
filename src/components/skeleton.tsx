@@ -22,5 +22,13 @@ export interface SkeletonProps extends Omit<ComponentProps<"span">, "children">,
 
 /** Decorative placeholder (a fade, so it stays under reduced motion). Give the loading region `aria-busy`. */
 export function Skeleton({ kind, className, ref, ...props }: SkeletonProps) {
-  return <span ref={ref} aria-hidden="true" className={skeletonStyles({ kind, className })} {...props} />;
+  return (
+    <span
+      data-slot="skeleton"
+      ref={ref}
+      aria-hidden="true"
+      className={skeletonStyles({ kind, className })}
+      {...props}
+    />
+  );
 }

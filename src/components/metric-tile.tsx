@@ -71,6 +71,7 @@ export function MetricTile({
   const Arrow = delta?.direction === "up" ? ArrowUpIcon : ArrowDownIcon;
   return (
     <div
+      data-slot="metric-tile"
       ref={ref}
       role="group"
       aria-label={label}

@@ -66,7 +66,13 @@ export function Breadcrumbs({ items, maxItems = 4, className, ref, ...props }: B
   const shown: (BreadcrumbItem | "more")[] = collapse ? [...items.slice(0, 1), "more", ...tail] : [...items];
 
   return (
-    <nav ref={ref} aria-label="Breadcrumb" className={cn("min-w-0 text-sb-base", className)} {...props}>
+    <nav
+      data-slot="breadcrumbs"
+      ref={ref}
+      aria-label="Breadcrumb"
+      className={cn("min-w-0 text-sb-base", className)}
+      {...props}
+    >
       <ol className="flex min-w-0 items-center gap-1">
         {shown.map((entry, i) => {
           const last = i === shown.length - 1;

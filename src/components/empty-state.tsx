@@ -27,6 +27,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
+      data-slot="empty-state"
       ref={ref}
       className={cn("mx-auto flex max-w-sm flex-col items-center gap-3 px-4 py-8 text-center", className)}
       {...props}

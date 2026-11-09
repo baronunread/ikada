@@ -69,6 +69,27 @@ jobs:
             test -s "site/dist/ikada/$f" || { echo "missing $f" >&2; exit 1; }
           done
 
+  # axe-core on every docs page (so on every example), light and dark. Any violation fails.
+  axe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - run: bun install --frozen-lockfile
+      - run: bun install --frozen-lockfile
+        working-directory: site
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run site:build
+      - name: axe on every page
+        working-directory: site
+        run: |
+          PORT=4413 bun scripts/preview.ts &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4413/ikada/sitemap.xml >/dev/null && break; sleep 1; done
+          bun scripts/axe.ts
+
   # Every registry item installed into a stock shadcn project (with its own button, input, dialog,
   # sidebar... and lib/utils.ts): the stock files must survive byte for byte, everything lands in
   # components/ikada, and tsc and the build pass. `shadcn build` validates the registry first.

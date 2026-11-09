@@ -35,8 +35,12 @@ export function Checkbox({
   const [bob, setBob] = useState(false);
   const box = (
     <BaseCheckbox.Root
+      data-slot="checkbox"
       ref={ref}
       id={controlId}
+      // A <label> does not name a role="checkbox" span, so name it by reference.
+      aria-labelledby={label ? `${controlId}-label` : undefined}
+      aria-describedby={label && description ? `${controlId}-description` : undefined}
       aria-invalid={invalid || undefined}
       data-sb-bob={bob ? "" : undefined}
       onCheckedChange={(checked, details) => {
@@ -81,8 +85,12 @@ export function Checkbox({
     <label htmlFor={controlId} className={cn("inline-flex items-start gap-2.5 text-sb-base text-fg", className)}>
       {box}
       <span className="flex flex-col">
-        <span>{label}</span>
-        {description ? <span className="text-sb-sm text-fg-muted">{description}</span> : null}
+        <span id={`${controlId}-label`}>{label}</span>
+        {description ? (
+          <span id={`${controlId}-description`} className="text-sb-sm text-fg-muted">
+            {description}
+          </span>
+        ) : null}
       </span>
     </label>
   );

@@ -35,6 +35,7 @@ export function CopyId({ value, display, label = "Copy ID", onCopied, className,
 
   return (
     <span
+      data-slot="copy-id"
       ref={ref}
       className={cn(
         "inline-flex h-8 min-w-0 max-w-full items-center gap-1 rounded-md bg-well ps-2.5 pe-1 shadow-field",

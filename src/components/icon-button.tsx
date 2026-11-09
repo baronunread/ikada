@@ -34,7 +34,14 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const button = (
-    <Button aria-label={label} variant={variant} size={size} className={iconSize({ size, className })} {...props}>
+    <Button
+      data-slot="icon-button"
+      aria-label={label}
+      variant={variant}
+      size={size}
+      className={iconSize({ size, className })}
+      {...props}
+    >
       {children}
     </Button>
   );

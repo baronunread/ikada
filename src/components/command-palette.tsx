@@ -110,6 +110,7 @@ export function CommandPalette({
           )}
         >
           <BaseDialog.Popup
+            data-slot="command-palette-content"
             aria-label={label}
             initialFocus={() => {
               const active = document.activeElement;

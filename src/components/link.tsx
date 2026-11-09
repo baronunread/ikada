@@ -20,6 +20,7 @@ export function Link({ external = false, className, children, ref, render, ...pr
     render,
     ref,
     props: {
+      "data-slot": "link",
       target: external ? "_blank" : undefined,
       rel: external ? "noopener noreferrer" : undefined,
       className: cn(

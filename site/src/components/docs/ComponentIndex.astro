@@ -9,9 +9,9 @@ const cells = components.map((c) => ({ name: c.name, title: c.title, file: sourc
 <ul class="cindex">
   {cells.map((c) => (
     <li>
-      <a href={href(`/components/${c.name}`)} aria-label={`${c.title}, ${c.file}, ${c.size} gzipped`}>
+      <a href={href(`/components/${c.name}`)}>
         <span>{c.title}</span>
-        <small aria-hidden="true"><span>{c.file}</span><span>{c.size}</span></small>
+        <small><span>{c.file}</span><span>{c.size}<span class="sr-only"> gzipped</span></span></small>
       </a>
     </li>
   ))}

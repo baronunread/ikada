@@ -90,6 +90,7 @@ export function SegmentedControl<T extends string = string>({
   const { ref, box, ready } = usePebble(value);
   return (
     <ToggleGroup
+      data-slot="segmented-control"
       ref={ref}
       aria-label={ariaLabel}
       value={[value]}

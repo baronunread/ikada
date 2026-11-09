@@ -84,7 +84,7 @@ export default function BlockPreview({ slug, defer = false }: { slug: string; de
   }, [on]);
   if (!on) return <div ref={box} aria-hidden="true" />;
   return (
-    <ToastProvider>
+    <ToastProvider label={`Notifications (${slug} demo)`}>
       <TooltipProvider>
         <Suspense fallback={<Loading />}>
           <div data-block-ready={slug}>

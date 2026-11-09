@@ -76,7 +76,6 @@ export function UsageLine({
   return (
     <a
       href={href}
-      aria-label="Usage today. Open the usage page"
       className={cn(
         "group @container block rounded-xl bg-surface px-4 py-3 text-sb-sm text-fg shadow-card",
         "transition-shadow duration-(--sb-duration-hover) ease-hover hover:shadow-float",
@@ -94,6 +93,7 @@ export function UsageLine({
         <span className="inline-flex items-center gap-1 text-fg-muted @max-3xl:basis-full @3xl:ms-auto">
           {note}
           <ChevronRightIcon className="transition-transform duration-(--sb-duration-hover) group-hover:translate-x-0.5" />
+          <span className="sr-only">. Open the usage page</span>
         </span>
       </span>
     </a>

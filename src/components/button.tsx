@@ -66,6 +66,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <BaseButton
+      data-slot="button"
       ref={ref}
       disabled={disabled || loading}
       focusableWhenDisabled={loading}

@@ -28,6 +28,7 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
+      data-slot="badge"
       ref={ref}
       data-tone={tone}
       className={cn(

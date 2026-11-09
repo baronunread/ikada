@@ -24,7 +24,7 @@ const { crumbs, title, lede, baseUi, size, source, registry, markdown } = Astro.
 const hasMeta = Boolean(baseUi || size || source || registry || markdown);
 ---
 
-<nav class="crumbs" aria-label="Breadcrumb">
+<nav class="crumbs" aria-label="Page path">
   <ol>
     {crumbs.map((c, i) => (
       <li>

@@ -20,8 +20,11 @@ export function Switch({ label, className, id, ref, ...props }: SwitchProps) {
   const controlId = id ?? autoId;
   const control = (
     <BaseSwitch.Root
+      data-slot="switch"
       ref={ref}
       id={controlId}
+      // A <label> does not name a role="switch" span, so name it by reference.
+      aria-labelledby={label ? `${controlId}-label` : undefined}
       className={cn(
         "group relative inline-flex h-6 w-10 shrink-0 items-center rounded-full bg-hover p-[3px]",
         "shadow-[inset_0_0_0_1.5px_var(--sb-control-edge),inset_0_1px_2px_oklch(0_0_0/0.1)]",
@@ -38,6 +41,7 @@ export function Switch({ label, className, id, ref, ...props }: SwitchProps) {
       {...props}
     >
       <BaseSwitch.Thumb
+        data-slot="switch-thumb"
         className={cn(
           "block size-[18px] rounded-full bg-fg-muted",
           "shadow-[0_0_0_0.5px_oklch(0_0_0/0.12),0_1px_2px_oklch(0_0_0/0.25),0_2px_4px_-1px_oklch(0_0_0/0.15)]",
@@ -55,7 +59,7 @@ export function Switch({ label, className, id, ref, ...props }: SwitchProps) {
   return (
     <label htmlFor={controlId} className={cn("inline-flex items-center gap-2.5 text-sb-base text-fg", className)}>
       {control}
-      <span>{label}</span>
+      <span id={`${controlId}-label`}>{label}</span>
     </label>
   );
 }

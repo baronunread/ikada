@@ -48,6 +48,7 @@ export function Select({
     <InstantProvider value={instant}>
       <BaseSelect.Root items={options} onOpenChange={handle} {...props}>
         <BaseSelect.Trigger
+          data-slot="select-trigger"
           ref={ref}
           id={id}
           aria-label={ariaLabel}
@@ -74,6 +75,7 @@ export function Select({
             className="z-(--sb-z-popover)"
           >
             <BaseSelect.Popup
+              data-slot="select-content"
               className={cn(
                 floatingSurface,
                 popupMotion,
@@ -84,6 +86,7 @@ export function Select({
               <BaseSelect.List>
                 {options.map((option) => (
                   <BaseSelect.Item
+                    data-slot="select-item"
                     key={option.value}
                     value={option.value}
                     disabled={option.disabled}

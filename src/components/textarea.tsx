@@ -17,6 +17,7 @@ export interface TextareaProps extends Omit<ComponentProps<"textarea">, "classNa
 export function Textarea({ invalid, mono, className, ref, ...props }: TextareaProps) {
   return (
     <BaseInput
+      data-slot="textarea"
       render={<textarea />}
       ref={ref as never}
       aria-invalid={invalid || undefined}

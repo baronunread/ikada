@@ -49,6 +49,7 @@ export function DropdownMenuContent({
     <Menu.Portal container={container}>
       <Menu.Positioner side={side} align={align} sideOffset={6} collisionPadding={8} className="z-(--sb-z-dropdown)">
         <Menu.Popup
+          data-slot="dropdown-menu-content"
           ref={ref}
           className={cn(
             floatingSurface,
@@ -79,7 +80,13 @@ export interface DropdownMenuItemProps extends Omit<ComponentProps<typeof Menu.I
 }
 
 export function DropdownMenuItem({ className, destructive = false, ...props }: DropdownMenuItemProps) {
-  return <Menu.Item className={cn(itemStyles, destructive && "text-danger-fg", className)} {...props} />;
+  return (
+    <Menu.Item
+      data-slot="dropdown-menu-item"
+      className={cn(itemStyles, destructive && "text-danger-fg", className)}
+      {...props}
+    />
+  );
 }
 
 export function DropdownMenuCheckboxItem({
@@ -88,7 +95,7 @@ export function DropdownMenuCheckboxItem({
   ...props
 }: WithClass<ComponentProps<typeof Menu.CheckboxItem>>) {
   return (
-    <Menu.CheckboxItem className={cn(itemStyles, className)} {...props}>
+    <Menu.CheckboxItem data-slot="dropdown-menu-checkbox-item" className={cn(itemStyles, className)} {...props}>
       <span aria-hidden="true" className="absolute start-2.5 grid size-4 place-items-center">
         <Menu.CheckboxItemIndicator
           className={cn(
@@ -111,7 +118,7 @@ export function DropdownMenuRadioItem({
   ...props
 }: WithClass<ComponentProps<typeof Menu.RadioItem>>) {
   return (
-    <Menu.RadioItem className={cn(itemStyles, className)} {...props}>
+    <Menu.RadioItem data-slot="dropdown-menu-radio-item" className={cn(itemStyles, className)} {...props}>
       <span aria-hidden="true" className="absolute start-2.5 grid size-4 place-items-center">
         <Menu.RadioItemIndicator
           className={cn(
@@ -131,6 +138,7 @@ export function DropdownMenuRadioItem({
 export function DropdownMenuLabel({ className, ...props }: WithClass<ComponentProps<typeof Menu.GroupLabel>>) {
   return (
     <Menu.GroupLabel
+      data-slot="dropdown-menu-label"
       className={cn("px-2.5 pt-1.5 pb-1 text-sb-xs font-semibold text-fg-muted", className)}
       {...props}
     />
@@ -138,5 +146,11 @@ export function DropdownMenuLabel({ className, ...props }: WithClass<ComponentPr
 }
 
 export function DropdownMenuSeparator({ className, ...props }: WithClass<ComponentProps<typeof Menu.Separator>>) {
-  return <Menu.Separator className={cn("mx-1.5 my-1 h-px bg-hairline-strong/70", className)} {...props} />;
+  return (
+    <Menu.Separator
+      data-slot="dropdown-menu-separator"
+      className={cn("mx-1.5 my-1 h-px bg-hairline-strong/70", className)}
+      {...props}
+    />
+  );
 }

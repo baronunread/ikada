@@ -52,7 +52,11 @@ export function InlineConfirm({
     </>
   );
   return (
-    <span className={cn("relative inline-flex items-center", appearance === "inline" && "gap-2", className)} {...props}>
+    <span
+      data-slot="inline-confirm"
+      className={cn("relative inline-flex items-center", appearance === "inline" && "gap-2", className)}
+      {...props}
+    >
       {children({ confirm, active })}
       {appearance === "bubble" ? (
         <span

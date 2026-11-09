@@ -1,4 +1,4 @@
-import { lazy, Suspense, useId, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Input } from "../../../src/components/input";
 import { SegmentedControl } from "../../../src/components/segmented-control";
@@ -167,7 +167,7 @@ function Stage({
   const titleId = useId();
   const Heading = top ? "h2" : "h3";
   return (
-    <section className="stage" aria-labelledby={titleId} id={id}>
+    <div className="stage" role="group" aria-labelledby={titleId} id={id}>
       <div className="stage-bar">
         <div className="ttl">
           <Heading
@@ -212,7 +212,7 @@ function Stage({
         </div>
         {aside}
       </div>
-    </section>
+    </div>
   );
 }
 

@@ -23,6 +23,7 @@ export interface InputProps extends Omit<ComponentProps<typeof BaseInput>, "clas
 export function Input({ invalid, mono, className, ref, ...props }: InputProps) {
   return (
     <BaseInput
+      data-slot="input"
       ref={ref}
       aria-invalid={invalid || undefined}
       className={cn(inputStyles, mono && "font-mono text-sb-sm", className)}

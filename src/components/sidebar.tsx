@@ -103,6 +103,7 @@ export function Sidebar({
 
   return (
     <aside
+      data-slot="sidebar"
       ref={ref}
       data-collapsed={collapsed || undefined}
       className={cn(
@@ -120,12 +121,20 @@ export function Sidebar({
 
 /** Top slot of the sidebar: the product mark or a project switcher. */
 export function SidebarHeader({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("mb-2 flex items-center gap-2 px-1 pt-1", className)} {...props} />;
+  return (
+    <div data-slot="sidebar-header" className={cn("mb-2 flex items-center gap-2 px-1 pt-1", className)} {...props} />
+  );
 }
 
 /** Bottom slot of the sidebar: account, theme or the rail toggle. */
 export function SidebarFooter({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("mt-auto flex flex-col gap-1 border-t border-hairline pt-3", className)} {...props} />;
+  return (
+    <div
+      data-slot="sidebar-footer"
+      className={cn("mt-auto flex flex-col gap-1 border-t border-hairline pt-3", className)}
+      {...props}
+    />
+  );
 }
 
 /** A flat list of links. Give each group a `label`; there is no nesting. */
@@ -136,7 +145,7 @@ export function SidebarNav({
   ...props
 }: ComponentProps<"nav"> & { label?: string }) {
   return (
-    <nav aria-label={label} className={className} {...props}>
+    <nav data-slot="sidebar-nav" aria-label={label} className={className} {...props}>
       <ul className="flex flex-col gap-0.5">{children}</ul>
     </nav>
   );
@@ -198,7 +207,7 @@ export function SidebarItem({
     },
   });
   return (
-    <li>
+    <li data-slot="sidebar-item">
       {rail ? (
         <Tooltip content={children} side="end">
           {link}
@@ -253,6 +262,7 @@ export function SidebarTrigger({
 }: ComponentProps<"button"> & { label?: string }) {
   return (
     <button
+      data-slot="sidebar-trigger"
       type="button"
       aria-label={label}
       aria-haspopup="dialog"

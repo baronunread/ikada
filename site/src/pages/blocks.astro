@@ -32,10 +32,10 @@ const markdown = pageMarkdown({
           <small>{b.description}</small>
         </h2>
         <div class="acts">
-          <button class="copy" type="button" data-copy={addCommands(b.name).npm} aria-label={`Copy the ${b.title} install command`}>
+          <button class="copy" type="button" data-copy={addCommands(b.name).npm} aria-label={`Copy command: install ${b.title}`}>
             <Icon name="copy" className="i i-copy" /><Icon name="check" className="i i-done" /><span class="lbl" aria-hidden="true">Copy command</span>
           </button>
-          <a class="copy" href={href(`/blocks/${b.name}`)} aria-label={`${b.title}: docs and code`}><span>Docs</span><Icon name="arrow" /></a>
+          <a class="copy" href={href(`/blocks/${b.name}`)} aria-label={`Docs and code for ${b.title}`}><span>Docs</span><Icon name="arrow" /></a>
         </div>
       </div>
       <div class="bview" data-demo>

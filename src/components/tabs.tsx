@@ -4,7 +4,7 @@ import { cn, focusRing, pebble, traySurface, type WithClass } from "../lib/cn";
 
 /** Switches between views of one subject in place. Compose with TabsList, TabsTab and TabsPanel. */
 export function Tabs({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Root>>) {
-  return <BaseTabs.Root className={cn("flex flex-col", className)} {...props} />;
+  return <BaseTabs.Root data-slot="tabs" className={cn("flex flex-col", className)} {...props} />;
 }
 
 /**
@@ -14,6 +14,7 @@ export function Tabs({ className, ...props }: WithClass<ComponentProps<typeof Ba
 export function TabsList({ className, children, ...props }: WithClass<ComponentProps<typeof BaseTabs.List>>) {
   return (
     <BaseTabs.List
+      data-slot="tabs-list"
       className={cn(
         "relative inline-flex max-w-full gap-0.5 self-start overflow-x-auto p-1 [scrollbar-width:none]",
         traySurface,
@@ -36,6 +37,7 @@ export function TabsList({ className, children, ...props }: WithClass<ComponentP
 export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Tab>>) {
   return (
     <BaseTabs.Tab
+      data-slot="tabs-tab"
       className={cn(
         "relative z-10 flex h-8 shrink-0 items-center whitespace-nowrap rounded-sm px-3 text-sb-base font-semibold text-fg-muted",
         "transition-colors duration-(--sb-duration-hover) ease-hover",
@@ -54,6 +56,7 @@ export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof
 export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
   return (
     <BaseTabs.Panel
+      data-slot="tabs-panel"
       className={cn(
         "pt-4 outline-hidden focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         className,

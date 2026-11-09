@@ -32,6 +32,7 @@ export function StatusDot({
 }: StatusDotProps) {
   return (
     <span
+      data-slot="status-dot"
       ref={ref}
       data-status={status}
       className={cn("inline-flex items-center gap-2 text-sb-base text-fg", className)}
