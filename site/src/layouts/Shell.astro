@@ -102,7 +102,7 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-(--sb-z-toast) focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
     <header class="nav" data-nav>
       <a class="brand" href={href("/")} aria-label="ikada home">
-        <span class="mark"><IkadaMark size={24} motion="interactive" /></span><span class="word">ikada</span>
+        <span class="mark"><IkadaMark size={26} motion="interactive" /></span><span class="word">ikada</span>
       </a>
       <nav class="links" aria-label="Main">
         {topNav.map((l) => <a href={l.href} aria-current={l.match(here) ? "page" : undefined}>{l.label}</a>)}
@@ -112,7 +112,7 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
         <Icon name="search" /> Search docs <kbd data-kbd>⌘K</kbd>
       </button>
       <div class="ctl">
-        <a class="ibtn" href={REPO_URL} aria-label="ikada on GitHub"><Icon name="github" /></a>
+        <a class="ibtn gh" href={REPO_URL} aria-label="ikada on GitHub"><Icon name="github" /></a>
         <button class="ibtn" type="button" data-theme-toggle aria-label="Switch to light theme">
           <svg class="i theme-sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1" /></svg>
           <svg class="i theme-moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z" /></svg>
