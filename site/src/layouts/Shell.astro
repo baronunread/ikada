@@ -35,10 +35,10 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
     <meta name="color-scheme" content="dark light" />
     <link rel="preload" href={figtreeUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
-    <link rel="icon" href={href("/favicon-light-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
-    <link rel="icon" href={href("/favicon-dark-32.png")} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />
-    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="icon" href={href("/favicon.svg?v=r2")} type="image/svg+xml" />
+    <link rel="icon" href={href("/favicon-light-32.png?v=r2")} type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={href("/favicon-dark-32.png?v=r2")} type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png?v=r2")} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <script is:inline>
       // Before first paint: the saved choice, else the system's. `dark` class on <html> (the standard) plus data-theme, which the site's own CSS and hero read.
