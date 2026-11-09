@@ -6,7 +6,7 @@ import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { tooltip } from "@tanstack/charts/tooltip";
 import { portal } from "@tanstack/charts/tooltip/portal";
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import { accessibleName } from "../lib/accessible-name";
@@ -37,9 +37,10 @@ export interface SparklineBase {
   className?: string;
 }
 
-/** Room kept around a point for the hover ring (radius 4 plus half its 2px stroke = 5px): at the sides, which also clears the tile's rounded corners, and above the lowest value. */
+/** Room kept around a point for the hover ring (radius 4 plus half its 2px stroke = 5px, plus 1px): above the lowest value, and at the sides, so the first and last points sit `SIDE` px inside the Sparkline's box. A MetricTile pads its slot by (16 - SIDE) px, so the line's ends line up with the tile's text. */
 const FLOOR = 7;
-const MARGIN = { top: 6, right: 8, bottom: 0, left: 8 } as const;
+const SIDE = 6;
+const MARGIN = { top: 6, right: SIDE, bottom: 0, left: SIDE } as const;
 
 const defaultValue = (value: number): string => formatNumber(value);
 
@@ -66,6 +67,7 @@ export function Sparkline({
   current = true,
   className,
 }: SparklineProps) {
+  const gradientId = `sb-spark-${useId().replaceAll(/[^a-zA-Z0-9_-]/g, "")}`;
   const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
   const definition = useMemo(() => {
     const rows: Row[] = data.map((v, i) => ({ i, v }));
@@ -83,7 +85,9 @@ export function Sparkline({
     if (yMax > yMin) yMin = yMax - (yMax - yMin) / (1 - Math.min(FLOOR / plotHeight, 0.5));
     return defineChart({
       marks: [
-        ...(area ? [areaY(rows, { x: "i", y: "v", y1: yMin, fill: stroke, fillOpacity: 0.1, id: "area" })] : []),
+        ...(area
+          ? [areaY(rows, { x: "i", y: "v", y1: yMin, fill: `url(#${gradientId})`, fillOpacity: 1, id: "area" })]
+          : []),
         lineY(rows, { x: "i", y: "v", stroke, strokeWidth: 1.75, id: "line" }),
         // No crosshair: its marker is clipped to the plot rectangle (cutting the ring on the first and last point) and its rule draws through the ring. At 28–64px the focus ring alone marks the point.
         ...(current && last
@@ -107,6 +111,20 @@ export function Sparkline({
         y: { scale: scaleLinear().domain([yMin, yMax]), axis: false },
       },
       guides: false,
+      // The fill fades out toward the bottom, so it has no hard edge at the foot; at the line ends it stops where the line does. Dropped in forced-colors mode (see theme.css).
+      gradients: [
+        {
+          id: gradientId,
+          x1: 0,
+          y1: 1,
+          x2: 0,
+          y2: 0,
+          stops: [
+            { offset: 0, color: stroke, opacity: 0 },
+            { offset: 1, color: stroke, opacity: 0.14 },
+          ],
+        },
+      ],
       // Room for the hover ring at the top and sides; the bottom is the tile edge (the floor is handled in the scale).
       margin: MARGIN,
       focus: "nearest-x",
@@ -133,7 +151,7 @@ export function Sparkline({
         },
       },
     });
-  }, [data, color, area, domain, label, ariaLabel, formatValue, formatPoint, current]);
+  }, [data, color, area, domain, gradientId, label, ariaLabel, formatValue, formatPoint, current]);
 
   return (
     <Chart

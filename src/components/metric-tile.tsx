@@ -30,7 +30,7 @@ export interface MetricTileProps extends Omit<ComponentProps<"div">, "children">
   delta?: MetricDelta;
   /** A line under the value: "14.8 req/s average". */
   hint?: ReactNode;
-  /** A `<Sparkline />` from `@sproutboat/ikada/charts`, flush to the tile's bottom edge. */
+  /** A `<Sparkline />` from `@sproutboat/ikada/charts`, flush to the tile's bottom edge, its line ending in line with the tile's text. */
   sparkline?: ReactNode;
   /** Draws a skeleton in place of the value. */
   loading?: boolean;
@@ -113,7 +113,7 @@ export function MetricTile({
       </div>
       {/* The slot exists only for tiles that have a sparkline, and keeps its height while loading or empty so the tile doesn't jump. */}
       {sparkline ? (
-        <div className="mt-2 flex h-11 flex-col justify-end">{loading || noData ? null : sparkline}</div>
+        <div className="mt-2 flex h-11 flex-col justify-end px-2.5">{loading || noData ? null : sparkline}</div>
       ) : (
         <div className="pb-3.5" />
       )}
