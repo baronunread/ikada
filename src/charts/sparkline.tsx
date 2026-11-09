@@ -38,6 +38,10 @@ export interface SparklineBase {
   className?: string;
 }
 
+/** Room kept around a point for the hover ring (radius 4 plus half its 2px stroke = 5px): at the sides, which also clears the tile's rounded corners, and above the lowest value. */
+const FLOOR = 7;
+const MARGIN = { top: 6, right: 8, bottom: 0, left: 8 } as const;
+
 const defaultValue = (value: number): string => formatNumber(value);
 
 interface Row {
@@ -71,18 +75,21 @@ export function Sparkline({
     const name = label ?? ariaLabel.split(",")[0]!.trim();
     const lo = data.length ? Math.min(...data) : 0;
     const hi = data.length ? Math.max(...data) : 1;
-    // Fit the data with air: 22% of the range below (the fill needs a floor) and 14% above (room for the stroke and the dot).
+    // Fit the data with air: 14% of the range above (room for the stroke and the dot). Below, the lowest value sits FLOOR px above the tile edge (see below), whatever the height.
     const span = hi - lo || Math.max(Math.abs(hi), 1) * 0.2;
-    const yMin = domain?.[0] ?? lo - span * 0.22;
+    let yMin = domain?.[0] ?? lo;
     const yMax = domain?.[1] ?? hi + span * 0.14;
+    // The hover ring on the lowest value would be cut by the tile's bottom edge and rounded corners. Lower the scale floor so that value sits FLOOR px up; the fill (y1 = the floor) still runs to the edge. Done in pixels, so it holds at 28px as at 64px, and for an explicit domain too.
+    const plotHeight = Math.max(1, height - MARGIN.top);
+    if (yMax > yMin) yMin = yMax - (yMax - yMin) / (1 - Math.min(FLOOR / plotHeight, 0.5));
     return defineChart({
       marks: [
-        ...(area ? [areaY(rows, { x: "i", y: "v", fill: stroke, fillOpacity: 0.1, id: "area" })] : []),
+        ...(area ? [areaY(rows, { x: "i", y: "v", y1: yMin, fill: stroke, fillOpacity: 0.1, id: "area" })] : []),
         lineY(rows, { x: "i", y: "v", stroke, strokeWidth: 1.75, id: "line" }),
+        // No crosshair marker: the library clips it to the plot rectangle, which cut the ring in half on the first and last point. The built-in focus ring (below) is not clipped.
         crosshair({
           x: { stroke, strokeOpacity: 0.4, strokeWidth: 1, strokeDasharray: "2 3" },
           y: false,
-          marker: { radius: 4, fill: "var(--sb-surface)", stroke, strokeWidth: 2 },
         }),
         ...(current && last
           ? [
@@ -105,10 +112,11 @@ export function Sparkline({
         y: { scale: scaleLinear().domain([yMin, yMax]), axis: false },
       },
       guides: false,
-      // Flush left so the fill starts at the tile edge; room on the right for the dot; the bottom is the tile edge.
-      margin: { top: 6, right: 8, bottom: 0, left: 0 },
+      // Room for the hover ring at the top and sides; the bottom is the tile edge (the floor is handled in the scale).
+      margin: MARGIN,
       focus: "nearest-x",
-      focusRing: false,
+      // Drawn after every mark, so it sits over the "now" dot instead of beside it; the fill is opaque and wider than the dot.
+      focusRing: { radius: 4, fill: "var(--sb-surface)", stroke, strokeWidth: 2 },
       maxFocusDistance: Number.POSITIVE_INFINITY,
       tooltip: {
         use: tooltip,
