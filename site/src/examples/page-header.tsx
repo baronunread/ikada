@@ -49,7 +49,7 @@ export const examples: Example[] = [
         headingLevel="h3"
         breadcrumbs={<Breadcrumbs items={trail} />}
         title="wren"
-        status={<StatusDot status="success" live label="Live" />}
+        status={<StatusDot tone="success" live label="Live" />}
         description="eu-west · main · 3 minutes ago"
         className="w-full"
       />
@@ -66,7 +66,7 @@ export const examples: Example[] = [
     />
   }
   title="wren"
-  status={<StatusDot status="success" live label="Live" />}
+  status={<StatusDot tone="success" live label="Live" />}
   description="eu-west · main · 3 minutes ago"
 />`,
   },
@@ -131,7 +131,7 @@ export const playground: Playground = {
       title={String(v.title)}
       description={v.description ? String(v.description) : undefined}
       breadcrumbs={v.breadcrumbs ? <Breadcrumbs items={trail} /> : undefined}
-      status={v.status ? <StatusDot status="success" live label="Live" /> : undefined}
+      status={v.status ? <StatusDot tone="success" live label="Live" /> : undefined}
       actions={v.actions ? <Button variant="primary">Deploy</Button> : undefined}
       tabs={
         v.tabs ? (
@@ -152,7 +152,7 @@ export const playground: Playground = {
         ? `  breadcrumbs={<Breadcrumbs items={[{ label: "Sproutboat", href: "/" }, { label: "heron" }]} />}`
         : "",
       `  title="${v.title}"`,
-      v.status ? `  status={<StatusDot status="success" live label="Live" />}` : "",
+      v.status ? `  status={<StatusDot tone="success" live label="Live" />}` : "",
       v.description ? `  description="${v.description}"` : "",
       v.actions ? `  actions={<Button variant="primary">Deploy</Button>}` : "",
       v.tabs

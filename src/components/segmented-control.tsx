@@ -10,6 +10,8 @@ export interface SegmentedOption<T extends string = string> {
   value: T;
   label: ReactNode;
   /** Plain text name when `label` is only an icon. */
+  "aria-label"?: string;
+  /** @deprecated Use `aria-label`; removed in 0.3.0. */
   ariaLabel?: string;
   disabled?: boolean;
 }
@@ -120,7 +122,7 @@ export function SegmentedControl<T extends string = string>({
           key={option.value}
           value={option.value}
           disabled={option.disabled}
-          aria-label={option.ariaLabel}
+          aria-label={option["aria-label"] ?? option.ariaLabel}
           className={cn(
             "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-semibold text-fg-muted",
             "transition-[background-color,color,box-shadow] duration-(--sb-duration-hover) ease-hover hover:text-fg",

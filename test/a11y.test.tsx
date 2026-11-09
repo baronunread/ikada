@@ -84,7 +84,7 @@ describe("axe: no violations", () => {
             />
           }
           title="field-notes"
-          status={<StatusDot status="success" label="Live" />}
+          status={<StatusDot tone="success" label="Live" />}
           actions={<Button>Deploy</Button>}
           tabs={
             <PageTabs>

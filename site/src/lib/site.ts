@@ -26,6 +26,7 @@ export interface NavGroup {
 export const guides: NavLink[] = [
   { href: href("/docs"), label: "Overview" },
   { href: href("/installation"), label: "Installation" },
+  { href: href("/tailwind"), label: "Tailwind v4 setup" },
   { href: href("/theming"), label: "Theming and tokens" },
   { href: href("/motion"), label: "Motion", badge: "Afloat" },
   { href: href("/changelog"), label: "Changelog" },

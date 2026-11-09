@@ -199,7 +199,7 @@ function Line({ line }: { line: LogLine }) {
         <span
           className={cn("inline-flex items-center gap-1.5 text-sb-xs font-semibold uppercase", levelText[line.level])}
         >
-          <StatusGlyph status={levelStatus[line.level]} />
+          <StatusGlyph tone={levelStatus[line.level]} />
           {line.level}
         </span>
         <span className="text-fg-muted">{line.source}</span>
@@ -395,7 +395,7 @@ export function LogsPanel({
       </div>
 
       <p className="flex min-h-11 items-center border-t border-hairline px-4 py-2.5 text-sb-sm text-fg-muted">
-        <StatusDot status={held ? "neutral" : "success"} live={!held} label={statusLabel} />
+        <StatusDot tone={held ? "neutral" : "success"} live={!held} label={statusLabel} />
       </p>
     </section>
   );

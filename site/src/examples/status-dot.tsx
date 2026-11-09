@@ -9,42 +9,42 @@ export const examples: Example[] = [
     description: "Each status has its own shape, so colour is never the only signal.",
     render: () => (
       <div className="flex flex-col gap-2">
-        <StatusDot status="success" label="Ready" />
-        <StatusDot status="warning" label="DNS pending" />
-        <StatusDot status="danger" label="Build failed" />
-        <StatusDot status="info" label="Building" />
-        <StatusDot status="neutral" label="Paused" />
+        <StatusDot tone="success" label="Ready" />
+        <StatusDot tone="warning" label="DNS pending" />
+        <StatusDot tone="danger" label="Build failed" />
+        <StatusDot tone="info" label="Building" />
+        <StatusDot tone="neutral" label="Paused" />
       </div>
     ),
-    code: `<StatusDot status="success" label="Ready" />
-<StatusDot status="warning" label="DNS pending" />
-<StatusDot status="danger" label="Build failed" />
-<StatusDot status="info" label="Building" />
-<StatusDot status="neutral" label="Paused" />`,
+    code: `<StatusDot tone="success" label="Ready" />
+<StatusDot tone="warning" label="DNS pending" />
+<StatusDot tone="danger" label="Build failed" />
+<StatusDot tone="info" label="Building" />
+<StatusDot tone="neutral" label="Paused" />`,
   },
   {
     title: "Live",
     description: "Success that is serving traffic gets its own bullseye, apart from the plain Ready circle.",
-    render: () => <StatusDot status="success" live label="Live 90%" />,
-    code: `<StatusDot status="success" live label="Live 90%" />`,
+    render: () => <StatusDot tone="success" live label="Live 90%" />,
+    code: `<StatusDot tone="success" live label="Live 90%" />`,
   },
   {
     title: "Pulse",
     description: "For in-progress states. The ring stops spinning when motion is reduced.",
-    render: () => <StatusDot status="info" pulse label="Building" />,
-    code: `<StatusDot status="info" pulse label="Building" />`,
+    render: () => <StatusDot tone="info" pulse label="Building" />,
+    code: `<StatusDot tone="info" pulse label="Building" />`,
   },
   {
     title: "Sprout",
     description: "Success that just happened: the shape grows up and sends one ring out.",
-    render: () => <StatusDot status="success" sprout label="Deployed" />,
-    code: `<StatusDot status="success" sprout label="Deployed" />`,
+    render: () => <StatusDot tone="success" sprout label="Deployed" />,
+    code: `<StatusDot tone="success" sprout label="Deployed" />`,
   },
   {
     title: "Hidden label",
     description: "Dense tables keep the label for screen readers and show only the shape.",
-    render: () => <StatusDot status="danger" hideLabel label="Build failed" />,
-    code: `<StatusDot status="danger" hideLabel label="Build failed" />`,
+    render: () => <StatusDot tone="danger" hideLabel label="Build failed" />,
+    code: `<StatusDot tone="danger" hideLabel label="Build failed" />`,
   },
 ];
 
@@ -64,7 +64,7 @@ export const playground: Playground = {
     <StatusDot
       // sprout plays on mount, so a change remounts it.
       key={`${v.sprout}`}
-      status={v.status as (typeof statuses)[number]}
+      tone={v.status as (typeof statuses)[number]}
       label={String(v.label)}
       live={Boolean(v.live)}
       pulse={Boolean(v.pulse)}
@@ -77,8 +77,8 @@ export const playground: Playground = {
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
   <div className="flex flex-col gap-1.5">
-    <StatusDot status="success" label="Live" />
-    <StatusDot status="warning" label="DNS pending" />
-    <StatusDot status="danger" label="Build failed" />
+    <StatusDot tone="success" label="Live" />
+    <StatusDot tone="warning" label="DNS pending" />
+    <StatusDot tone="danger" label="Build failed" />
   </div>
 );

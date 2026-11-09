@@ -20,7 +20,7 @@ export const examples: Example[] = [
     render: () => (
       <div className="w-full">
         <TimeseriesChart
-          ariaLabel="Requests, last 48 hours"
+          aria-label="Requests, last 48 hours"
           series={[{ id: "req", label: "Requests", data }]}
           deploy={{ time: start + 30 * 3_600_000, label: "Deploy" }}
           height={220}
@@ -30,7 +30,7 @@ export const examples: Example[] = [
     code: `${dataConst}
 
 <TimeseriesChart
-  ariaLabel="Requests, last 48 hours"
+  aria-label="Requests, last 48 hours"
   series={[{ id: "req", label: "Requests", data }]}
   deploy={{ time: start + 30 * 3_600_000, label: "Deploy" }}
   height={220}
@@ -42,7 +42,7 @@ export const examples: Example[] = [
     render: () => (
       <div className="w-full">
         <TimeseriesChart
-          ariaLabel="Requests and errors, last 48 hours"
+          aria-label="Requests and errors, last 48 hours"
           series={[
             { id: "req", label: "Requests", data, area: true },
             {
@@ -60,7 +60,7 @@ export const examples: Example[] = [
     code: `${dataConst}
 
 <TimeseriesChart
-  ariaLabel="Requests and errors, last 48 hours"
+  aria-label="Requests and errors, last 48 hours"
   series={[
     { id: "req", label: "Requests", data, area: true },
     {
@@ -78,10 +78,10 @@ export const examples: Example[] = [
     title: "No data",
     render: () => (
       <div className="w-full">
-        <TimeseriesChart ariaLabel="Requests, last hour" series={[]} height={160} />
+        <TimeseriesChart aria-label="Requests, last hour" series={[]} height={160} />
       </div>
     ),
-    code: `<TimeseriesChart ariaLabel="Requests, last hour" series={[]} height={160} />`,
+    code: `<TimeseriesChart aria-label="Requests, last hour" series={[]} height={160} />`,
   },
 ];
 
@@ -101,7 +101,7 @@ export const playground: Playground = {
   render: (v) => (
     <div className="w-full">
       <TimeseriesChart
-        ariaLabel="Requests, last 48 hours"
+        aria-label="Requests, last 48 hours"
         series={[
           {
             id: "req",
@@ -138,7 +138,7 @@ export const playground: Playground = {
 export const preview: Preview = () => (
   <div className="w-60">
     <TimeseriesChart
-      ariaLabel="Requests, last 48 hours"
+      aria-label="Requests, last 48 hours"
       series={[{ id: "req", label: "Requests", data }]}
       deploy={{ time: start + 30 * 3_600_000, label: "Deploy" }}
       height={110}

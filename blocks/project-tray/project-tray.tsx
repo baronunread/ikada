@@ -184,7 +184,7 @@ function SproutCard({ sprout, href }: { sprout: Sprout; href: string }) {
       </span>
       <span className="flex min-w-0 border-t border-hairline pt-2.5">
         <StatusDot
-          status={l.status}
+          tone={l.status}
           live={l.live}
           pulse={l.pulse}
           label={stateLine(sprout)}

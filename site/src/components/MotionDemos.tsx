@@ -90,7 +90,7 @@ export default function MotionDemos() {
           values="sprout 480ms · ring 700ms"
         >
           <div className="flex items-center gap-4">
-            <StatusGlyph key={sprout} status="success" sprout />
+            <StatusGlyph key={sprout} tone="success" sprout />
             <Button size="sm" onClick={() => setSprout((n) => n + 1)}>
               Replay
             </Button>

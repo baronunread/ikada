@@ -1,0 +1,98 @@
+---
+import PageHead from "../components/docs/PageHead.astro";
+import Pager from "../components/docs/Pager.astro";
+import Snippet from "../components/docs/Snippet.astro";
+import Docs from "../layouts/Docs.astro";
+import { fence, href, pageMarkdown } from "../lib/site";
+
+const lede = "How ikada fits a Tailwind CSS v4 project: one import for tokens and component classes, dark mode as a class, and what ikada never touches.";
+const importCss = `/* app.css */\n@import "tailwindcss";\n@import "@sproutboat/ikada/theme.css";`;
+const sourceCss = `/* Only needed to scan other packages or your own folders that Tailwind skips */\n@source "../node_modules/some-ui-kit/dist";`;
+const darkHtml = `<html lang="en" class="dark">`;
+const nextThemes = `<ThemeProvider attribute="class" defaultTheme="system" enableSystem>\n  {children}\n</ThemeProvider>`;
+const scale = `/* ikada's sizes are text-sb-*; your text-sm is still Tailwind's */\n<p className="text-sb-base">Body</p>\n<h2 className="text-sb-lg">Title</h2>`;
+const vite = `// vite.config.ts\nimport tailwindcss from "@tailwindcss/vite";\nexport default defineConfig({ plugins: [tailwindcss()] });`;
+const next = `// postcss.config.mjs\nexport default { plugins: { "@tailwindcss/postcss": {} } };`;
+const toc = [
+  { id: "import", label: "One import" },
+  { id: "source", label: "How classes are found" },
+  { id: "dark", label: "Dark mode" },
+  { id: "scale", label: "The type scale" },
+  { id: "registry", label: "With the shadcn registry" },
+  { id: "bundlers", label: "Vite and Next.js" },
+];
+const markdown = pageMarkdown({
+  title: "Tailwind v4 setup",
+  description: lede,
+  url: href("/tailwind"),
+  body: [
+    "## One import",
+    fence(importCss, "css"),
+    "`theme.css` carries the tokens (`@theme`), the light and dark variables and an `@source` for the compiled components, so no other line is needed.",
+    "## How classes are found",
+    "Tailwind skips `node_modules` by default. ikada's `theme.css` contains `@source \"./**/*.js\"` relative to itself, so it scans the compiled package. Add your own `@source` only for other packages.",
+    fence(sourceCss, "css"),
+    "## Dark mode",
+    "Light is the default. Dark is a `dark` class on `<html>` (shadcn and next-themes `attribute=\"class\"`). The `dark:` variant follows the class. `data-theme=\"dark|light\"` still works for one release and is removed in 0.3.0.",
+    fence(darkHtml, "html"),
+    fence(nextThemes, "tsx"),
+    "## The type scale",
+    "Components use `text-sb-xs` to `text-sb-metric`, so a host's own `text-sm` keeps Tailwind's size. The npm `theme.css` also keeps the plain `--text-*` sizes for 0.1.x apps (deprecated); the registry theme defines only `--text-sb-*`.",
+    fence(scale, "tsx"),
+    "## With the shadcn registry",
+    "`npx shadcn@latest add @ikada/theme` merges the same tokens into your CSS. Components install to `components/ikada/`, never over your own shadcn files.",
+    "## Vite and Next.js",
+    fence(vite, "ts"),
+    fence(next, "js"),
+  ],
+});
+---
+
+<Docs title="Tailwind v4 setup" description={lede} toc={toc}>
+  <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Tailwind v4 setup" }]} title="Tailwind v4 setup" lede={lede} markdown={markdown} />
+
+  <h2 id="import">One import</h2>
+  <p>
+    ikada is built for Tailwind CSS v4 (<code>tailwindcss ^4.3</code>). <code>theme.css</code> carries the tokens as <code>@theme</code>,
+    the light and dark variables, and an <code>@source</code> for the compiled components, so nothing else is needed.
+  </p>
+  <Snippet code={importCss} label="app.css" />
+
+  <h2 id="source">How classes are found</h2>
+  <p>
+    Tailwind does not scan <code>node_modules</code> unless told to. <code>theme.css</code> contains <code>@source "./**/*.js"</code>, which is relative to the
+    file itself, so Tailwind reads the compiled components and generates exactly the utilities they use. Add your own <code>@source</code> only for
+    other packages. A component you copied with the registry lives in your project and is scanned like the rest of your code.
+  </p>
+  <Snippet code={sourceCss} label="app.css" />
+
+  <h2 id="dark">Dark mode</h2>
+  <p>
+    Light is the default. Dark is a <code>dark</code> class on <code>&lt;html&gt;</code>, the shadcn and next-themes convention, and the <code>dark:</code> variant follows it.
+    <code>data-theme="dark|light"</code> still works as a deprecated alias in 0.2 and goes in 0.3.0.
+  </p>
+  <Snippet code={darkHtml} label="html" />
+  <Snippet code={nextThemes} label="next-themes" />
+
+  <h2 id="scale">The type scale</h2>
+  <p>
+    ikada's sizes are <code>text-sb-xs</code> to <code>text-sb-metric</code>, so installing ikada never changes what your own <code>text-sm</code> means. The npm
+    <code>theme.css</code> also keeps the plain <code>--text-*</code> sizes for 0.1.x apps (deprecated, removed in 0.3.0); the registry theme defines only the
+    scoped ones.
+  </p>
+  <Snippet code={scale} label="tsx" />
+
+  <h2 id="registry">With the shadcn registry</h2>
+  <p>
+    <code>npx shadcn@latest add @ikada/theme</code> merges the same tokens into your CSS. Components install to <code>components/ikada/</code>, and the
+    theme's variables are all prefixed <code>--sb-</code>, so they sit next to shadcn's <code>--background</code> and friends without touching them.
+  </p>
+
+  <h2 id="bundlers">Vite and Next.js</h2>
+  <Snippet code={vite} label="vite.config.ts" />
+  <Snippet code={next} label="postcss.config.mjs" />
+  <p>
+    Neither needs <code>transpilePackages</code>: the package ships compiled ESM with <code>"use client"</code> kept, so a Server Component can render it.
+  </p>
+  <Pager />
+</Docs>

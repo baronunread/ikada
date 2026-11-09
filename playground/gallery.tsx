@@ -330,7 +330,7 @@ function SproutRow() {
           sprout-{made.length - i}
         </Badge>
       ))}
-      {made.length === 0 ? <StatusDot status="success" label="Deployed" sprout /> : null}
+      {made.length === 0 ? <StatusDot tone="success" label="Deployed" sprout /> : null}
     </Row>
   );
 }
@@ -357,16 +357,16 @@ function StatusSection() {
       </Row>
       <Row label="StatusDot with label">
         {statuses.map((s) => (
-          <StatusDot key={s.label} status={s.status} live={s.live} label={s.label} />
+          <StatusDot key={s.label} tone={s.status} live={s.live} label={s.label} />
         ))}
-        <StatusDot status="info" label="Deploying" pulse />
-        <StatusDot status="success" live label="Live" pulse />
+        <StatusDot tone="info" label="Deploying" pulse />
+        <StatusDot tone="success" live label="Live" pulse />
       </Row>
       <SproutRow />
       <Row label="StatusDot, label hidden visually (still announced)">
-        <StatusDot status="success" label="Ready" hideLabel />
-        <StatusDot status="warning" label="Domain not verified" hideLabel />
-        <StatusDot status="danger" label="Build failed" hideLabel />
+        <StatusDot tone="success" label="Ready" hideLabel />
+        <StatusDot tone="warning" label="Domain not verified" hideLabel />
+        <StatusDot tone="danger" label="Build failed" hideLabel />
       </Row>
     </Section>
   );
@@ -490,8 +490,8 @@ function MiscSection() {
           <Skeleton />
           <Skeleton className="w-4/5" />
         </div>
-        <Skeleton kind="circle" />
-        <Skeleton kind="block" className="max-w-48" />
+        <Skeleton variant="circle" />
+        <Skeleton variant="block" className="max-w-48" />
       </Row>
       <Row label="CopyId (click: the icons swap with scale, blur and fade)">
         <CopyId value="dpl_8f3a91c2d4e7" label="Copy deployment ID" />
@@ -512,7 +512,7 @@ function ChartsSection() {
     >
       <Row label="TimeseriesChart: requests (area) with a deploy marker">
         <TimeseriesChart
-          ariaLabel="Requests per minute"
+          aria-label="Requests per minute"
           series={[{ id: "req", label: "Requests", data: requests, area: true }]}
           deploy={deploy}
           {...format}
@@ -522,7 +522,7 @@ function ChartsSection() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Row label="Errors with a deploy marker">
           <TimeseriesChart
-            ariaLabel="Errors per minute"
+            aria-label="Errors per minute"
             height={150}
             series={[{ id: "err", label: "Errors", data: errors, color: "errors", dashed: true }]}
             deploy={deploy}
@@ -533,7 +533,7 @@ function ChartsSection() {
         </Row>
         <Row label="Latency: p50 and p99">
           <TimeseriesChart
-            ariaLabel="Latency"
+            aria-label="Latency"
             height={150}
             series={[
               { id: "p99", label: "p99", data: p99, color: "series", dashed: true },
@@ -546,7 +546,7 @@ function ChartsSection() {
         </Row>
         <Row label="Epoch milliseconds: the default x axis reads clock times">
           <TimeseriesChart
-            ariaLabel="Requests per minute, epoch timestamps"
+            aria-label="Requests per minute, epoch timestamps"
             height={150}
             yTicks={2}
             series={[{ id: "req-epoch", label: "Requests", data: requestsEpoch, area: true }]}
@@ -554,7 +554,7 @@ function ChartsSection() {
           />
         </Row>
         <Row label="No points: the chart keeps its height and says so">
-          <TimeseriesChart ariaLabel="Requests per minute, no data" height={150} series={[]} />
+          <TimeseriesChart aria-label="Requests per minute, no data" height={150} series={[]} />
         </Row>
       </div>
       <Row label="Sparkline">
@@ -563,7 +563,7 @@ function ChartsSection() {
             <div key={label} className="flex flex-col gap-1 rounded-lg bg-well p-3">
               <span className="text-xs font-semibold text-fg-muted">{label}</span>
               <Sparkline
-                ariaLabel={`${label}, last 24 hours`}
+                aria-label={`${label}, last 24 hours`}
                 data={data.map((p) => p.value)}
                 color={color}
                 formatValue={fmt}

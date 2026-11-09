@@ -9,6 +9,8 @@ import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatCompact, formatNumber } from "../lib/format";
 import { useLocale } from "../lib/locale";
+import { accessibleName } from "../lib/accessible-name";
+import type { AccessibleName } from "../lib/accessible-name";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
@@ -36,13 +38,11 @@ export interface DeployMarker {
   label: string;
 }
 
-export interface TimeseriesChartProps {
+export interface TimeseriesChartBase {
   /** The lines to draw: a label, a colour and the points of each. */
   series: readonly TimeseriesSeries[];
   /** A dashed vertical rule with a label, in the `chart-deploy` color. */
   deploy?: DeployMarker | readonly DeployMarker[];
-  /** Accessible name of the chart. Required. */
-  ariaLabel: string;
   /** Height in pixels. Default 210; the width fills the container. */
   height?: number;
   /** [min, max] of the value axis. Defaults to 0 up to the largest value, rounded up. */
@@ -118,6 +118,9 @@ export function timeTicks(domain: readonly [number, number], count = 5): number[
 const markers = (deploy: TimeseriesChartProps["deploy"]): readonly DeployMarker[] =>
   deploy === undefined ? [] : "time" in deploy ? [deploy] : deploy;
 
+/** Props of {@link TimeseriesChart}. The accessible name is `aria-label`; `ariaLabel` is deprecated. */
+export type TimeseriesChartProps = TimeseriesChartBase & AccessibleName;
+
 /**
  * A line (and optional area) chart on TanStack Charts, themed by the chart tokens:
  * grid and tooltip follow light and dark, and the deploy marker is a dashed rule
@@ -127,7 +130,8 @@ const markers = (deploy: TimeseriesChartProps["deploy"]): readonly DeployMarker[
 export function TimeseriesChart({
   series,
   deploy,
-  ariaLabel,
+  "aria-label": ariaLabelStd,
+  ariaLabel: ariaLabelLegacy,
   height = 210,
   yDomain,
   xDomain,
@@ -140,6 +144,7 @@ export function TimeseriesChart({
   emptyText = "No data for this range",
   className,
 }: TimeseriesChartProps) {
+  const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
   const resolvedLocale = useLocale(locale);
   const empty = !series.some((s) => s.data.length > 0);
   const definition = useMemo(() => {

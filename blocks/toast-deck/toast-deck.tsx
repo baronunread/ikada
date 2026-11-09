@@ -200,7 +200,7 @@ export function ToastDeck({
             <ol className="flex flex-col gap-2.5" aria-label="Recent notifications">
               {history.map((s) => (
                 <li key={s.key} className="flex items-start gap-2.5">
-                  <StatusGlyph status={s.tone} className="mt-1.5" />
+                  <StatusGlyph tone={s.tone} className="mt-1.5" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sb-sm font-semibold">{s.title}</p>
                     {s.description ? <p className="line-clamp-2 text-sb-sm text-fg-muted">{s.description}</p> : null}

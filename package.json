@@ -28,6 +28,7 @@
   "files": [
     "dist",
     "src",
+    "codemods",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"

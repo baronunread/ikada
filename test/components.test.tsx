@@ -225,13 +225,13 @@ describe("Select", () => {
 
 describe("Badge, StatusDot, Skeleton", () => {
   test("StatusDot always has a text label, dot is hidden from AT", () => {
-    render(<StatusDot status="warning" label="Domain not verified" />);
+    render(<StatusDot tone="warning" label="Domain not verified" />);
     expect(screen.getByText("Domain not verified")).toBeTruthy();
     expect(document.querySelector("[aria-hidden=true]")).toBeTruthy();
   });
 
   test("hideLabel keeps the label for screen readers", () => {
-    render(<StatusDot status="success" label="Ready" hideLabel />);
+    render(<StatusDot tone="success" label="Ready" hideLabel />);
     expect(screen.getByText("Ready").className).toContain("sr-only");
   });
 

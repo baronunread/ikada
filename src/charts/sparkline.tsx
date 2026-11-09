@@ -8,14 +8,14 @@ import { tooltip } from "@tanstack/charts/tooltip";
 import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
+import { accessibleName } from "../lib/accessible-name";
+import type { AccessibleName } from "../lib/accessible-name";
 import { chartClassName, chartColors } from "./theme";
 import type { ChartColorName } from "./theme";
 
-export interface SparklineProps {
+export interface SparklineBase {
   /** Values in time order, oldest first. */
   data: readonly number[];
-  /** Accessible name, e.g. "Requests, last 24 hours". Required. */
-  ariaLabel: string;
   /** Chart colour token for the line. Default `requests`. */
   color?: ChartColorName;
   /** Height in pixels. Default 40; the width fills the container. */
@@ -41,10 +41,14 @@ interface Row {
   v: number;
 }
 
+/** Props of {@link Sparkline}. The accessible name is `aria-label` (e.g. "Requests, last 24 hours"); `ariaLabel` is deprecated. */
+export type SparklineProps = SparklineBase & AccessibleName;
+
 /** A 40px trend line with no axes, a dot on the current point, a hover value and the same tokens as TimeseriesChart. */
 export function Sparkline({
   data,
-  ariaLabel,
+  "aria-label": ariaLabelStd,
+  ariaLabel: ariaLabelLegacy,
   color = "requests",
   height = 40,
   area = true,
@@ -54,6 +58,7 @@ export function Sparkline({
   current = true,
   className,
 }: SparklineProps) {
+  const ariaLabel = accessibleName({ "aria-label": ariaLabelStd, ariaLabel: ariaLabelLegacy });
   const definition = useMemo(() => {
     const rows: Row[] = data.map((v, i) => ({ i, v }));
     const last = rows.at(-1);

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildRegistry } from "../scripts/build-registry";
+import { buildRegistry, sourceFiles } from "../scripts/build-registry";
 import { colorNames } from "../tokens/tokens";
 
 const URL = "https://example.test/ikada/r";
@@ -117,6 +117,17 @@ describe("shadcn registry", () => {
       for (const m of content.matchAll(/from\s+["'](@\/[^"']+)["']/g)) {
         expect(m[1], path).toMatch(/^@\/components\/ikada\//);
       }
+    }
+  });
+
+  test("one source: a registry file is the npm source with only its import specifiers rewritten", () => {
+    const blank = (code: string): string =>
+      code
+        .replace(/^"use client";\n\n/, "")
+        .replace(/(from\s+["'])(\.{1,2}\/[^"']+|@\/components\/ikada\/[^"']+)(["'])/g, "$1§$3");
+    for (const file of sourceFiles()) {
+      const npm = readFileSync(join(import.meta.dir, "../src", file.srcPath), "utf8");
+      expect(blank(files.get(file.outPath) ?? ""), file.srcPath).toBe(blank(npm));
     }
   });
 });

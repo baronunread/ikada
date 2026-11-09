@@ -60,6 +60,7 @@ export const CATEGORIES: Record<string, string[]> = {
   "chart-theme": ["charts", "utilities"],
   // Libraries
   cn: ["utilities"],
+  "accessible-name": ["utilities"],
   crossfade: ["utilities"],
   format: ["utilities"],
   icons: ["utilities"],
@@ -137,6 +138,10 @@ export const TEXT: Record<string, { title?: string; description?: string }> = {
   },
   table: {
     description: "A semantic table in a scroll container, with sortable headers, loading, empty and error rows.",
+  },
+  "accessible-name": {
+    title: "Accessible name",
+    description: "The aria-label or deprecated ariaLabel prop type that the chart components share.",
   },
   format: {
     description: "Number and byte formatting shared by every ikada component: compact, grouped and locale-aware.",

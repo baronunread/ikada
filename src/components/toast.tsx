@@ -104,7 +104,7 @@ function Glyph({ tone, busy }: { tone: ToastTone; busy: boolean }) {
           />
         ) : (
           // Success sprouts as it lands (on arrival, or when a busy toast turns into a success).
-          <StatusGlyph status={v.tone} pulse={v.busy} sprout={v.tone === "success" && !v.busy} />
+          <StatusGlyph tone={v.tone} pulse={v.busy} sprout={v.tone === "success" && !v.busy} />
         )
       }
     />

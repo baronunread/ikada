@@ -424,7 +424,7 @@ function DeploymentsTable({
             <TableCell className="whitespace-nowrap">
               {/* Critical status lives in a column that never hides, so a failure survives at 390px. */}
               <div className="py-1.5">
-                <StatusDot status={d.status} live={d.live} label={d.statusLabel} />
+                <StatusDot tone={d.status} live={d.live} label={d.statusLabel} />
               </div>
             </TableCell>
             <TableCell hideBelow="3xl" className="whitespace-nowrap text-fg-muted">
@@ -595,7 +595,7 @@ function SproutboatSection() {
             amount={1_280_000}
             delta={{ value: "12%", direction: "up" }}
             hint="14.8 req/s average"
-            sparkline={<Sparkline data={reqSpark} ariaLabel="Requests, last 24 hours" />}
+            sparkline={<Sparkline data={reqSpark} aria-label="Requests, last 24 hours" />}
           />
           <MetricTile
             label="Errors (5xx)"
@@ -603,7 +603,7 @@ function SproutboatSection() {
             unit="%"
             delta={{ value: "0.08 pt", direction: "up", sentiment: "bad" }}
             hint="2,685 requests"
-            sparkline={<Sparkline data={errSpark} color="errors" ariaLabel="Errors, last 24 hours" />}
+            sparkline={<Sparkline data={errSpark} color="errors" aria-label="Errors, last 24 hours" />}
           />
           <MetricTile
             label="CPU time"
@@ -611,7 +611,7 @@ function SproutboatSection() {
             unit="ms p50"
             delta={{ value: "0.4 ms", direction: "down", sentiment: "good" }}
             hint="p99 58 ms"
-            sparkline={<Sparkline data={p99Spark} color="series" ariaLabel="CPU time, last 24 hours" />}
+            sparkline={<Sparkline data={p99Spark} color="series" aria-label="CPU time, last 24 hours" />}
           />
           <MetricTile label="Cold starts" loading />
           <MetricTile label="Cache hits" noData emptyText="No cache traffic in this range" />
@@ -747,7 +747,7 @@ export function DashboardPreview() {
               <PageHeader
                 breadcrumbs={<Breadcrumbs items={crumbs} />}
                 title="field-notes"
-                status={<StatusDot status="success" live label="Live" />}
+                status={<StatusDot tone="success" live label="Live" />}
                 description="field-notes.sproutboat.app · fernhill/field-notes · main"
                 actions={
                   <>
@@ -779,7 +779,7 @@ export function DashboardPreview() {
                   amount={1_280_000}
                   delta={{ value: "12%", direction: "up" }}
                   hint="14.8 req/s average"
-                  sparkline={<Sparkline data={reqSpark} ariaLabel="Requests, last 24 hours" />}
+                  sparkline={<Sparkline data={reqSpark} aria-label="Requests, last 24 hours" />}
                 />
                 <MetricTile
                   label="Errors (5xx)"
@@ -787,7 +787,7 @@ export function DashboardPreview() {
                   unit="%"
                   delta={{ value: "0.08 pt", direction: "up", sentiment: "bad" }}
                   hint="2,685 requests"
-                  sparkline={<Sparkline data={errSpark} color="errors" ariaLabel="Errors, last 24 hours" />}
+                  sparkline={<Sparkline data={errSpark} color="errors" aria-label="Errors, last 24 hours" />}
                 />
                 <MetricTile
                   label="CPU time"
@@ -796,7 +796,7 @@ export function DashboardPreview() {
                   delta={{ value: "0.4 ms", direction: "down", sentiment: "good" }}
                   hint="p99 58 ms"
                   className="sm:max-xl:col-span-2"
-                  sparkline={<Sparkline data={p99Spark} color="series" ariaLabel="CPU time, last 24 hours" />}
+                  sparkline={<Sparkline data={p99Spark} color="series" aria-label="CPU time, last 24 hours" />}
                 />
               </div>
               <section

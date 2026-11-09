@@ -15,7 +15,7 @@ describe("charts", () => {
   test("TimeseriesChart renders a labelled chart with a deploy rule", () => {
     const { container } = render(
       <TimeseriesChart
-        ariaLabel="Requests per minute"
+        aria-label="Requests per minute"
         series={[
           {
             id: "req",
@@ -34,7 +34,7 @@ describe("charts", () => {
   });
 
   test("Sparkline renders a labelled chart", () => {
-    const { container } = render(<Sparkline ariaLabel="Errors, last hour" data={[1, 2, 3]} color="errors" />);
+    const { container } = render(<Sparkline aria-label="Errors, last hour" data={[1, 2, 3]} color="errors" />);
     expect(container.querySelector('[aria-label="Errors, last hour"]')).not.toBeNull();
   });
 });
