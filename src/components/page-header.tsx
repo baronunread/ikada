@@ -1,3 +1,5 @@
+"use client";
+
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentProps, ReactNode } from "react";
 import { cn, coarseTarget, focusRing, type WithClass } from "../lib/cn";
@@ -35,10 +37,10 @@ export function PageHeader({
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="min-w-0 break-words text-xl font-bold">{title}</h1>
+            <h1 className="min-w-0 break-words text-sb-xl font-bold">{title}</h1>
             {status}
           </div>
-          {description ? <p className="text-base text-fg-muted">{description}</p> : null}
+          {description ? <p className="text-sb-base text-fg-muted">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>
@@ -82,7 +84,7 @@ export function PageTab({ current = false, className, ref, render, ...props }: P
     props: {
       "aria-current": current ? "page" : undefined,
       className: cn(
-        "relative -mb-px inline-flex h-10 items-center whitespace-nowrap rounded-xs text-base font-medium text-fg-muted",
+        "relative -mb-px inline-flex h-10 items-center whitespace-nowrap rounded-xs text-sb-base font-medium text-fg-muted",
         "transition-colors duration-(--sb-duration-hover) ease-hover hover:text-fg aria-[current=page]:text-fg",
         "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-fg after:opacity-0 after:transition-opacity after:duration-(--sb-duration-hover) aria-[current=page]:after:opacity-100",
         coarseTarget,

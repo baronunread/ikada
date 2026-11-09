@@ -19,7 +19,7 @@ Bun is the package manager (`bun.lock` is committed; CI uses `--frozen-lockfile`
 - DESIGN.md is the contract (principles, tokens, usage rules); INVENTORY.md lists every component and its status. Update both when a component or token changes.
 - Every component gets a playground entry and a test in `test/` (the a11y suite runs axe on them).
 - The package is open source: keep Cloud-only or product-specific UI out of it.
-- Dark is the default theme, light opts in with `data-theme="light"`; the `dark:` variant means "not light".
+- Light is the default theme, dark is a `dark` class on `<html>` (`data-theme` is a deprecated alias); the `dark:` variant follows the class. Components use `text-sb-*` sizes, not `text-sm`.
 - Check UI changes at 390px and 1440px in both themes, including open states, focus and hover. `bun run e2e` covers overflow; look at the result anyway.
 
 ## Releases

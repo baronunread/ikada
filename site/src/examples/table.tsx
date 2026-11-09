@@ -346,7 +346,7 @@ const rows = [
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="w-60 text-sm">
+  <div className="w-60 text-sb-sm">
     <div className="flex border-b border-hairline py-1.5 text-fg-muted">
       <span className="flex-1">Version</span>
       <span>Status</span>

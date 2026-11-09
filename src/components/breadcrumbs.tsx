@@ -1,3 +1,5 @@
+"use client";
+
 import { useRender } from "@base-ui/react/use-render";
 import { Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
@@ -64,7 +66,7 @@ export function Breadcrumbs({ items, maxItems = 4, className, ref, ...props }: B
   const shown: (BreadcrumbItem | "more")[] = collapse ? [...items.slice(0, 1), "more", ...tail] : [...items];
 
   return (
-    <nav ref={ref} aria-label="Breadcrumb" className={cn("min-w-0 text-base", className)} {...props}>
+    <nav ref={ref} aria-label="Breadcrumb" className={cn("min-w-0 text-sb-base", className)} {...props}>
       <ol className="flex min-w-0 items-center gap-1">
         {shown.map((entry, i) => {
           const last = i === shown.length - 1;

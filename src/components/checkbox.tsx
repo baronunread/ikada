@@ -1,3 +1,5 @@
+"use client";
+
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { useId, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
@@ -76,11 +78,11 @@ export function Checkbox({
   );
   if (!label) return box;
   return (
-    <label htmlFor={controlId} className={cn("inline-flex items-start gap-2.5 text-base text-fg", className)}>
+    <label htmlFor={controlId} className={cn("inline-flex items-start gap-2.5 text-sb-base text-fg", className)}>
       {box}
       <span className="flex flex-col">
         <span>{label}</span>
-        {description ? <span className="text-sm text-fg-muted">{description}</span> : null}
+        {description ? <span className="text-sb-sm text-fg-muted">{description}</span> : null}
       </span>
     </label>
   );

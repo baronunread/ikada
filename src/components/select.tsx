@@ -1,3 +1,5 @@
+"use client";
+
 import { Select as BaseSelect } from "@base-ui/react/select";
 import type { ComponentProps } from "react";
 import { cn, coarseTarget, fieldSurface, floatingSurface, focusRing, popupMotion } from "../lib/cn";
@@ -51,7 +53,7 @@ export function Select({
           aria-label={ariaLabel}
           aria-invalid={invalid || undefined}
           className={cn(
-            "inline-flex h-(--sb-control-h) w-full min-w-0 items-center justify-between gap-2 ps-3 pe-2.5 text-start text-base",
+            "inline-flex h-(--sb-control-h) w-full min-w-0 items-center justify-between gap-2 ps-3 pe-2.5 text-start text-sb-base",
             fieldSurface,
             "data-popup-open:shadow-field-hover",
             focusRing,
@@ -85,7 +87,7 @@ export function Select({
                     key={option.value}
                     value={option.value}
                     disabled={option.disabled}
-                    className="grid min-h-9 cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md py-1.5 ps-2.5 pe-3 text-base outline-hidden transition-colors duration-(--sb-duration-hover) ease-hover select-none data-disabled:opacity-50 data-highlighted:bg-hover data-selected:font-semibold pointer-coarse:min-h-11"
+                    className="grid min-h-9 cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-md py-1.5 ps-2.5 pe-3 text-sb-base outline-hidden transition-colors duration-(--sb-duration-hover) ease-hover select-none data-disabled:opacity-50 data-highlighted:bg-hover data-selected:font-semibold pointer-coarse:min-h-11"
                   >
                     <BaseSelect.ItemIndicator className="col-start-1">
                       <CheckIcon />

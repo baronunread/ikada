@@ -172,14 +172,14 @@ function SproutCard({ sprout, href }: { sprout: Sprout; href: string }) {
     >
       <span className="flex min-w-0 items-center gap-2">
         <SproutTile status={l.status} />
-        <span className="min-w-0 flex-1 truncate text-base font-semibold">{sprout.name}</span>
+        <span className="min-w-0 flex-1 truncate text-sb-base font-semibold">{sprout.name}</span>
         {sprout.trigger && sprout.trigger !== "http" ? (
-          <span className="shrink-0 rounded-md bg-neutral-soft px-1.5 py-0.5 font-mono text-xs font-semibold text-neutral-fg">
+          <span className="shrink-0 rounded-md bg-neutral-soft px-1.5 py-0.5 font-mono text-sb-xs font-semibold text-neutral-fg">
             {sprout.trigger}
           </span>
         ) : null}
       </span>
-      <span className="truncate font-mono text-xs text-fg-muted" title={sprout.hostname}>
+      <span className="truncate font-mono text-sb-xs text-fg-muted" title={sprout.hostname}>
         {sprout.hostname}
       </span>
       <span className="flex min-w-0 border-t border-hairline pt-2.5">
@@ -189,7 +189,7 @@ function SproutCard({ sprout, href }: { sprout: Sprout; href: string }) {
           pulse={l.pulse}
           label={stateLine(sprout)}
           className={cn(
-            "min-w-0 truncate text-sm",
+            "min-w-0 truncate text-sb-sm",
             sprout.status === "deploy_failed" ? "text-danger-fg" : "text-fg-muted",
           )}
         />
@@ -220,17 +220,17 @@ function Tray({
       className="@container rounded-2xl bg-well p-1.5 shadow-[inset_0_0_0_1px_var(--sb-hairline)]"
     >
       <div className="flex min-w-0 items-center gap-2.5 px-3 pt-2 pb-2.5">
-        <h2 id={id} className="min-w-0 truncate text-md font-semibold">
+        <h2 id={id} className="min-w-0 truncate text-sb-md font-semibold">
           <a href={href} className={cn("rounded-sm hover:underline", focusRing)}>
             {project.name}
           </a>
         </h2>
-        <span className="shrink-0 text-sm text-fg-muted">
+        <span className="shrink-0 text-sb-sm text-fg-muted">
           {count} {count === 1 ? "sprout" : "sprouts"}
         </span>
         <span className="ms-auto flex shrink-0 items-center gap-1">
           {requests > 0 ? (
-            <span className="me-2 hidden text-sm text-fg-muted tabular-nums @xl:inline">
+            <span className="me-2 hidden text-sb-sm text-fg-muted tabular-nums @xl:inline">
               {formatCompact(requests)} requests, 24 h
             </span>
           ) : null}
@@ -263,7 +263,7 @@ function Tray({
           type="button"
           onClick={onNewSprout}
           className={cn(
-            "flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-[0.6875rem] p-4 text-center text-sm text-fg-muted",
+            "flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-[0.6875rem] p-4 text-center text-sb-sm text-fg-muted",
             "border border-dashed border-hairline-strong",
             "transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
             focusRing,

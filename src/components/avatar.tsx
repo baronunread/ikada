@@ -6,9 +6,9 @@ const avatarStyles = tv({
   base: "inline-grid shrink-0 select-none place-items-center overflow-hidden bg-hover font-semibold text-fg shadow-pill",
   variants: {
     size: {
-      sm: "size-6 rounded-md text-xs",
-      md: "size-8 rounded-lg text-sm",
-      lg: "size-12 rounded-xl text-lg",
+      sm: "size-6 rounded-md text-sb-xs",
+      md: "size-8 rounded-lg text-sb-sm",
+      lg: "size-12 rounded-xl text-sb-lg",
     },
   },
   defaultVariants: { size: "md" },

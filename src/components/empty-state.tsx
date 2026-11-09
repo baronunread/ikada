@@ -40,8 +40,8 @@ export function EmptyState({
         </span>
       ) : null}
       <div className="flex flex-col gap-1">
-        <Heading className="text-md font-semibold">{title}</Heading>
-        {description ? <p className="text-base text-fg-muted">{description}</p> : null}
+        <Heading className="text-sb-md font-semibold">{title}</Heading>
+        {description ? <p className="text-sb-base text-fg-muted">{description}</p> : null}
       </div>
       {action ? <div className="mt-1">{action}</div> : null}
     </div>

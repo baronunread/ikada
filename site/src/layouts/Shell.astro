@@ -41,11 +41,12 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
     <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <script is:inline>
-      // Before first paint: the saved choice, else the system's. ikada is dark unless light is stamped.
+      // Before first paint: the saved choice, else the system's. `dark` class on <html> (the standard) plus data-theme, which the site's own CSS and hero read.
       (() => {
         const saved = localStorage.getItem("ikada-theme");
         const light = saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)").matches;
         document.documentElement.dataset.theme = light ? "light" : "dark";
+        document.documentElement.classList.toggle("dark", !light);
       })();
       // The mark's first-paint drop plays once per session (site.css, .ikm).
       try {

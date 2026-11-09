@@ -197,7 +197,7 @@ function Stage({
       <div className={aside ? "pg" : undefined}>
         <div>
           <div
-            className={top ? "stage-preview top" : "stage-preview"}
+            className={`${top ? "stage-preview top" : "stage-preview"}${theme === "dark" ? " dark" : ""}`}
             data-theme={theme ?? undefined}
             data-demo
             hidden={view !== "preview"}

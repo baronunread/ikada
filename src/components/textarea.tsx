@@ -21,12 +21,12 @@ export function Textarea({ invalid, mono, className, ref, ...props }: TextareaPr
       ref={ref as never}
       aria-invalid={invalid || undefined}
       className={cn(
-        "min-h-20 w-full min-w-0 resize-y px-3 py-2 text-base",
+        "min-h-20 w-full min-w-0 resize-y px-3 py-2 text-sb-base",
         fieldSurface,
         "placeholder:text-fg-muted pointer-coarse:text-[16px]",
         "read-only:bg-hover",
         focusRing,
-        mono && "font-mono text-sm leading-relaxed",
+        mono && "font-mono text-sb-sm leading-relaxed",
         className,
       )}
       {...(props as object)}

@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
-import type { VariantProps } from "tailwind-variants";
 import { SpinnerIcon } from "../lib/icons";
 import { tv } from "../lib/cn";
+import type { VariantProps } from "../lib/cn";
 
 const spinnerStyles = tv({
   base: "inline-flex shrink-0 items-center justify-center text-fg-muted",

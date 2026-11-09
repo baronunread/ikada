@@ -1,3 +1,5 @@
+"use client";
+
 import { Menu } from "@base-ui/react/menu";
 import type { ComponentProps } from "react";
 import { cn, floatingSurface, popupMotion, type WithClass } from "../lib/cn";
@@ -51,7 +53,7 @@ export function DropdownMenuContent({
           className={cn(
             floatingSurface,
             popupMotion,
-            "min-w-48 p-1 text-base [--sb-gutter:0rem] has-[[role=menuitemcheckbox]]:[--sb-gutter:1.5rem] has-[[role=menuitemradio]]:[--sb-gutter:1.5rem]",
+            "min-w-48 p-1 text-sb-base [--sb-gutter:0rem] has-[[role=menuitemcheckbox]]:[--sb-gutter:1.5rem] has-[[role=menuitemradio]]:[--sb-gutter:1.5rem]",
             className,
           )}
           {...instantAttr(instant)}
@@ -65,7 +67,7 @@ export function DropdownMenuContent({
 }
 
 const itemStyles = [
-  "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-1.5 pe-2.5 ps-[calc(0.625rem+var(--sb-gutter))] text-base outline-hidden select-none",
+  "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-1.5 pe-2.5 ps-[calc(0.625rem+var(--sb-gutter))] text-sb-base outline-hidden select-none",
   "transition-colors duration-(--sb-duration-hover) ease-hover",
   "data-disabled:opacity-50 data-highlighted:bg-hover pointer-coarse:min-h-11",
 ].join(" ");
@@ -128,7 +130,10 @@ export function DropdownMenuRadioItem({
 
 export function DropdownMenuLabel({ className, ...props }: WithClass<ComponentProps<typeof Menu.GroupLabel>>) {
   return (
-    <Menu.GroupLabel className={cn("px-2.5 pt-1.5 pb-1 text-xs font-semibold text-fg-muted", className)} {...props} />
+    <Menu.GroupLabel
+      className={cn("px-2.5 pt-1.5 pb-1 text-sb-xs font-semibold text-fg-muted", className)}
+      {...props}
+    />
   );
 }
 

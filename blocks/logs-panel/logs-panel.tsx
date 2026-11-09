@@ -150,7 +150,7 @@ function Chip({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm pointer-coarse:h-11",
+        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-sb-sm pointer-coarse:h-11",
         pressed
           ? "bg-neutral-soft font-semibold text-fg"
           : "text-fg-muted shadow-[inset_0_0_0_1px_var(--sb-hairline-strong)] hover:bg-hover hover:text-fg",
@@ -196,7 +196,9 @@ function Line({ line }: { line: LogLine }) {
         <time className="text-fg-muted tabular-nums" dateTime={new Date(line.t).toISOString()}>
           {clock(line.t)}
         </time>
-        <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold uppercase", levelText[line.level])}>
+        <span
+          className={cn("inline-flex items-center gap-1.5 text-sb-xs font-semibold uppercase", levelText[line.level])}
+        >
           <StatusGlyph status={levelStatus[line.level]} />
           {line.level}
         </span>
@@ -304,7 +306,7 @@ export function LogsPanel({
     >
       <div className="flex flex-col gap-3 px-4 pt-4 pb-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 id="logs-panel-title" className="me-auto text-md font-semibold">
+          <h2 id="logs-panel-title" className="me-auto text-sb-md font-semibold">
             {title}
           </h2>
           <div className="relative order-last w-full @2xl:order-none @2xl:w-64">
@@ -357,7 +359,7 @@ export function LogsPanel({
         <div
           aria-hidden="true"
           className={cn(
-            "sticky top-0 z-[1] hidden bg-surface px-4 py-2 font-sans text-xs font-semibold text-fg-muted shadow-[inset_0_-1px_0_var(--sb-hairline)] @3xl:grid",
+            "sticky top-0 z-[1] hidden bg-surface px-4 py-2 font-sans text-sb-xs font-semibold text-fg-muted shadow-[inset_0_-1px_0_var(--sb-hairline)] @3xl:grid",
             ROW,
           )}
         >
@@ -368,7 +370,7 @@ export function LogsPanel({
           <span className="text-end">Duration</span>
         </div>
         {shown.length === 0 ? (
-          <div className="flex h-[calc(100%-2.25rem)] flex-col items-center justify-center gap-2 px-6 text-center font-sans text-base text-fg-muted">
+          <div className="flex h-[calc(100%-2.25rem)] flex-col items-center justify-center gap-2 px-6 text-center font-sans text-sb-base text-fg-muted">
             <p>{filtered ? "No lines match these filters yet." : "Waiting for the first line."}</p>
             {filtered ? (
               <Button size="sm" variant="ghost" onClick={clear}>
@@ -385,7 +387,7 @@ export function LogsPanel({
         )}
       </div>
 
-      <p className="flex min-h-11 items-center border-t border-hairline px-4 py-2.5 text-sm text-fg-muted">
+      <p className="flex min-h-11 items-center border-t border-hairline px-4 py-2.5 text-sb-sm text-fg-muted">
         <StatusDot status={held ? "neutral" : "success"} live={!held} label={statusLabel} />
       </p>
     </section>

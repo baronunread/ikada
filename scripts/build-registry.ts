@@ -38,6 +38,7 @@ const root = join(import.meta.dir, "..");
 const src = join(root, "src");
 const blocksDir = join(root, "blocks");
 const STYLE = "ikada";
+const CLIENT = `"use client";`;
 
 export interface RegistryFile {
   path: string;
@@ -253,7 +254,12 @@ function blockItem(
     for (const l of rewritten.local) local.add(l);
     for (const p of rewritten.packages) packages.add(p);
     const outPath = `registry/${STYLE}/blocks/${block.name}/${posix.basename(path)}`;
-    files.set(outPath, path.endsWith(".tsx") ? `"use client";\n\n${rewritten.content}` : rewritten.content);
+    files.set(
+      outPath,
+      path.endsWith(".tsx") && !rewritten.content.startsWith(CLIENT)
+        ? `${CLIENT}\n\n${rewritten.content}`
+        : rewritten.content,
+    );
     out.push({ path: outPath, type: "registry:component" });
     if (!description) description = describe(raw, block.name, "");
   }
@@ -333,10 +339,10 @@ export function themeItem(): RegistryItem {
     ...Object.fromEntries(Object.entries(motion.easing).map(([k, v]) => [`ease-${k}`, v])),
     ...Object.fromEntries(
       Object.entries(typeScale).flatMap(([name, s]) => [
-        [`text-${name}`, rem(s.size)],
-        [`text-${name}--line-height`, rem(s.line)],
-        [`text-${name}--letter-spacing`, `${s.tracking}em`],
-        [`text-${name}--font-weight`, String(s.weight)],
+        [`text-sb-${name}`, rem(s.size)],
+        [`text-sb-${name}--line-height`, rem(s.line)],
+        [`text-sb-${name}--letter-spacing`, `${s.tracking}em`],
+        [`text-sb-${name}--font-weight`, String(s.weight)],
       ]),
     ),
     ...Object.fromEntries(colorNames.map((n) => [`color-${n}`, `var(--sb-${n})`])),
@@ -411,7 +417,8 @@ export interface BuiltRegistry {
 
 /** Builds the registry in memory: the registry.json object and every output file's content. */
 export function buildRegistry(url: string): BuiltRegistry {
-  const versions = new Map(Object.entries(pkg.dependencies));
+  // Runtime dependencies and the optional or heavy peers (Base UI, charts) an installed item needs from npm.
+  const versions = new Map(Object.entries({ ...pkg.peerDependencies, ...pkg.dependencies }));
   const sources = sourceFiles();
   const bySrc = new Map(sources.map((f) => [f.srcPath, f]));
   const files = new Map<string, string>();
@@ -427,7 +434,10 @@ export function buildRegistry(url: string): BuiltRegistry {
       return `${p}@${version}`;
     });
     // Client components for frameworks with server components; shadcn strips it elsewhere.
-    const body = file.type === "registry:ui" && file.srcPath.endsWith(".tsx") ? `"use client";\n\n${content}` : content;
+    const body =
+      file.type === "registry:ui" && file.srcPath.endsWith(".tsx") && !content.startsWith(CLIENT)
+        ? `${CLIENT}\n\n${content}`
+        : content;
     files.set(file.outPath, body);
     const item: RegistryItem = {
       name: file.item,

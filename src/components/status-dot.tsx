@@ -34,7 +34,7 @@ export function StatusDot({
     <span
       ref={ref}
       data-status={status}
-      className={cn("inline-flex items-center gap-2 text-base text-fg", className)}
+      className={cn("inline-flex items-center gap-2 text-sb-base text-fg", className)}
       {...props}
     >
       <StatusGlyph status={status} live={live} pulse={pulse} sprout={sprout} />

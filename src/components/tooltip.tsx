@@ -1,3 +1,5 @@
+"use client";
+
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { cn, floatingSurface } from "../lib/cn";
@@ -41,7 +43,7 @@ export function Tooltip({ content, children, side = "top", delay, defaultOpen, c
             ref={ref}
             className={cn(
               floatingSurface,
-              "max-w-64 rounded-md px-2.5 py-1.5 text-xs font-medium",
+              "max-w-64 rounded-md px-2.5 py-1.5 text-sb-xs font-medium",
               "origin-(--transform-origin) [transition:opacity_var(--sb-duration-tooltip-out)_var(--ease-out),scale_var(--sb-duration-tooltip-out)_var(--ease-out)]",
               "data-open:[transition:opacity_var(--sb-duration-tooltip-in)_var(--ease-out),scale_var(--sb-duration-spring-snappy)_var(--sb-spring-snappy)]",
               "data-starting-style:scale-(--sb-scale-popup) data-starting-style:opacity-0",

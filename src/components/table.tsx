@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentProps, ReactNode } from "react";
 import { cn, focusRing, focusRingInset } from "../lib/cn";
 import { AlertIcon, ArrowDownIcon, ArrowUpIcon, SortIcon } from "../lib/icons";
@@ -79,7 +81,7 @@ export function Table({
     >
       <table
         ref={ref}
-        className={cn("w-full border-separate border-spacing-0 text-start text-base", className)}
+        className={cn("w-full border-separate border-spacing-0 text-start text-sb-base", className)}
         {...props}
       >
         {children}
@@ -152,7 +154,7 @@ export function TableHead({
       aria-sort={ariaSort}
       className={cn(
         cellBase,
-        "h-10 whitespace-nowrap bg-surface text-sm font-semibold text-fg-muted shadow-[inset_0_-1px_0_var(--sb-hairline)]",
+        "h-10 whitespace-nowrap bg-surface text-sb-sm font-semibold text-fg-muted shadow-[inset_0_-1px_0_var(--sb-hairline)]",
         hideBelow && hideBelowClass[hideBelow],
         className,
       )}

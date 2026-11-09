@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentProps } from "react";
 import { cn, focusRingInset } from "../lib/cn";
 import { CheckIcon, CopyIcon } from "../lib/icons";
@@ -37,7 +39,7 @@ export function CodeBlock({ code, label, wrap = false, copyable = true, classNam
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scroll region must be keyboard-focusable
         tabIndex={0}
         className={cn(
-          "m-0 max-w-full overflow-auto rounded-lg py-3 ps-4 pe-12 font-mono text-sm leading-6 text-fg",
+          "m-0 max-w-full overflow-auto rounded-lg py-3 ps-4 pe-12 font-mono text-sb-sm leading-6 text-fg",
           wrap ? "whitespace-pre-wrap break-words" : "whitespace-pre",
           focusRingInset,
         )}

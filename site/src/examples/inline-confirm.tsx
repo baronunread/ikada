@@ -70,7 +70,7 @@ export const playground: Playground = {
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex items-center gap-2 text-sm">
+  <div className="flex items-center gap-2 text-sb-sm">
     <span className="text-fg-muted">Press again to delete</span>
     <Button size="sm" variant="danger">
       Delete

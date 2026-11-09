@@ -3,20 +3,25 @@
 筏 ikada (raft) is the Sproutboat design system: design tokens and React components built on [Base UI](https://base-ui.com) and Tailwind CSS v4. It is what the Sproutboat dashboards are made of.
 
 ```sh
-bun add @sproutboat/ikada
-# peers: react, react-dom, tailwindcss
+bun add @sproutboat/ikada @base-ui/react
+# peers: react, react-dom, tailwindcss, @base-ui/react (and @tanstack/charts for /charts)
 ```
 
 ```css
 /* your app.css */
 @import "tailwindcss";
-@import "@sproutboat/ikada/theme.css";
-/* Tailwind does not scan node_modules: point it at the package source */
-@source "../node_modules/@sproutboat/ikada/src";
+@import "@sproutboat/ikada/theme.css"; /* tokens, plus an @source for the compiled components */
+```
+
+Light is the default; dark is a `dark` class on `<html>` (shadcn and next-themes `attribute="class"`):
+
+```html
+<html class="dark"></html>
 ```
 
 ```tsx
 import { Button } from "@sproutboat/ikada";
+import { Button as Same } from "@sproutboat/ikada/button"; // one subpath per component
 import { Sparkline } from "@sproutboat/ikada/charts";
 import { colors, typeScale } from "@sproutboat/ikada/tokens";
 ```
@@ -28,9 +33,9 @@ import { colors, typeScale } from "@sproutboat/ikada/tokens";
 | `@sproutboat/ikada/tokens`    | The same tokens as a typed TypeScript object    |
 | `@sproutboat/ikada/charts`    | `Sparkline` and `TimeseriesChart`               |
 
-The package ships TypeScript source, not a compiled build: use it from a bundler that compiles TypeScript in `node_modules` (Vite, Bun, or Next.js with `transpilePackages`).
+The package is compiled ESM with types and declaration maps. Client modules keep `"use client"`, so Server Components in Next.js can render them (pass serializable props). No `transpilePackages` and no manual `@source`. Upgrading from 0.1.0: see [CHANGELOG.md](CHANGELOG.md).
 
-See [DESIGN.md](DESIGN.md) for the principles and [INVENTORY.md](INVENTORY.md) for every component and its status.
+See [DESIGN.md](https://github.com/baronunread/ikada/blob/main/DESIGN.md) for the principles and [INVENTORY.md](https://github.com/baronunread/ikada/blob/main/INVENTORY.md) for every component and its status.
 
 ## Develop
 
@@ -38,6 +43,9 @@ See [DESIGN.md](DESIGN.md) for the principles and [INVENTORY.md](INVENTORY.md) f
 bun install
 bun run playground      # every component, at http://localhost:5180 (bound to 0.0.0.0)
 bun run check           # tokens:check, typecheck, tests
+bun run lint:package    # build dist, check "use client" and imports, publint, attw
+bun run size            # size budgets per entry
+bun run test:tarball:next   # pack, install into a fresh Next.js app, next build (also :vite)
 bun run e2e             # screenshot and overflow checks of the playground (needs Chromium)
 bun run tokens          # regenerate theme.css, tokens.generated.ts and the DESIGN.md tables
 ```

@@ -1,3 +1,5 @@
+"use client";
+
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useRender } from "@base-ui/react/use-render";
 import { createContext, useCallback, useContext, useMemo, useState, useSyncExternalStore } from "react";
@@ -177,7 +179,7 @@ export function SidebarItem({
         if (drawer) closeDrawer();
       },
       className: cn(
-        "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-base font-medium text-fg-muted",
+        "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sb-base font-medium text-fg-muted",
         "transition-colors duration-(--sb-duration-hover) ease-hover hover:bg-hover hover:text-fg",
         "aria-[current=page]:bg-hover aria-[current=page]:text-fg aria-[current=page]:shadow-pill",
         rail && "justify-center px-0",

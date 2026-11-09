@@ -20,7 +20,7 @@ export interface DescriptionListProps extends Omit<ComponentProps<"dl">, "childr
 /** Term and details pairs: an account, a deployment. Rules between rows, no boxes. */
 export function DescriptionList({ items, layout = "inline", className, ref, ...props }: DescriptionListProps) {
   return (
-    <dl ref={ref} className={cn("@container m-0 flex flex-col text-base", className)} {...props}>
+    <dl ref={ref} className={cn("@container m-0 flex flex-col text-sb-base", className)} {...props}>
       {items.map((item) => (
         <div
           key={item.id}
@@ -29,8 +29,8 @@ export function DescriptionList({ items, layout = "inline", className, ref, ...p
             layout === "inline" && "@md:grid-cols-[10rem_minmax(0,1fr)]",
           )}
         >
-          <dt className="text-sm font-medium text-fg-muted">{item.term}</dt>
-          <dd className={cn("m-0 min-w-0 break-words", item.mono && "font-mono text-sm")}>{item.details}</dd>
+          <dt className="text-sb-sm font-medium text-fg-muted">{item.term}</dt>
+          <dd className={cn("m-0 min-w-0 break-words", item.mono && "font-mono text-sb-sm")}>{item.details}</dd>
         </div>
       ))}
     </dl>

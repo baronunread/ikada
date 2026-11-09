@@ -1,3 +1,5 @@
+"use client";
+
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -124,7 +126,7 @@ export function SegmentedControl<T extends string = string>({
             "data-pressed:bg-raised data-pressed:text-fg data-pressed:shadow-pill",
             "group-data-pebble/seg:data-pressed:bg-transparent group-data-pebble/seg:data-pressed:shadow-none",
             "data-disabled:cursor-not-allowed data-disabled:opacity-50",
-            size === "sm" ? "h-6 px-2 text-xs" : "h-7 px-3 text-sm",
+            size === "sm" ? "h-6 px-2 text-sb-xs" : "h-7 px-3 text-sb-sm",
             coarseTarget,
             focusRing,
           )}

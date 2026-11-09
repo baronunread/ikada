@@ -5,7 +5,7 @@ import Docs from "../layouts/Docs.astro";
 import { colorNames, colors, radius, typeScale, zIndex } from "../../../src/tokens.generated";
 import { href, pageMarkdown } from "../lib/site";
 
-const lede = "Every value on this page is read from tokens/tokens.ts at build time. Colours are OKLCH; dark is the default and light opts in.";
+const lede = "Every value on this page is read from tokens/tokens.ts at build time. Colours are OKLCH; light is the default and dark is a `dark` class on the html element.";
 const toc = [
   { id: "colours", label: "Colours" },
   { id: "type", label: "Type scale" },
@@ -34,8 +34,8 @@ const markdown = pageMarkdown({
 <Docs title="Theming and tokens" description={lede} toc={toc}>
   <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Theming and tokens" }]} title="Theming and tokens" lede={lede} markdown={markdown} />
   <p>
-    ikada is dark unless <code>data-theme="light"</code> is set on <code>&lt;html&gt;</code>; the shadcn theme maps light to <code>:root</code>{" "}
-    and dark to <code>.dark</code>. Use the theme switch in the header to compare.
+    ikada is light unless a <code>dark</code> class is set on <code>&lt;html&gt;</code>, the shadcn and next-themes convention, for the npm theme and the shadcn theme alike.
+    <code>data-theme="dark|light"</code> still works as a deprecated alias for one release. Use the theme switch in the header to compare.
   </p>
 
   <h2 id="colours">Colours</h2>

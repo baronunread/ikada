@@ -19,7 +19,7 @@
 
 ## Theming convention
 
-Compatible with the Sproutboat dashboards: dark is the default, light opts in with `data-theme="light"` on `<html>`, and a boot script stamps the attribute before first paint. The attribute is always `light` or `dark`; "system" is resolved by the boot script against `prefers-color-scheme`. The `dark:` Tailwind variant means "not light", exactly as in the Community dashboard's `app.css`. `theme.css` sets `color-scheme` per theme so native controls and scrollbars follow.
+Light is the default and dark is a `dark` class on `<html>`, the shadcn and next-themes (`attribute="class"`) convention. A boot script stamps the class before first paint; "system" is resolved by that script against `prefers-color-scheme`. `data-theme="dark|light"` still works as a deprecated alias for one release. The `dark:` Tailwind variant follows the class. `theme.css` sets `color-scheme` per theme so native controls and scrollbars follow.
 
 ```css
 @import "tailwindcss";
@@ -29,7 +29,7 @@ Compatible with the Sproutboat dashboards: dark is the default, light opts in wi
 
 The package ships Figtree and JetBrains Mono as the intended faces. Apps load them (`@fontsource-variable/figtree`, `@fontsource-variable/jetbrains-mono`); the stacks fall back to system fonts.
 
-Nested `data-theme` scopes work: put `data-theme="light"` on any element and every token below re-scopes inside it. Wrap that element in `PortalContainer` so menus, selects, popovers and dialogs mount inside the scope and take its theme (the playground shows both themes side by side this way).
+Nested scopes work: put `class="dark"` (or `data-theme="light"`) on any element and every token below re-scopes inside it. Wrap that element in `PortalContainer` so menus, selects, popovers and dialogs mount inside the scope and take its theme (the playground shows both themes side by side this way).
 
 ## Color
 
@@ -257,16 +257,16 @@ Figtree for UI, JetBrains Mono (slashed zero) for ids, hashes, keys and logs. He
 
 <!-- tokens:type:start -->
 
-| Step     | Size / line | Weight | Tracking | Utility       | Use                                                  |
-| -------- | ----------- | ------ | -------- | ------------- | ---------------------------------------------------- |
-| `xs`     | 12px / 16px | 500    | 0em      | `text-xs`     | Captions, keycaps, dense meta                        |
-| `sm`     | 13px / 20px | 400    | 0em      | `text-sm`     | Labels, helper text, table meta                      |
-| `base`   | 14px / 20px | 400    | 0em      | `text-base`   | Body, controls, table cells                          |
-| `md`     | 15px / 22px | 600    | -0.005em | `text-md`     | Section titles                                       |
-| `lg`     | 18px / 26px | 700    | -0.01em  | `text-lg`     | Dialog and panel titles                              |
-| `xl`     | 24px / 32px | 700    | -0.015em | `text-xl`     | Page titles on small screens                         |
-| `2xl`    | 28px / 36px | 700    | -0.02em  | `text-2xl`    | Page titles                                          |
-| `metric` | 28px / 36px | 700    | -0.02em  | `text-metric` | Hero numbers in a metric tile (proportional figures) |
+| Step     | Size / line | Weight | Tracking | Utility          | Use                                                  |
+| -------- | ----------- | ------ | -------- | ---------------- | ---------------------------------------------------- |
+| `xs`     | 12px / 16px | 500    | 0em      | `text-sb-xs`     | Captions, keycaps, dense meta                        |
+| `sm`     | 13px / 20px | 400    | 0em      | `text-sb-sm`     | Labels, helper text, table meta                      |
+| `base`   | 14px / 20px | 400    | 0em      | `text-sb-base`   | Body, controls, table cells                          |
+| `md`     | 15px / 22px | 600    | -0.005em | `text-sb-md`     | Section titles                                       |
+| `lg`     | 18px / 26px | 700    | -0.01em  | `text-sb-lg`     | Dialog and panel titles                              |
+| `xl`     | 24px / 32px | 700    | -0.015em | `text-sb-xl`     | Page titles on small screens                         |
+| `2xl`    | 28px / 36px | 700    | -0.02em  | `text-sb-2xl`    | Page titles                                          |
+| `metric` | 28px / 36px | 700    | -0.02em  | `text-sb-metric` | Hero numbers in a metric tile (proportional figures) |
 
 <!-- tokens:type:end -->
 

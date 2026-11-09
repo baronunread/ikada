@@ -140,10 +140,10 @@ export function ToastDeck({
         >
           <header className="flex flex-wrap items-center gap-3 px-4 pt-4 pb-3">
             <div className="me-auto min-w-0">
-              <h2 id="toast-deck-tokens" className="text-md font-semibold">
+              <h2 id="toast-deck-tokens" className="text-sb-md font-semibold">
                 API tokens
               </h2>
-              <p className="text-sm text-fg-muted">Revoke one: it goes at once, and Undo (or ⌘Z) brings it back.</p>
+              <p className="text-sb-sm text-fg-muted">Revoke one: it goes at once, and Undo (or ⌘Z) brings it back.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" size="sm" disabled={deploying} onClick={() => deploy(true)}>
@@ -167,9 +167,9 @@ export function ToastDeck({
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col @md:flex-row @md:items-center @md:gap-3">
                     <span className="truncate font-semibold">{token.name}</span>
-                    <span className="truncate font-mono text-sm text-fg-muted">{token.hint}</span>
+                    <span className="truncate font-mono text-sb-sm text-fg-muted">{token.hint}</span>
                   </div>
-                  <span className="hidden shrink-0 text-sm text-fg-muted @lg:inline">Used {token.lastUsed}</span>
+                  <span className="hidden shrink-0 text-sb-sm text-fg-muted @lg:inline">Used {token.lastUsed}</span>
                   <IconButton label={`Revoke ${token.name}`} variant="ghost" size="sm" onClick={() => revoke(token)}>
                     <TrashIcon />
                   </IconButton>
@@ -191,10 +191,10 @@ export function ToastDeck({
           className="flex min-w-0 flex-col gap-3 rounded-xl bg-surface p-4 shadow-card"
         >
           <div>
-            <h2 id="toast-deck-history" className="text-md font-semibold">
+            <h2 id="toast-deck-history" className="text-sb-md font-semibold">
               Recent
             </h2>
-            <p className="text-sm text-fg-muted">What the toasts said this session.</p>
+            <p className="text-sb-sm text-fg-muted">What the toasts said this session.</p>
           </div>
           {history.length ? (
             <ol className="flex flex-col gap-2.5" aria-label="Recent notifications">
@@ -202,17 +202,20 @@ export function ToastDeck({
                 <li key={s.key} className="flex items-start gap-2.5">
                   <StatusGlyph status={s.tone} className="mt-1.5" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{s.title}</p>
-                    {s.description ? <p className="line-clamp-2 text-sm text-fg-muted">{s.description}</p> : null}
+                    <p className="truncate text-sb-sm font-semibold">{s.title}</p>
+                    {s.description ? <p className="line-clamp-2 text-sb-sm text-fg-muted">{s.description}</p> : null}
                   </div>
-                  <time className="shrink-0 text-xs text-fg-muted tabular-nums" dateTime={new Date(s.at).toISOString()}>
+                  <time
+                    className="shrink-0 text-sb-xs text-fg-muted tabular-nums"
+                    dateTime={new Date(s.at).toISOString()}
+                  >
                     {clock(s.at)}
                   </time>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="rounded-lg bg-well px-3 py-4 text-center text-sm text-fg-muted shadow-tray">
+            <p className="rounded-lg bg-well px-3 py-4 text-center text-sb-sm text-fg-muted shadow-tray">
               Nothing yet. Revoke a token or deploy.
             </p>
           )}

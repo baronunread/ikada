@@ -46,9 +46,9 @@ export function Field({
       </BaseField.Label>
       {children}
       {description ? (
-        <BaseField.Description className="text-sm text-fg-muted">{description}</BaseField.Description>
+        <BaseField.Description className="text-sb-sm text-fg-muted">{description}</BaseField.Description>
       ) : null}
-      <BaseField.Error match={Boolean(error)} className="flex items-start gap-1.5 text-sm text-danger-fg">
+      <BaseField.Error match={Boolean(error)} className="flex items-start gap-1.5 text-sb-sm text-danger-fg">
         {error}
       </BaseField.Error>
     </BaseField.Root>

@@ -160,8 +160,8 @@ export const playground: Playground = {
 export const preview: Preview = () => (
   <div className="flex w-60 items-end justify-between gap-3 border-b border-hairline pb-2">
     <div>
-      <p className="text-xs text-fg-muted">acme / web</p>
-      <p className="text-lg font-semibold">Overview</p>
+      <p className="text-sb-xs text-fg-muted">acme / web</p>
+      <p className="text-sb-lg font-semibold">Overview</p>
     </div>
     <Button size="sm" variant="primary">
       Deploy

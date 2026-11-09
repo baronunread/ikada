@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "types": ["react"],
+    "composite": false,
+    "removeComments": false
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.*"]
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
@@ -57,7 +59,7 @@ export function InlineConfirm({
           aria-hidden="true"
           data-open={active ? "" : undefined}
           className={cn(
-            "pointer-events-none absolute bottom-full start-1/2 z-(--sb-z-popover) mb-1.5 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-lg bg-raised px-2 py-1 text-xs font-medium text-fg shadow-float",
+            "pointer-events-none absolute bottom-full start-1/2 z-(--sb-z-popover) mb-1.5 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-lg bg-raised px-2 py-1 text-sb-xs font-medium text-fg shadow-float",
             "group/confirm origin-bottom [transition:opacity_var(--sb-duration-popup-out)_var(--ease-out),translate_var(--sb-duration-popup-out)_var(--ease-out),scale_var(--sb-duration-popup-out)_var(--ease-out)]",
             "translate-y-[calc(4px*var(--sb-move))] scale-(--sb-scale-popup) opacity-0",
             "data-open:translate-y-0 data-open:scale-100 data-open:opacity-100",
@@ -71,7 +73,7 @@ export function InlineConfirm({
           aria-hidden="true"
           data-open={active ? "" : undefined}
           className={cn(
-            "group/confirm inline-flex min-w-16 items-center gap-1 text-sm font-medium text-brand-fg",
+            "group/confirm inline-flex min-w-16 items-center gap-1 text-sb-sm font-medium text-brand-fg",
             "-translate-x-[calc(4px*var(--sb-move))] opacity-0 transition-[opacity,translate] duration-(--sb-duration-popup-in) ease-out",
             "data-open:translate-x-0 data-open:opacity-100",
           )}

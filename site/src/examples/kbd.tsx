@@ -21,13 +21,13 @@ export const examples: Example[] = [
   {
     title: "In a hint",
     render: () => (
-      <p className="flex items-center gap-1.5 text-sm text-fg-muted">
+      <p className="flex items-center gap-1.5 text-sb-sm text-fg-muted">
         <Kbd>⌘</Kbd>
         <Kbd>K</Kbd>
         <span className="ms-1">to search sprouts</span>
       </p>
     ),
-    code: `<p className="flex items-center gap-1.5 text-sm text-fg-muted">
+    code: `<p className="flex items-center gap-1.5 text-sb-sm text-fg-muted">
   <Kbd>⌘</Kbd>
   <Kbd>K</Kbd>
   <span className="ms-1">to search sprouts</span>
@@ -37,7 +37,7 @@ export const examples: Example[] = [
 
 /** The compact render on the overview's component tile. */
 export const preview: Preview = () => (
-  <div className="flex items-center gap-1.5 text-sm text-fg-muted">
+  <div className="flex items-center gap-1.5 text-sb-sm text-fg-muted">
     <Kbd>⌘</Kbd>
     <Kbd>K</Kbd>
     <span className="ms-1">to search</span>

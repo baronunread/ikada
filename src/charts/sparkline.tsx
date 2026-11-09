@@ -1,3 +1,5 @@
+"use client";
+
 import { areaY, defineChart, dot, lineY } from "@tanstack/charts";
 import { decorative } from "@tanstack/charts/mark/decorative";
 import { Chart } from "@tanstack/charts/react";

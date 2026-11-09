@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { cn, coarseTarget, focusRing, pressMotion } from "../lib/cn";
@@ -44,7 +46,7 @@ export function Banner({
       ref={ref}
       role={tone === "danger" ? "alert" : "status"}
       data-tone={tone}
-      className={cn("flex items-start gap-3 rounded-lg px-4 py-3 text-base", softSurface[tone], className)}
+      className={cn("flex items-start gap-3 rounded-lg px-4 py-3 text-sb-base", softSurface[tone], className)}
       {...props}
     >
       <StatusGlyph status={tone} className="mt-[5px]" />

@@ -1,3 +1,5 @@
+"use client";
+
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
@@ -32,7 +34,7 @@ export function Meter({ label, tone = "normal", valueLabel, className, locale, .
   return (
     <BaseMeter.Root className={cn("flex flex-col gap-1.5", className)} locale={resolved} {...props}>
       {label || valueLabel !== null ? (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-base">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-sb-base">
           {label ? <BaseMeter.Label className="font-medium">{label}</BaseMeter.Label> : <span />}
           {valueLabel === undefined ? <BaseMeter.Value className="tabular-nums text-fg-muted" /> : valueLabel}
         </div>
@@ -119,7 +121,7 @@ export function UsageMeter({
 
   if (limit === null) {
     return (
-      <div className={cn("flex items-baseline justify-between gap-3 text-base", className)}>
+      <div className={cn("flex items-baseline justify-between gap-3 text-sb-base", className)}>
         <span className="font-medium">{label}</span>
         <span className="tabular-nums text-fg-muted">{text}</span>
       </div>

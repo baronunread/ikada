@@ -6,7 +6,7 @@ export const examples: Example[] = [
   {
     title: "Inline",
     render: () => (
-      <p className="text-base">
+      <p className="text-sb-base">
         Read the <Link href={demo.installation}>deploy guide</Link> before moving robin to eu-west.
       </p>
     ),

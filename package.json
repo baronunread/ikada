@@ -1,16 +1,21 @@
 {
   "name": "@sproutboat/ikada",
-  "version": "0.1.0",
-  "description": "Sproutboat design system: tokens and React components on Base UI and Tailwind v4.",
+  "version": "0.2.0",
+  "description": "Sproutboat design system: tokens and React components on Base UI and Tailwind v4. Compiled ESM, shadcn registry, light by default with a .dark class.",
   "keywords": [
     "base-ui",
+    "dark-mode",
     "design-system",
+    "oklch",
     "react",
+    "react-19",
+    "shadcn",
+    "shadcn-registry",
     "sproutboat",
     "tailwindcss",
     "tokens"
   ],
-  "homepage": "https://github.com/baronunread/ikada#readme",
+  "homepage": "https://sproutboat.com/ikada",
   "bugs": "https://github.com/baronunread/ikada/issues",
   "license": "MIT",
   "repository": {
@@ -21,9 +26,9 @@
     "site"
   ],
   "files": [
+    "dist",
     "src",
-    "DESIGN.md",
-    "INVENTORY.md",
+    "CHANGELOG.md",
     "LICENSE",
     "README.md"
   ],
@@ -31,11 +36,184 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./tokens": "./src/tokens.generated.ts",
-    "./theme.css": "./src/theme.css",
-    "./charts": "./src/charts/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./avatar": {
+      "types": "./dist/components/avatar.d.ts",
+      "default": "./dist/components/avatar.js"
+    },
+    "./badge": {
+      "types": "./dist/components/badge.d.ts",
+      "default": "./dist/components/badge.js"
+    },
+    "./banner": {
+      "types": "./dist/components/banner.d.ts",
+      "default": "./dist/components/banner.js"
+    },
+    "./breadcrumbs": {
+      "types": "./dist/components/breadcrumbs.d.ts",
+      "default": "./dist/components/breadcrumbs.js"
+    },
+    "./button": {
+      "types": "./dist/components/button.d.ts",
+      "default": "./dist/components/button.js"
+    },
+    "./checkbox": {
+      "types": "./dist/components/checkbox.d.ts",
+      "default": "./dist/components/checkbox.js"
+    },
+    "./code-block": {
+      "types": "./dist/components/code-block.d.ts",
+      "default": "./dist/components/code-block.js"
+    },
+    "./command-palette": {
+      "types": "./dist/components/command-palette.d.ts",
+      "default": "./dist/components/command-palette.js"
+    },
+    "./copy-id": {
+      "types": "./dist/components/copy-id.d.ts",
+      "default": "./dist/components/copy-id.js"
+    },
+    "./description-list": {
+      "types": "./dist/components/description-list.d.ts",
+      "default": "./dist/components/description-list.js"
+    },
+    "./dialog": {
+      "types": "./dist/components/dialog.d.ts",
+      "default": "./dist/components/dialog.js"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/components/dropdown-menu.d.ts",
+      "default": "./dist/components/dropdown-menu.js"
+    },
+    "./empty-state": {
+      "types": "./dist/components/empty-state.d.ts",
+      "default": "./dist/components/empty-state.js"
+    },
+    "./field": {
+      "types": "./dist/components/field.d.ts",
+      "default": "./dist/components/field.js"
+    },
+    "./icon-button": {
+      "types": "./dist/components/icon-button.d.ts",
+      "default": "./dist/components/icon-button.js"
+    },
+    "./inline-confirm": {
+      "types": "./dist/components/inline-confirm.d.ts",
+      "default": "./dist/components/inline-confirm.js"
+    },
+    "./input": {
+      "types": "./dist/components/input.d.ts",
+      "default": "./dist/components/input.js"
+    },
+    "./kbd": {
+      "types": "./dist/components/kbd.d.ts",
+      "default": "./dist/components/kbd.js"
+    },
+    "./label": {
+      "types": "./dist/components/label.d.ts",
+      "default": "./dist/components/label.js"
+    },
+    "./link": {
+      "types": "./dist/components/link.d.ts",
+      "default": "./dist/components/link.js"
+    },
+    "./meter": {
+      "types": "./dist/components/meter.d.ts",
+      "default": "./dist/components/meter.js"
+    },
+    "./metric-tile": {
+      "types": "./dist/components/metric-tile.d.ts",
+      "default": "./dist/components/metric-tile.js"
+    },
+    "./page-header": {
+      "types": "./dist/components/page-header.d.ts",
+      "default": "./dist/components/page-header.js"
+    },
+    "./pagination": {
+      "types": "./dist/components/pagination.d.ts",
+      "default": "./dist/components/pagination.js"
+    },
+    "./popover": {
+      "types": "./dist/components/popover.d.ts",
+      "default": "./dist/components/popover.js"
+    },
+    "./radio-group": {
+      "types": "./dist/components/radio-group.d.ts",
+      "default": "./dist/components/radio-group.js"
+    },
+    "./segmented-control": {
+      "types": "./dist/components/segmented-control.d.ts",
+      "default": "./dist/components/segmented-control.js"
+    },
+    "./select": {
+      "types": "./dist/components/select.d.ts",
+      "default": "./dist/components/select.js"
+    },
+    "./sensitive-input": {
+      "types": "./dist/components/sensitive-input.d.ts",
+      "default": "./dist/components/sensitive-input.js"
+    },
+    "./sidebar": {
+      "types": "./dist/components/sidebar.d.ts",
+      "default": "./dist/components/sidebar.js"
+    },
+    "./skeleton": {
+      "types": "./dist/components/skeleton.d.ts",
+      "default": "./dist/components/skeleton.js"
+    },
+    "./spinner": {
+      "types": "./dist/components/spinner.d.ts",
+      "default": "./dist/components/spinner.js"
+    },
+    "./status-dot": {
+      "types": "./dist/components/status-dot.d.ts",
+      "default": "./dist/components/status-dot.js"
+    },
+    "./status-glyph": {
+      "types": "./dist/components/status-glyph.d.ts",
+      "default": "./dist/components/status-glyph.js"
+    },
+    "./switch": {
+      "types": "./dist/components/switch.d.ts",
+      "default": "./dist/components/switch.js"
+    },
+    "./table": {
+      "types": "./dist/components/table.d.ts",
+      "default": "./dist/components/table.js"
+    },
+    "./tabs": {
+      "types": "./dist/components/tabs.d.ts",
+      "default": "./dist/components/tabs.js"
+    },
+    "./textarea": {
+      "types": "./dist/components/textarea.d.ts",
+      "default": "./dist/components/textarea.js"
+    },
+    "./toast": {
+      "types": "./dist/components/toast.d.ts",
+      "default": "./dist/components/toast.js"
+    },
+    "./tooltip": {
+      "types": "./dist/components/tooltip.d.ts",
+      "default": "./dist/components/tooltip.js"
+    },
+    "./charts": {
+      "types": "./dist/charts/index.d.ts",
+      "default": "./dist/charts/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.generated.d.ts",
+      "default": "./dist/tokens.generated.js"
+    },
+    "./theme.css": "./dist/theme.css",
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
@@ -53,21 +231,30 @@
     "check": "bun run tokens:check && bun run typecheck && bun run test",
     "registry": "bun scripts/build-registry.ts",
     "site": "bun run --cwd site dev",
-    "site:build": "bun run --cwd site build"
+    "site:build": "bun run --cwd site build",
+    "build": "bun scripts/build-dist.ts",
+    "prepack": "bun run build",
+    "lint:package": "bun run build && bun run check:dist && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints ./theme.css",
+    "size": "size-limit",
+    "check:dist": "bun scripts/check-dist.ts",
+    "test:tarball:next": "bun scripts/test-tarball.ts next",
+    "test:tarball:vite": "bun scripts/test-tarball.ts vite"
   },
   "dependencies": {
-    "@base-ui/react": "^1.9.0",
-    "@tanstack/charts": "1.2.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.6.0",
-    "tailwind-variants": "^4.0.1"
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@base-ui/react": "^1.9.0",
     "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@happy-dom/global-registrator": "^20.0.0",
     "@playwright/test": "^1.62.1",
+    "@size-limit/esbuild": "^14.3.0",
+    "@size-limit/file": "^14.3.0",
     "@tailwindcss/vite": "4.3.3",
+    "@tanstack/charts": "1.2.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/bun": "1.4.0",
@@ -76,16 +263,28 @@
     "@vitejs/plugin-react": "^6.1.0",
     "axe-core": "^4.14.0",
     "oxfmt": "0.66.0",
+    "publint": "^0.3.25",
     "react": "19",
     "react-dom": "19",
+    "size-limit": "^14.3.0",
     "tailwindcss": "4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"
   },
   "peerDependencies": {
+    "@base-ui/react": "^1.9.0",
+    "@tanstack/charts": "^1.2.1",
     "react": "^19",
     "react-dom": "^19",
     "tailwindcss": "^4.3"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/charts": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20"
   },
   "packageManager": "bun@1.4.4",
   "fledgling": {

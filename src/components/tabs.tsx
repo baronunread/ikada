@@ -37,7 +37,7 @@ export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof
   return (
     <BaseTabs.Tab
       className={cn(
-        "relative z-10 flex h-8 shrink-0 items-center whitespace-nowrap rounded-sm px-3 text-base font-semibold text-fg-muted",
+        "relative z-10 flex h-8 shrink-0 items-center whitespace-nowrap rounded-sm px-3 text-sb-base font-semibold text-fg-muted",
         "transition-colors duration-(--sb-duration-hover) ease-hover",
         "hover:text-fg data-active:text-fg data-disabled:cursor-not-allowed data-disabled:opacity-50",
         "before:absolute before:inset-x-0 before:top-1/2 before:h-10 before:-translate-y-1/2 before:content-[''] pointer-fine:before:hidden",

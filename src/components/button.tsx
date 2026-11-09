@@ -1,7 +1,9 @@
+"use client";
+
 import { Button as BaseButton } from "@base-ui/react/button";
 import type { ComponentProps } from "react";
-import type { VariantProps } from "tailwind-variants";
 import { coarseTarget, focusRing, pressMotion, tv } from "../lib/cn";
+import type { VariantProps } from "../lib/cn";
 import { SpinnerIcon } from "../lib/icons";
 
 export const buttonStyles = tv({
@@ -31,9 +33,9 @@ export const buttonStyles = tv({
       ],
     },
     size: {
-      sm: "h-(--sb-control-h-sm) px-2.5 text-sm",
-      md: "h-(--sb-control-h) px-3.5 text-base",
-      lg: "h-11 px-4.5 text-base",
+      sm: "h-(--sb-control-h-sm) px-2.5 text-sb-sm",
+      md: "h-(--sb-control-h) px-3.5 text-sb-base",
+      lg: "h-11 px-4.5 text-sb-base",
     },
   },
   defaultVariants: { variant: "secondary", size: "md" },

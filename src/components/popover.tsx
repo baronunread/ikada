@@ -1,3 +1,5 @@
+"use client";
+
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import type { ComponentProps } from "react";
 import { usePortalContainer } from "../lib/portal";
@@ -46,7 +48,7 @@ export function PopoverContent({
       >
         <BasePopover.Popup
           ref={ref}
-          className={cn(floatingSurface, popupMotion, "w-72 max-w-(--available-width) p-4 text-base", className)}
+          className={cn(floatingSurface, popupMotion, "w-72 max-w-(--available-width) p-4 text-sb-base", className)}
           {...instantAttr(instant)}
           {...props}
         >
@@ -58,9 +60,9 @@ export function PopoverContent({
 }
 
 export function PopoverTitle({ className, ...props }: WithClass<ComponentProps<typeof BasePopover.Title>>) {
-  return <BasePopover.Title className={cn("text-md font-semibold", className)} {...props} />;
+  return <BasePopover.Title className={cn("text-sb-md font-semibold", className)} {...props} />;
 }
 
 export function PopoverDescription({ className, ...props }: WithClass<ComponentProps<typeof BasePopover.Description>>) {
-  return <BasePopover.Description className={cn("mt-1 text-sm text-fg-muted", className)} {...props} />;
+  return <BasePopover.Description className={cn("mt-1 text-sb-sm text-fg-muted", className)} {...props} />;
 }
