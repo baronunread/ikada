@@ -597,8 +597,11 @@ html[data-theme="light"] .bp {
 }
 
 /* seen this session: the settled sheet, with a short fade instead of the reveal */
+/* `backwards`, not `both`: a fill that holds the opacity animation keeps .art-a a stacking context for good, and the
+   callout (z-index 8) inside it was then trapped under the hero copy (z-index 3). Once the fade ends .art-a must not
+   be a context, so the callout takes part in the hero's stacking and sits above the copy. */
 .bp[data-settled] .art-a {
-  animation: bp-settle 200ms ease-out both;
+  animation: bp-settle 200ms ease-out backwards;
 }
 .bp[data-settled] .sheet .ghost {
   animation: none;

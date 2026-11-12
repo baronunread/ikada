@@ -11,13 +11,13 @@
     "path": "dist/index.js",
     "import": "{ Button }",
     "ignore": ["react", "react-dom"],
-    "limit": "10.5 kB"
+    "limit": "11 kB"
   },
   {
     "name": "Button via subpath",
     "path": "dist/components/button.js",
     "ignore": ["react", "react-dom"],
-    "limit": "10.5 kB"
+    "limit": "11 kB"
   },
   {
     "name": "Dialog",

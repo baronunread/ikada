@@ -5,7 +5,7 @@ import { Checkbox } from "../../../src/components/checkbox";
 import { SegmentedControl } from "../../../src/components/segmented-control";
 import { StatusGlyph } from "../../../src/components/status-glyph";
 import { Switch } from "../../../src/components/switch";
-import { toast, ToastProvider } from "../../../src/components/toast";
+import { toast } from "../../../src/components/toast";
 
 /** The Motion page's live demos: the real components, one Afloat moment each. */
 function Cell({
@@ -40,7 +40,7 @@ export default function MotionDemos() {
   const [checked, setChecked] = useState(false);
   const [sprout, setSprout] = useState(0);
   return (
-    <ToastProvider>
+    <>
       <ul className="my-4 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
         <Cell
           n="01"
@@ -97,6 +97,6 @@ export default function MotionDemos() {
           </div>
         </Cell>
       </ul>
-    </ToastProvider>
+    </>
   );
 }

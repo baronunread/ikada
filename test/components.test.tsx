@@ -413,3 +413,35 @@ describe("CopyId", () => {
     await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Copied to clipboard"));
   });
 });
+
+describe("Button morph", () => {
+  test("a new label crossfades: the old one is hidden from assistive tech until it is gone", async () => {
+    const { rerender } = render(<Button>Deploy</Button>);
+    expect(document.querySelectorAll("[data-layer]").length).toBe(1);
+    rerender(<Button>Deployed</Button>);
+    const layers = [...document.querySelectorAll("[data-layer]")];
+    expect(layers.map((l) => l.getAttribute("data-layer"))).toEqual(["out", "live"]);
+    expect(layers[0]?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByRole("button", { name: "Deployed" })).toBeTruthy();
+    await waitFor(() => expect(document.querySelectorAll("[data-layer]").length).toBe(1));
+  });
+
+  test("the same label re-renders in place, with no morph", () => {
+    const { rerender } = render(<Button>Deploy</Button>);
+    rerender(<Button variant="primary">Deploy</Button>);
+    expect(document.querySelectorAll("[data-layer]").length).toBe(1);
+    expect(document.querySelector("[data-morphing]")).toBeNull();
+  });
+
+  test("a change in the middle of a morph keeps the layers already leaving", async () => {
+    const { rerender } = render(<Button>One</Button>);
+    rerender(<Button>Two</Button>);
+    rerender(<Button>Three</Button>);
+    expect([...document.querySelectorAll("[data-layer]")].map((l) => l.getAttribute("data-layer"))).toEqual([
+      "out",
+      "out",
+      "live",
+    ]);
+    await waitFor(() => expect(document.querySelectorAll("[data-layer]").length).toBe(1));
+  });
+});

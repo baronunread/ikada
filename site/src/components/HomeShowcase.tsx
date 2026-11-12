@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import type { ComponentType, ReactNode } from "react";
-import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import type { Preview } from "../examples/types";
 import { Icon } from "./icons";
@@ -47,21 +46,19 @@ function Cell({ tile, children }: { tile: Tile; children: ReactNode }) {
 
 export default function HomeShowcase({ tiles }: { tiles: Tile[] }) {
   return (
-    <ToastProvider>
-      <TooltipProvider>
-        <ul className="bento" aria-label="Live components">
-          {tiles.map((t) => {
-            const Live = load(t.slug);
-            return Live ? (
-              <Cell key={t.slug} tile={t}>
-                <Suspense fallback={null}>
-                  <Live />
-                </Suspense>
-              </Cell>
-            ) : null;
-          })}
-        </ul>
-      </TooltipProvider>
-    </ToastProvider>
+    <TooltipProvider>
+      <ul className="bento" aria-label="Live components">
+        {tiles.map((t) => {
+          const Live = load(t.slug);
+          return Live ? (
+            <Cell key={t.slug} tile={t}>
+              <Suspense fallback={null}>
+                <Live />
+              </Suspense>
+            </Cell>
+          ) : null;
+        })}
+      </ul>
+    </TooltipProvider>
   );
 }

@@ -6,6 +6,7 @@
 import "../styles/site.css";
 import "../styles/vt.css";
 import { IkadaMark } from "../components/IkadaMark";
+import ToastHost from "../components/ToastHost";
 import { Icon } from "../components/icons";
 import { REPO_URL } from "../lib/registry";
 import { href, sideNav, topNav, VERSION } from "../lib/site";
@@ -179,6 +180,7 @@ const searchPages = sideNav.flatMap((g) => g.links.map((l) => ({ group: g.headin
       <div class="fine"><span>MIT licensed. Built on Base UI and Tailwind CSS v4.</span><span>ikada {VERSION}</span></div>
     </footer>
 
+    <ToastHost client:load />
     <div class="sr-only" role="status" aria-live="polite" data-announce></div>
     <script type="application/json" id="search-pages" set:html={JSON.stringify(searchPages)} />
 

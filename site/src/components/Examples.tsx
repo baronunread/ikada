@@ -4,7 +4,6 @@ import { Input } from "../../../src/components/input";
 import { SegmentedControl } from "../../../src/components/segmented-control";
 import { Select } from "../../../src/components/select";
 import { Switch } from "../../../src/components/switch";
-import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import { Code } from "../lib/highlight";
 import { initialValues, writeCode } from "../lib/playground";
@@ -44,13 +43,11 @@ type Part = "top" | "examples";
 export default function Examples({ slug, part }: { slug: string; part: Part }) {
   const Loaded = load(slug, part);
   return (
-    <ToastProvider>
-      <TooltipProvider>
-        <Suspense fallback={<div className="stage" style={{ minHeight: part === "top" ? 320 : 480 }} />}>
-          <Loaded />
-        </Suspense>
-      </TooltipProvider>
-    </ToastProvider>
+    <TooltipProvider>
+      <Suspense fallback={<div className="stage" style={{ minHeight: part === "top" ? 320 : 480 }} />}>
+        <Loaded />
+      </Suspense>
+    </TooltipProvider>
   );
 }
 

@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import { Sheet } from "../hero/blueprint/Sheet";
 import { introSeen, markIntroSeen } from "../hero/intro";
@@ -127,20 +126,18 @@ export default function HeroBlueprint({ version }: { version: string }) {
       data-reduced={reduced || undefined}
       data-chart-ignore
     >
-      <ToastProvider>
-        <TooltipProvider>
-          {size && mounted && (
-            <Sheet
-              w={size.w}
-              h={size.h}
-              armed={open}
-              copyBottom={size.copyBottom}
-              navH={size.navH || undefined}
-              version={version}
-            />
-          )}
-        </TooltipProvider>
-      </ToastProvider>
+      <TooltipProvider>
+        {size && mounted && (
+          <Sheet
+            w={size.w}
+            h={size.h}
+            armed={open}
+            copyBottom={size.copyBottom}
+            navH={size.navH || undefined}
+            version={version}
+          />
+        )}
+      </TooltipProvider>
     </div>
   );
 }
