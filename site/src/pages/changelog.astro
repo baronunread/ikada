@@ -3,34 +3,59 @@ import PageHead from "../components/docs/PageHead.astro";
 import Pager from "../components/docs/Pager.astro";
 import Docs from "../layouts/Docs.astro";
 import { REPO_URL } from "../lib/registry";
-import { href, pageMarkdown, VERSION } from "../lib/site";
+import { href, pageMarkdown } from "../lib/site";
 
 const pr = (n: number): string => `${REPO_URL}/pull/${n}`;
-const entries: { title: string; pr?: number; text: string }[] = [
-  { title: "Registry installs under components/ikada", text: "Every item installs to components/ikada (blocks to components/ikada/blocks), through target placeholders that follow your components.json aliases, so no stock shadcn file is overwritten. Install as @ikada/<name>; every item has categories, and llms.txt, a markdown page per doc and a sitemap are published." },
-  { title: "Compiled package, class-based dark mode", pr: 11, text: "Compiled ESM with types and a subpath per component, use client kept for Server Components, Base UI as a peer, light by default with a dark class, and the text-sb-* type scale. See the package CHANGELOG for migration notes." },
-  { title: "The docs site, redesigned", text: "A shader hero on the home page, the Waterline docs chrome on every page, prop playgrounds, install tabs for four package managers and a component index with sizes." },
-  { title: "The ikada mark", pr: 6, text: "E4, Buoyed: two lashed logs riding low on one wave line, with a press, a first-paint drop and a loading loop." },
-  { title: "Blocks", pr: 5, text: "Eleven dashboard patterns as shadcn registry:block items, each with a live preview and sample data." },
-  { title: "Docs site and shadcn registry", pr: 3, text: "Every component and helper as a registry item, generated from the source, with a docs page per component." },
-  { title: "Afloat", pr: 4, text: "ikada’s motion character: springs, press and release, the focus wake and sprouting success." },
-  { title: "Menus above modals", pr: 2, text: "Menus stack above dialogs and the mobile drawer, so they open from inside them." },
-  { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard’s vendored copy." },
+type Entry = { title: string; pr?: number; text: string };
+type Release = { version: string; date: string; entries: Entry[] };
+// Newest first. The dates are the commit dates of the v0.2.0 and v0.1.0 tags.
+const releases: Release[] = [
+  {
+    version: "0.2.0",
+    date: "2026-11-09",
+    entries: [
+      { title: "Registry installs under components/ikada", text: "Every item installs to components/ikada (blocks to components/ikada/blocks), through target placeholders that follow your components.json aliases, so no stock shadcn file is overwritten. Install as @ikada/<name>; every item has categories, and llms.txt, a markdown page per doc and a sitemap are published." },
+      { title: "Compiled package, class-based dark mode", pr: 11, text: "Compiled ESM with types and a subpath per component, use client kept for Server Components, Base UI as a peer, light by default with a dark class, and the text-sb-* type scale. See the package CHANGELOG for migration notes." },
+    ],
+  },
+  {
+    version: "0.1.0",
+    date: "2026-11-08",
+    entries: [
+      { title: "The docs site, redesigned", text: "A shader hero on the home page, the Waterline docs chrome on every page, prop playgrounds, install tabs for four package managers and a component index with sizes." },
+      { title: "The ikada mark", pr: 6, text: "E4, Buoyed: two lashed logs riding low on one wave line, with a press, a first-paint drop and a loading loop." },
+      { title: "Blocks", pr: 5, text: "Eleven dashboard patterns as shadcn registry:block items, each with a live preview and sample data." },
+      { title: "Docs site and shadcn registry", pr: 3, text: "Every component and helper as a registry item, generated from the source, with a docs page per component." },
+      { title: "Afloat", pr: 4, text: "ikada’s motion character: springs, press and release, the focus wake and sprouting success." },
+      { title: "Menus above modals", pr: 2, text: "Menus stack above dialogs and the mobile drawer, so they open from inside them." },
+      { title: "Textarea and dashboard icons", pr: 1, text: "Upstreamed from the Cloud dashboard’s vendored copy." },
+    ],
+  },
 ];
-const lede = "What changed in each release of ikada. 0.1.0 shipped raw TypeScript; 0.2.0 is the compiled package and the Kibo-style registry. Entries below the first two are in 0.1.0.";
-const markdown = pageMarkdown({ title: "Changelog", description: lede, url: href("/changelog"), body: [`## ${VERSION} (unreleased)`, ...entries.map((e) => `- ${e.title}${e.pr ? ` (#${e.pr})` : ""}: ${e.text}`)] });
+const lede = "What changed in each release of ikada. 0.1.0 shipped raw TypeScript; 0.2.0 is the compiled package and the Kibo-style registry.";
+const shown = (iso: string): string => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const markdown = pageMarkdown({
+  title: "Changelog",
+  description: lede,
+  url: href("/changelog"),
+  body: releases.flatMap((r) => ["", `## ${r.version} (${r.date})`, "", ...r.entries.map((e) => `- ${e.title}${e.pr ? ` (#${e.pr})` : ""}: ${e.text}`)]),
+});
 ---
 
-<Docs title="Changelog" description={lede} toc={[{ id: `v${VERSION}`, label: VERSION }]}>
+<Docs title="Changelog" description={lede} toc={releases.map((r) => ({ id: `v${r.version}`, label: r.version }))}>
   <PageHead crumbs={[{ label: "Docs", href: href("/docs") }, { label: "Changelog" }]} title="Changelog" lede={lede} markdown={markdown} />
-  <h2 id={`v${VERSION}`}>{VERSION} <span class="chip" style="vertical-align:middle;margin-inline-start:8px">Unreleased</span></h2>
-  <ul class="list">
-    {entries.map((e) => (
-      <li>
-        <strong style="color:var(--sb-fg);font-weight:600">{e.title}</strong>
-        {e.pr ? <> (<a class="ilink" href={pr(e.pr)}>#{e.pr}</a>)</> : null}: {e.text}
-      </li>
-    ))}
-  </ul>
+  {releases.map((r) => (
+    <>
+      <h2 id={`v${r.version}`}>{r.version} <time datetime={r.date} style="vertical-align:middle;margin-inline-start:8px;font-size:14px;font-weight:500;color:var(--sb-fg-muted)">{shown(r.date)}</time></h2>
+      <ul class="list">
+        {r.entries.map((e) => (
+          <li>
+            <strong style="color:var(--sb-fg);font-weight:600">{e.title}</strong>
+            {e.pr ? <> (<a class="ilink" href={pr(e.pr)}>#{e.pr}</a>)</> : null}: {e.text}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
   <Pager />
 </Docs>

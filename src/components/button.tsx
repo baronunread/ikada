@@ -1,9 +1,11 @@
 "use client";
 
 import { Button as BaseButton } from "@base-ui/react/button";
+import { Children, isValidElement } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { coarseTarget, focusRing, pressMotion, tv } from "../lib/cn";
 import type { VariantProps } from "../lib/cn";
+import { Crossfade } from "../lib/crossfade";
 import { SpinnerIcon } from "../lib/icons";
 
 export const buttonStyles = tv({
@@ -12,6 +14,7 @@ export const buttonStyles = tv({
     pressMotion,
     // Optical alignment: the icon side gets 2px less padding than the text side.
     "has-[>svg:first-child:not(:only-child)]:ps-3 has-[>svg:last-child:not(:only-child)]:pe-3",
+    "has-[[data-layer=live]>svg:first-child:not(:only-child)]:ps-3 has-[[data-layer=live]>svg:last-child:not(:only-child)]:pe-3",
     "data-disabled:cursor-not-allowed data-disabled:opacity-50 data-disabled:active:translate-y-0 data-disabled:active:scale-100",
     "data-loading:cursor-progress",
     focusRing,
@@ -41,9 +44,21 @@ export const buttonStyles = tv({
   defaultVariants: { variant: "secondary", size: "md" },
 });
 
-/** A plain-text label truncates at the button's max width instead of overflowing; icons and nodes are left alone. */
-function Label({ children }: { children: ReactNode }) {
-  return typeof children === "string" ? <span className="min-w-0 truncate">{children}</span> : children;
+/**
+ * What the button says, as a string: the same text and the same icons give the same key. A different key is a
+ * different label, and the button morphs to it.
+ */
+function contentKey(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((child) => {
+      if (!isValidElement<{ children?: ReactNode }>(child)) return String(child);
+      const type =
+        typeof child.type === "string"
+          ? child.type
+          : ((child.type as { displayName?: string }).displayName ?? child.type.name);
+      return `<${type}>${contentKey(child.props.children)}`;
+    })
+    .join("");
 }
 
 export type ButtonVariants = VariantProps<typeof buttonStyles>;
@@ -57,6 +72,8 @@ export interface ButtonProps extends Omit<ComponentProps<typeof BaseButton>, "cl
 /**
  * The action control: primary (green, one per view), secondary, ghost and danger, in three sizes.
  * A press settles it 1px down and 3% smaller; the release bobs back once. `loading` keeps the width.
+ * When the label, the icon or `loading` changes, the old content blurs out as the new sharpens in and the button
+ * grows or shrinks to fit (a deploy button going Deploy, spinner, Deployed). A change mid-morph carries on from where it is.
  */
 export function Button({
   variant,
@@ -83,14 +100,23 @@ export function Button({
       className={buttonStyles({ variant, size, className })}
       {...props}
     >
-      {loading ? (
-        <>
-          <span className="inline-flex min-w-0 items-center gap-2 opacity-0">{label}</span>
-          <SpinnerIcon className="absolute" />
-        </>
-      ) : (
-        label
-      )}
+      <Crossfade
+        kind="inline"
+        layerKey={loading ? "\u0001loading" : contentKey(children)}
+        value={{ loading, label }}
+        settleMs={240}
+        render={(v) =>
+          v.loading ? (
+            // The label stays in the box, unseen, so the width holds and the name is still read.
+            <span className="relative inline-flex min-w-0 items-center justify-center gap-2">
+              <span className="inline-flex min-w-0 items-center gap-2 opacity-0">{v.label}</span>
+              <SpinnerIcon className="absolute" />
+            </span>
+          ) : (
+            v.label
+          )
+        }
+      />
     </BaseButton>
   );
 }

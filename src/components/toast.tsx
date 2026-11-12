@@ -5,7 +5,7 @@
  * dismisses. They arrive on the snappy spring, leave in 110ms, and success sprouts as it lands.
  */
 import { Toast } from "@base-ui/react/toast";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { cn, focusRing, pressMotion } from "../lib/cn";
 import { Crossfade } from "../lib/crossfade";
@@ -43,6 +43,38 @@ type BaseToast = Toast.Root.ToastObject<ToastData>;
 const FLICK_SPEED = 0.4;
 const FLICK_MIN = 16;
 
+/**
+ * How long a dismissed toast takes to leave. It carries the release speed (px per ms) off the screen: a hard flick
+ * clears in 180ms, a slow push in 300ms. Springs and fades stay under the 300ms line for UI.
+ */
+function swipeExitMs(distance: number, speed: number): number {
+  return Math.round(Math.min(300, Math.max(180, distance / (Math.max(Math.abs(speed), 0.5) * 2))));
+}
+
+type SwipeEdge = "left" | "right";
+const SWIPES_BOTH = ["left", "right"] as const satisfies readonly SwipeEdge[];
+const SWIPES_RIGHT = ["right"] as const satisfies readonly SwipeEdge[];
+const SWIPES_LEFT = ["left"] as const satisfies readonly SwipeEdge[];
+
+/**
+ * Which way a toast may be thrown. The deck sits in the bottom corner on wide screens, so only the way out of that
+ * corner (the inline end) is a dismissal and the other way pushes back with resistance. On a phone the deck spans
+ * the screen and either side is a way out.
+ */
+function subscribeSwipeEdges(notify: () => void): () => void {
+  const mq = matchMedia("(min-width: 40rem)");
+  mq.addEventListener("change", notify);
+  return () => mq.removeEventListener("change", notify);
+}
+function swipeEdgesSnapshot(): "both" | "right" | "left" {
+  if (!matchMedia("(min-width: 40rem)").matches) return "both";
+  return getComputedStyle(document.documentElement).direction === "rtl" ? "left" : "right";
+}
+function useSwipeEdges(): readonly SwipeEdge[] {
+  const edges = useSyncExternalStore(subscribeSwipeEdges, swipeEdgesSnapshot, () => "both" as const);
+  return edges === "both" ? SWIPES_BOTH : edges === "right" ? SWIPES_RIGHT : SWIPES_LEFT;
+}
+
 const rootBase = [
   "absolute inset-x-0 bottom-0 origin-top touch-pan-y select-none rounded-xl",
   "[--peek:10px] [--gap:8px]",
@@ -53,15 +85,13 @@ const rootBase = [
   "[transition:transform_var(--sb-duration-spring-snappy)_var(--sb-spring-snappy),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
   // Reduced motion: the deck stays where it is and only fades.
   "motion-reduce:[transition:opacity_var(--sb-duration-toast-in)_linear,height_var(--sb-duration-toast-in)_linear]",
-  // A drag let go short of dismissal returns on the bob spring.
-  "data-released:[transition:transform_var(--sb-duration-spring-bob)_var(--sb-spring-bob),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
   "data-swiping:cursor-grabbing",
   focusRing,
   // Invisible bridge across the gap so the pointer can cross from one fanned-out toast to the next.
   "after:absolute after:inset-x-0 after:top-full after:h-[calc(var(--gap)+1px)] after:content-['']",
 ].join(" ");
 
-function rootState(state: Toast.Root.State, flick: string | undefined): string {
+function rootState(state: Toast.Root.State, flick: string | undefined, released: boolean): string {
   const leaving = state.transitionStatus === "ending";
   const entering = state.transitionStatus === "starting";
   const swiped = leaving && (state.swipeDirection !== undefined || flick !== undefined);
@@ -77,12 +107,21 @@ function rootState(state: Toast.Root.State, flick: string | undefined): string {
         ],
     // Entering and leaving: slide from below by a full height, or fly sideways after a swipe or flick.
     entering || (leaving && !swiped) ? "[--ey:calc(100%*var(--sb-move))]" : "[--ey:0px]",
-    swiped ? "[--ex:120%]" : "[--ex:0px]",
-    swiped && (state.swipeDirection === "left" || flick === "left") && "[--ex:-120%]",
+    swiped ? "[--ex:120%] motion-reduce:[--ex:0px]" : "[--ex:0px]",
+    swiped && (state.swipeDirection === "left" || flick === "left") && "[--ex:-120%] motion-reduce:[--ex:0px]",
     entering || leaving || state.limited ? "[--o-life:0]" : "[--o-life:1]",
+    // A drag let go short of dismissal returns on the bob spring.
+    released &&
+      !leaving &&
+      "[transition:transform_var(--sb-duration-spring-bob)_var(--sb-spring-bob),opacity_var(--sb-duration-toast-in)_var(--ease-out),height_var(--sb-duration-toast-in)_var(--ease-out)]",
     // Leaving is quick and plain: 110ms ease-out, no spring.
     leaving &&
+      !swiped &&
       "[transition:transform_var(--sb-duration-toast-out)_var(--ease-out),opacity_var(--sb-duration-toast-out)_var(--ease-out),height_var(--sb-duration-toast-out)_var(--ease-out)]",
+    // Thrown off the side: it keeps its momentum (--swipe-ms is set at release from the release speed) and fades
+    // on the way, while the rest of the deck closes the gap on the snappy spring. Reduced motion: no travel, a fade.
+    swiped &&
+      "[transition:transform_var(--swipe-ms,220ms)_var(--ease-out),opacity_var(--swipe-ms,220ms)_linear,height_var(--sb-duration-toast-out)_var(--ease-out)] motion-reduce:[transition:opacity_160ms_linear,height_var(--sb-duration-toast-out)_linear]",
     state.swiping && "transition-none!",
   );
 }
@@ -272,6 +311,7 @@ function ToastItem({ item }: { item: BaseToast }) {
   const data: ToastData = item.data ?? { title: "", tone: "info", busy: false, actions: [], count: 1 };
   const [flick, setFlick] = useState<"left" | "right" | undefined>(undefined);
   const [released, setReleased] = useState(false);
+  const edges = useSwipeEdges();
   const releaseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(releaseTimer.current), []);
 
@@ -281,7 +321,8 @@ function ToastItem({ item }: { item: BaseToast }) {
       return;
     clearTimeout(releaseTimer.current);
     setReleased(false);
-    const doc = event.currentTarget.ownerDocument;
+    const root = event.currentTarget;
+    const doc = root.ownerDocument;
     const startX = event.clientX;
     const samples = [{ x: event.clientX, t: event.timeStamp }];
     const move = (e: PointerEvent) => {
@@ -299,10 +340,19 @@ function ToastItem({ item }: { item: BaseToast }) {
       const a = samples[0];
       const b = samples[samples.length - 1];
       const speed = a && b && b.t > a.t ? (b.x - a.x) / (b.t - a.t) : 0;
-      if (Math.abs(speed) >= FLICK_SPEED && Math.abs(dx) >= FLICK_MIN && Math.sign(speed) === Math.sign(dx)) {
-        setFlick(dx > 0 ? "right" : "left");
+      const side: SwipeEdge = dx > 0 ? "right" : "left";
+      // Written straight to the element: the exit transition reads it in the very frame the toast starts leaving.
+      root.style.setProperty("--swipe-ms", `${swipeExitMs(root.offsetWidth * 1.2, speed)}ms`);
+      if (
+        edges.includes(side) &&
+        Math.abs(speed) >= FLICK_SPEED &&
+        Math.abs(dx) >= FLICK_MIN &&
+        Math.sign(speed) === Math.sign(dx)
+      ) {
+        setFlick(side);
         toast.close(item.id);
       } else if (Math.abs(dx) > 1) {
+        // Short of the threshold (or pushed the wrong way): it springs back. If Base UI dismisses it, leaving wins.
         setReleased(true);
         releaseTimer.current = setTimeout(() => setReleased(false), 600);
       }
@@ -326,13 +376,13 @@ function ToastItem({ item }: { item: BaseToast }) {
     <Toast.Root
       data-slot="toast"
       toast={item}
-      swipeDirection={["left", "right"]}
+      swipeDirection={edges as SwipeEdge[]}
       data-sb-toast=""
       data-tone={data.tone}
       data-flick={flick}
       data-released={released ? "" : undefined}
       onPointerDown={onPointerDown}
-      className={(state) => cn(rootBase, rootState(state, flick))}
+      className={(state) => cn(rootBase, rootState(state, flick, released))}
       style={{ zIndex: `calc(100 - var(--toast-index))` }}
     >
       <Toast.Content
@@ -388,18 +438,37 @@ export interface ToastProviderProps {
 }
 
 /**
- * Mount once near the app root. The viewport is a labelled region at the bottom end; Alt+T (or F6) moves
- * focus to the newest toast, Escape dismisses the focused one. Hover or focus fans the deck out, and timers
- * stop while it is out or the tab is hidden.
+ * Every provider shares the one store behind `toast`, so two viewports would draw each toast twice. The providers
+ * therefore queue up: the first one mounted owns the viewport, the others only wrap their children, and the next in
+ * line takes over if the owner unmounts. Several islands or roots can mount a provider and still get one deck.
  */
-export function ToastProvider({ children, onToast, limit = 5, label = "Notifications (Alt+T)" }: ToastProviderProps) {
-  const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
-  const onToastRef = useRef(onToast);
-  useEffect(() => {
-    onToastRef.current = onToast;
-  });
+const providers: symbol[] = [];
+const providerListeners = new Set<() => void>();
+function registerProvider(token: symbol): () => void {
+  providers.push(token);
+  for (const notify of providerListeners) notify();
+  return () => {
+    providers.splice(providers.indexOf(token), 1);
+    for (const notify of providerListeners) notify();
+  };
+}
+function subscribeProviders(notify: () => void): () => void {
+  providerListeners.add(notify);
+  return () => void providerListeners.delete(notify);
+}
+function useOwnsViewport(): boolean {
+  const [token] = useState(() => Symbol("ikada-toast-provider"));
+  useEffect(() => registerProvider(token), [token]);
+  return useSyncExternalStore(
+    subscribeProviders,
+    () => providers[0] === token,
+    () => false,
+  );
+}
 
-  useEffect(() => toast.subscribe((event) => onToastRef.current?.(event)), []);
+/** The owner's half: the viewport, its keyboard shortcuts and the timers that pause while it is out. */
+function ToastViewport({ label }: { label: string }) {
+  const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const hidden = () => toast.setPaused("hidden", document.hidden);
@@ -448,19 +517,39 @@ export function ToastProvider({ children, onToast, limit = 5, label = "Notificat
   }, [viewport]);
 
   return (
+    <Toast.Portal>
+      <Toast.Viewport
+        data-slot="toast-viewport"
+        ref={setViewport}
+        aria-label={label}
+        aria-keyshortcuts="Alt+T F6"
+        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-(--sb-z-toast) h-0 w-auto outline-hidden sm:start-auto sm:end-4 sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:w-90"
+      >
+        <ToastList />
+      </Toast.Viewport>
+    </Toast.Portal>
+  );
+}
+
+/**
+ * Mount once near the app root (more than one is safe: only the first draws). The viewport is a labelled region
+ * at the bottom end, portalled to the body above every stacking context of the page; Alt+T (or F6) moves focus to
+ * the newest toast, Escape dismisses the focused one. Hover or focus fans the deck out, and timers stop while it
+ * is out or the tab is hidden.
+ */
+export function ToastProvider({ children, onToast, limit = 5, label = "Notifications (Alt+T)" }: ToastProviderProps) {
+  const owns = useOwnsViewport();
+  const onToastRef = useRef(onToast);
+  useEffect(() => {
+    onToastRef.current = onToast;
+  });
+
+  useEffect(() => toast.subscribe((event) => onToastRef.current?.(event)), []);
+
+  return (
     <Toast.Provider toastManager={toast.manager} timeout={0} limit={limit}>
       {children}
-      <Toast.Portal>
-        <Toast.Viewport
-          data-slot="toast-viewport"
-          ref={setViewport}
-          aria-label={label}
-          aria-keyshortcuts="Alt+T F6"
-          className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-(--sb-z-toast) h-0 w-auto outline-hidden sm:start-auto sm:end-4 sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:w-90"
-        >
-          <ToastList />
-        </Toast.Viewport>
-      </Toast.Portal>
+      {owns ? <ToastViewport label={label} /> : null}
     </Toast.Provider>
   );
 }

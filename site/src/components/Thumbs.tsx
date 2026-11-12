@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import { ToastProvider } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import type { Preview } from "../examples/types";
 
@@ -21,21 +20,15 @@ export function ComponentThumb({ slug }: { slug: string }) {
   const mod = examples[`../examples/${slug}.tsx`];
   const render = mod?.thumb ?? mod?.preview;
   if (!render) return null;
-  return (
-    <ToastProvider>
-      <TooltipProvider>{render()}</TooltipProvider>
-    </ToastProvider>
-  );
+  return <TooltipProvider>{render()}</TooltipProvider>;
 }
 
 export function BlockThumb({ slug }: { slug: string }) {
   const Block = blockMods[`../../../blocks/${slug}/${slug}.tsx`]?.[pascal(slug)] as ComponentType | undefined;
   if (!Block) return null;
   return (
-    <ToastProvider>
-      <TooltipProvider>
-        <Block />
-      </TooltipProvider>
-    </ToastProvider>
+    <TooltipProvider>
+      <Block />
+    </TooltipProvider>
   );
 }

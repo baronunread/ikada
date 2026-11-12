@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **Toasts drew twice when more than one `ToastProvider` was mounted** (several islands or roots share the one store behind `toast`). Providers now queue: the first mounted draws the viewport, the rest only wrap their children, and the next takes over if it unmounts.
+- **Swiping a toast away made it vanish.** It now follows the finger, pushes back with resistance when dragged the wrong way (on wide screens only the inline end dismisses), springs back when let go early, and keeps its momentum on the way out: 180 to 300ms from the release speed, fading as it travels, while the deck closes the gap. Reduced motion fades it in place.
+
+### Changed
+
+- **`Button` morphs when its label, icon or `loading` changes.** The old content blurs (3px) and fades as the new sharpens in, and the button grows or shrinks to the new width in 220ms (a width transition; 0ms under reduced motion). A change in the middle of a morph carries on from where it is. `Crossfade` gains `kind="inline"` for this and now keeps every layer that is still leaving. The Button size budget is 11 kB (was 10.5).
+
 ## 0.2.0
 
 The package is now a compiled build, works from Server Components, and follows the standard dark mode. 0.1.0 shipped raw TypeScript and was only usable from bundlers that compile `node_modules`.

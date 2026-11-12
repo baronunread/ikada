@@ -45,7 +45,10 @@ describe("worst-case data", () => {
         <b>Node</b>
       </Button>,
     );
-    expect(container.querySelector("b")?.parentElement?.getAttribute("data-slot")).toBe("button");
+    // The node sits straight in the morph layer (no truncating wrapper around it), inside the button.
+    const node = container.querySelector("b");
+    expect(node?.parentElement?.getAttribute("data-layer")).toBe("live");
+    expect(node?.closest("[data-slot=button]")).toBeTruthy();
   });
 
   test("Breadcrumbs give every truncated crumb a title", () => {

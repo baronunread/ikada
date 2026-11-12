@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
-import { ToastProvider, toast } from "../../../src/components/toast";
+import { toast } from "../../../src/components/toast";
 import { TooltipProvider } from "../../../src/components/tooltip";
 import { demo } from "../lib/demo-href";
 import { IkadaMark } from "./IkadaMark";
@@ -84,14 +84,12 @@ export default function BlockPreview({ slug, defer = false }: { slug: string; de
   }, [on]);
   if (!on) return <div ref={box} aria-hidden="true" />;
   return (
-    <ToastProvider label={`Notifications (${slug} demo)`}>
-      <TooltipProvider>
-        <Suspense fallback={<Loading />}>
-          <div data-block-ready={slug}>
-            <Block />
-          </div>
-        </Suspense>
-      </TooltipProvider>
-    </ToastProvider>
+    <TooltipProvider>
+      <Suspense fallback={<Loading />}>
+        <div data-block-ready={slug}>
+          <Block />
+        </div>
+      </Suspense>
+    </TooltipProvider>
   );
 }

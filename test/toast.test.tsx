@@ -283,3 +283,39 @@ describe("InlineConfirm", () => {
     await waitFor(() => expect(screen.getAllByRole("status").every((s) => s.textContent === "")).toBe(true));
   });
 });
+
+describe("one deck", () => {
+  test("several providers share the store but draw one viewport, and the next takes over", async () => {
+    // The beforeEach provider is mounted; two more (other islands, other roots) must stay quiet.
+    const second = render(<ToastProvider label="second" />);
+    const third = render(<ToastProvider label="third" />);
+    add({ title: "Once", duration: 0 });
+    await screen.findByText("Once");
+    expect(document.querySelectorAll("[data-slot=toast-viewport]").length).toBe(1);
+    expect(screen.getAllByText("Once").length).toBe(1);
+    expect(items().length).toBe(1);
+    second.unmount();
+    third.unmount();
+    expect(document.querySelectorAll("[data-slot=toast-viewport]").length).toBe(1);
+    // The first provider leaves: the survivor (here a fresh one) draws the deck, and the toast is still in it.
+    cleanup();
+    render(<ToastProvider label="heir" />);
+    await waitFor(() => expect(screen.getByRole("region", { name: "heir" })).toBeTruthy());
+    expect(document.querySelectorAll("[data-slot=toast-viewport]").length).toBe(1);
+  });
+});
+
+describe("swipe", () => {
+  test("letting go writes the exit duration the toast will leave with", async () => {
+    const id = add({ title: "Flick me", duration: 0 });
+    const root = (await screen.findByText("Flick me")).closest<HTMLElement>("[data-sb-toast]");
+    if (!root) throw new Error("no toast root");
+    // jsdom has no layout, so the width is 0: the exit still gets the shortest allowed duration
+    const down = new PointerEvent("pointerdown", { bubbles: true, button: 0, pointerId: 3, clientX: 10, clientY: 10 });
+    act(() => void root.dispatchEvent(down));
+    const up = new PointerEvent("pointerup", { bubbles: true, button: 0, pointerId: 3, clientX: 10, clientY: 10 });
+    act(() => void document.dispatchEvent(up));
+    expect(root.style.getPropertyValue("--swipe-ms")).toMatch(/^\d+ms$/);
+    expect(open(id)).toBe(true);
+  });
+});
