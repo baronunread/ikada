@@ -1,0 +1,18 @@
+{
+  // The ikada docs app on the Sproutboat Cloud (sproutboat.com/ikada). It differs from ../sproutboat.jsonc in one block: `assets.directory`
+  // points at an empty directory, because on the Cloud the pages are not baked into the module (a module has about 0.5 MiB for static
+  // files; dist/ is 3 MiB): cloud/deploy.sh uploads dist/ to the Cloud's asset store and its edge serves it. The module is built by the
+  // Cloud's own builder from this directory's source (`sbcloud-deploy --from-source`), so the Cloud holds the source and a generation
+  // swap prebuilds the app for the next runtime like any other (docs/swap.md in sproutboat-cloud).
+  "$schema": "https://sproutboat.com/schema.json",
+  "name": "ikada-site",
+  "main": "src/sprout.js",
+  "compatibility_date": "2026-08-31",
+  "assets": {
+    "directory": "empty",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // only the bare paths need the handler (redirect to /ikada/); files serve from disk
+    "run_sprout_first": ["/", "/ikada"],
+  },
+}

@@ -12,6 +12,14 @@ bun run build               # registry + pages -> dist/ikada
 bun run preview             # serve dist/ like the asset server, 0.0.0.0:4410
 ```
 
+## Deploying to the Sproutboat Cloud
+
+`bun run deploy:cloud` (`cloud/deploy.sh`) builds `dist/`, uploads it to the Cloud's asset store and has the Cloud's own builder compile the
+redirect module from `cloud/src/sprout.js` (`sbcloud-deploy --from-source`), routed at `sproutboat.com/ikada`. The Cloud keeps the source of what
+runs, so a generation swap prebuilds the app for the next runtime like any other (sproutboat-cloud `docs/swap.md`). The operator token and the
+API tunnel are described in the header of `cloud/deploy.sh`; the module config in `cloud/sproutboat.jsonc` differs from `sproutboat.jsonc` only in
+its empty assets directory (the Cloud edge serves the pages, they are not baked into the module).
+
 ## Layout
 
 - `scripts/registry.ts`: runs `../scripts/build-registry.ts` into `.registry/`, then `shadcn build` into `public/r`,
